@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">"New MPAS "</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="PREFERENCE_FILE">turbotec.mpas.PREFERENCE_FILE</string>
+    <string name="DeviceID">Device Unique ID</string>
+    <string name="Token">Token</string>
+    <string name="FileVersion">FileVersion</string>
+    <string name="defaultValue">Not_Saved</string>
+    <string name="Username">Username</string>
+    <string name="Activation">Activation</string>
+    <string name="Password">Password</string>
+    <string name="Username_Password_File">LoginDetails</string>
+    <string name="Status">Status</string>
+    <string name="LastCheckHour">LastCheckHour</string>
+    <string name="LastCheckDay">LastCheckDay</string>
+    <string name="NotActive">NotActive</string>
+    <string name="MyFile">MyFile</string>
+    <string name="Installing">Installing ...</string>
+
+    <string name="OK">OK</string>
+    <string name="Wait">Wait</string>
+    <string name="ID">Unique ID</string>
+    <string name="Title">Title</string>
+    <string name="Body">Body</string>
+    <string name="Critical">Critical</string>
+    <string name="Delivered">Delivered</string>
+    <string name="Seen">Seen</string>
+    <string name="SendSeen">SendSeen</string>
+    <string name="error_invalid_password">Error! Password is empty.</string>
+    <string name="error_field_required">Error! Username is empty.</string>
+
+    <string name="WaitForActivation">Please wait for activation</string>
+    <string name="Waiting">Please wait</string>
+    <string name="Register">Register</string>
+    <string name="Waiting_for_Network">Waiting for Network ...</string>
+    <string name="Connecting">Connecting ...</string>
+    <string name="Updating">Updating ... </string>
+
+    <string name="menu_read">Mark as Read</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_select_all">Select All</string>
+    <string name="menu_deselect_all">Deselect All</string>
+
+    <string name="dialog_message">Are you sure?</string>
+    <string name="dialog_title">Delete</string>
+
+
+</resources>

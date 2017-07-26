@@ -42,6 +42,7 @@
     <string name="menu_delete">Delete</string>
     <string name="menu_select_all">Select All</string>
     <string name="menu_deselect_all">Deselect All</string>
+    <string name="action_help">Help</string>
 
     <string name="dialog_message">Are you sure?</string>
     <string name="dialog_title">Delete</string>

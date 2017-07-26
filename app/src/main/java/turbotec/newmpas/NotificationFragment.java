@@ -1,21 +1,14 @@
 package turbotec.newmpas;
 
 
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,7 +16,7 @@ import android.widget.TextView;
 public class NotificationFragment extends Fragment {
 
 
-    private SimpleCursorAdapter m_adapter;
+    //    private SimpleCursorAdapter m_adapter;
     static final String PROVIDER_NAME = "TURBOTEC.NEWMPAS.MESSAGEPROVIDER";
     static final String URL = "content://" + PROVIDER_NAME + "/messages";
     static final Uri CONTENT_URI = Uri.parse(URL);
@@ -36,28 +29,41 @@ public class NotificationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.list_row_layout, container, false);
+        View rootView = inflater.inflate(R.layout.notification_tab, container, false);
 
-        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.messages_layout, container, false);
+//        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.notification_tab, container, false);
 //        ListView list = (ListView)view.findViewById(R.id.list);
 
-        TextView tv = (TextView) view.findViewById(R.id.empty);
-        tv.setText("No Message");
+//        TextView tv = (TextView) view.findViewById(R.id.empty);
+//        tv.setText("No Message");
 //        list.setEmptyView(tv);
 
-        m_adapter = new SimpleCursorAdapter(getContext(), R.layout.list_row_layout, null, new String[]{}, new int[]{}, 0);
+//        m_adapter = new SimpleCursorAdapter(getContext(), R.layout.list_row_layout, null, new String[]{}, new int[]{1}, 0);
 
 //        list.setAdapter(m_adapter);
-        refreshValuesFromContentProvider();
+//        refreshValuesFromContentProvider();
 
         return rootView;
     }
 
-    private void refreshValuesFromContentProvider() {
-        CursorLoader cursorLoader = new CursorLoader(getContext(), CONTENT_URI,
-                null, null, null, null);
-        Cursor c = cursorLoader.loadInBackground();
-        m_adapter.swapCursor(c);
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        ListView list = (ListView) view.findViewById(R.id.list_notification);
+
+        MainActivity.CustomAdapter adapter = new MainActivity.CustomAdapter();
+//        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+//        recyclerView.setLayoutManager(layoutManager);
+        list.setAdapter(adapter);
     }
+
+//    private void refreshValuesFromContentProvider() {
+//        CursorLoader cursorLoader = new CursorLoader(getContext(), CONTENT_URI,
+//                null, null, null, null);
+//        Cursor c = cursorLoader.loadInBackground();
+//        m_adapter.swapCursor(c);
+//    }
 
 }

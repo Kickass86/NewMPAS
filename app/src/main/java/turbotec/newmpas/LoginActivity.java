@@ -1,44 +1,25 @@
 package turbotec.newmpas;
 
 import android.app.AlarmManager;
-import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.SystemClock;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -53,13 +34,6 @@ import java.util.UUID;
 
 public class LoginActivity extends AppCompatActivity {
 
-//    private static DatabaseHandler db;
-    //    private static int numrun = 0;
-//    private static List<MessageObject> MESSAGES;
-    //    public static SQLiteDatabase database;
-//    private int Message_Number = 0;
-    //    private SharedPreferenceHandler sp;
-    private SharedPreferenceHandler share;
     List<String> Mlist = new ArrayList<>(); //Messages List
     List<String> Tlist = new ArrayList<>(); //Title List
     //        List<String> Dlist = new ArrayList<>(); //Date List
@@ -67,19 +41,13 @@ public class LoginActivity extends AppCompatActivity {
     List<Integer> IList = new ArrayList<>(); //Message ID
     List<Boolean> CList = new ArrayList<>(); //Critical
     List<Boolean> SSList = new ArrayList<>(); //SendSeen
-    private int Scroll_Position = 0;
-    private boolean[] mCheckedState;
-    private Menu mMenu;
-    private boolean isSelected = false;
-    private int interval = 60000;
-    private String Username;
-    private String Password;
-    private String DeviceID;
-    private boolean first = false;
-    //    private static String DeviceID;
-//    private static String username;
-//    private static String password;
-    private PendingIntent pendingIntent;
+    //    private static DatabaseHandler db;
+    //    private static int numrun = 0;
+//    private static List<MessageObject> MESSAGES;
+    //    public static SQLiteDatabase database;
+//    private int Message_Number = 0;
+    //    private SharedPreferenceHandler sp;
+    private SharedPreferenceHandler share;
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -105,7 +73,19 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     };
-
+    private int Scroll_Position = 0;
+    private boolean[] mCheckedState;
+    private Menu mMenu;
+    private boolean isSelected = false;
+    private int interval = 60000;
+    private String Username;
+    private String Password;
+    private String DeviceID;
+    private boolean first = false;
+    //    private static String DeviceID;
+//    private static String username;
+//    private static String password;
+    private PendingIntent pendingIntent;
     private EditText UsernameView;
     private EditText PasswordView;
 
@@ -165,8 +145,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
 
+
         share = SharedPreferenceHandler.getInstance(this);
-        first = false;
+        first = true;
         mCheckedState = new boolean[0];
 
 
@@ -225,8 +206,8 @@ public class LoginActivity extends AppCompatActivity {
 //        String[] UserDetails = {share.GetUsername(), share.GetPassword(), share.GetDeviceID()};
 //        NetworkAsyncTask task = new NetworkAsyncTask(this);
 //        task.execute(UserDetails);
-        first = false;
-        isSelected = false;
+//        first = false;
+//        isSelected = false;
         setTitle(R.string.Connecting);
         String state = share.GetStatus();
 
@@ -235,7 +216,7 @@ public class LoginActivity extends AppCompatActivity {
         switch (st) {
             case OK: {
 
-                setContentView(R.layout.messages_layout);
+                setContentView(R.layout.notification_tab);
 
                 Intent alarmIntent = new Intent(this, AlarmReceiver.class);
                 alarmIntent.setAction("Alarm");
@@ -292,24 +273,48 @@ public class LoginActivity extends AppCompatActivity {
             case Invalid:
             case Not_Saved:
             default: {
-                setContentView(R.layout.login_layout);
+                if (first) {
+                    setContentView(R.layout.waiting_layout);
+                } else {
+                    setContentView(R.layout.login_layout);
 
 
 //            new Thread(new Runnable() {
 //                @Override
 //                public void run() {
 
-                UsernameView = (EditText) findViewById(R.id.editText2);
-                PasswordView = (EditText) findViewById(R.id.editText);
-                Button registerButton = (Button) findViewById(R.id.button);
-                PasswordView.setOnKeyListener(new View.OnKeyListener() {
+                    UsernameView = (EditText) findViewById(R.id.editText2);
+                    PasswordView = (EditText) findViewById(R.id.editText);
+                    Button registerButton = (Button) findViewById(R.id.button);
+                    PasswordView.setOnKeyListener(new View.OnKeyListener() {
 
-                    @Override
-                    public boolean onKey(View v, int keyCode, KeyEvent event) {
-                        if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+                        @Override
+                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+                            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+
+                                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
+                                String Username = UsernameView.getText().toString();
+                                String Password = PasswordView.getText().toString();
+                                String DeviceID = getUniquePsuedoID();
+                                share.SaveLoginDetails(Username, Password);
+                                share.SaveDeviceID(DeviceID);
+
+                                attemptLogin(Username, Password, DeviceID);
+                            }
+                            return false;
+                        }
+                    });
+
+
+                    registerButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
 
                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
 
                             String Username = UsernameView.getText().toString();
                             String Password = PasswordView.getText().toString();
@@ -318,33 +323,12 @@ public class LoginActivity extends AppCompatActivity {
                             share.SaveDeviceID(DeviceID);
 
                             attemptLogin(Username, Password, DeviceID);
-                        }
-                        return false;
-                    }
-                });
-
-
-                registerButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-
-
-                        String Username = UsernameView.getText().toString();
-                        String Password = PasswordView.getText().toString();
-                        String DeviceID = getUniquePsuedoID();
-                        share.SaveLoginDetails(Username, Password);
-                        share.SaveDeviceID(DeviceID);
-
-                        attemptLogin(Username, Password, DeviceID);
 //                Log.i("Successful Login ", "Welcome " + Name);
-                    }
-                });
+                        }
+                    });
+                }
+
             }
-
-
         }
 
 
@@ -398,7 +382,7 @@ public class LoginActivity extends AppCompatActivity {
             Password = password;
             this.DeviceID = DeviceID;
             String[] Userdata = {username, password, DeviceID};
-            first = true;
+//            first = true;
 
             share.SaveDeviceID(DeviceID);
             share.SaveLoginDetails(username, password);

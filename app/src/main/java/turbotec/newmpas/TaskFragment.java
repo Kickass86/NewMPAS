@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 /**
@@ -26,11 +25,12 @@ public class TaskFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.list_row_layout, container, false);
 
-        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.messages_layout, container, false);
+        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.notification_tab, container, false);
 //        ListView list = (ListView)view.findViewById(R.id.list);
         TextView tv = (TextView) view.findViewById(R.id.empty);
         tv.setText("No Task");
 //        list.setEmptyView(tv);
+//        m_adapter = new SimpleCursorAdapter(getContext(), R.layout.list_row_layout, null, new String[]{}, new int[]{1}, 0);
 
 //        ViewGroup rootView = (ViewGroup) inflater.inflate(
 //                R.layout.fragment_screen_slide_page, container, false);

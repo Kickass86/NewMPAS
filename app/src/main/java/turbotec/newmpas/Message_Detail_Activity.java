@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -19,20 +17,16 @@ import android.widget.TextView;
 
 public class Message_Detail_Activity extends Activity {
 
-//    private static DatabaseHandler db;
-    //    private final Context main_menu;
-    //    SQLiteDatabase database;
-    private Button DelBut;
-    private Integer ID = 1;
-
     static final String PROVIDER_NAME = "TURBOTEC.NEWMPAS.MESSAGEPROVIDER";
     static final String URL1 = "content://" + PROVIDER_NAME + "/messages";
     static final String URL2 = "content://" + PROVIDER_NAME + "/messages/1";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
     static final Uri CONTENT_URI2 = Uri.parse(URL2);
-
-
-
+//    private static DatabaseHandler db;
+    //    private final Context main_menu;
+    //    SQLiteDatabase database;
+    private Button DelBut;
+    private Integer ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,29 +138,27 @@ public class Message_Detail_Activity extends Activity {
     }
 
 
-
-
-    private class DatabaseDeleteOperation extends AsyncTask<String, String, String> {
-
-
-        @Override
-        protected String doInBackground(String... params) {
-
-//            String tablename = params[0];
-//            String WhereClause = params[1];
-
-//            SQLiteDatabase database = db.getWritableDatabase();
-//            arg = new String[]{String.valueOf(ID)};
-//            database.delete("Messages", "MessageID  = ?", new String[]{String.valueOf(ID)});
-            getContentResolver().delete(CONTENT_URI1, "MessageID  = ?", new String[]{String.valueOf(ID)});
-//            database.close();
-            finish();
-
-            return null;
-        }
-
-
-    }
+//    private class DatabaseDeleteOperation extends AsyncTask<String, String, String> {
+//
+//
+//        @Override
+//        protected String doInBackground(String... params) {
+//
+////            String tablename = params[0];
+////            String WhereClause = params[1];
+//
+////            SQLiteDatabase database = db.getWritableDatabase();
+////            arg = new String[]{String.valueOf(ID)};
+////            database.delete("Messages", "MessageID  = ?", new String[]{String.valueOf(ID)});
+//            getContentResolver().delete(CONTENT_URI1, "MessageID  = ?", new String[]{String.valueOf(ID)});
+////            database.close();
+//            finish();
+//
+//            return null;
+//        }
+//
+//
+//    }
 
 
 }

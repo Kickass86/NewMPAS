@@ -2,12 +2,11 @@ package turbotec.newmpas;
 
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,12 +22,16 @@ public class TaskFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.list_row_layout, container, false);
+        View rootView = inflater.inflate(R.layout.notification_tab, container, false);
 
-        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.notification_tab, container, false);
+//        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.notification_tab, container, false);
 //        ListView list = (ListView)view.findViewById(R.id.list);
-        TextView tv = (TextView) view.findViewById(R.id.empty);
-        tv.setText("No Task");
+//        ListView list = (ListView) view.findViewById(R.id.list_task);
+
+//        CustomAdapter adapter = CustomAdapter.getInstance();
+//        list.setAdapter(adapter);
+
+//        tv.setText("No Task");
 //        list.setEmptyView(tv);
 //        m_adapter = new SimpleCursorAdapter(getContext(), R.layout.list_row_layout, null, new String[]{}, new int[]{1}, 0);
 
@@ -39,6 +42,23 @@ public class TaskFragment extends Fragment {
 //        textView.setText(R.string.hello_blank_fragment);
 
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+//        ListView list = (ListView) view.findViewById(R.id.list_task);
+//
+//        TextView tv = (TextView) view.findViewById(R.id.empty2);
+//        tv.setText("No Tasks");
+//        list.setEmptyView(tv);
+
+//        CustomAdapter adapter = CustomAdapter.getInstance();
+//        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+//        recyclerView.setLayoutManager(layoutManager);
+//        list.setAdapter(adapter);
     }
 
 }

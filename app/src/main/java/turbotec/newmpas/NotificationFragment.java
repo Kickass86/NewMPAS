@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,9 +35,7 @@ public class NotificationFragment extends Fragment {
 //        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.notification_tab, container, false);
 //        ListView list = (ListView)view.findViewById(R.id.list);
 
-//        TextView tv = (TextView) view.findViewById(R.id.empty);
-//        tv.setText("No Message");
-//        list.setEmptyView(tv);
+
 
 //        m_adapter = new SimpleCursorAdapter(getContext(), R.layout.list_row_layout, null, new String[]{}, new int[]{1}, 0);
 
@@ -52,7 +51,11 @@ public class NotificationFragment extends Fragment {
 
         ListView list = (ListView) view.findViewById(R.id.list_notification);
 
-        MainActivity.CustomAdapter adapter = new MainActivity.CustomAdapter();
+        CustomAdapter adapter = CustomAdapter.getInstance();
+
+        TextView tv = (TextView) view.findViewById(R.id.empty1);
+        tv.setText("No Message");
+        list.setEmptyView(tv);
 //        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 //        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
 //        recyclerView.setLayoutManager(layoutManager);

@@ -61,7 +61,9 @@ public class LoginActivity extends AppCompatActivity {
                 String stat = share.GetStatus();
                 if (stat.contains("OK")) {
 //                    UpdateUI(share.GetStatus());
-                    startActivity(new Intent(context, MainActivity.class));
+                    intent = new Intent(context, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
 
                     Log.i("is this ", "BroadcastReceiver");
                 }
@@ -145,12 +147,17 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
 
-
+//        CustomAdapter.getInstance(this);
         share = SharedPreferenceHandler.getInstance(this);
         first = true;
         mCheckedState = new boolean[0];
 
+        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+        alarmIntent.setAction("Alarm");
+        pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
 
         if(share.GetStatus().equals(getString(R.string.defaultValue)))
         {
@@ -218,11 +225,11 @@ public class LoginActivity extends AppCompatActivity {
 
                 setContentView(R.layout.notification_tab);
 
-                Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+                alarmIntent = new Intent(this, AlarmReceiver.class);
                 alarmIntent.setAction("Alarm");
                 pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
-                AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 //                setTitle(R.string.Connecting);
 //                long interval = INTERVAL_FIFTEEN_MINUTES;
 //                    int interval = 60000;
@@ -249,11 +256,11 @@ public class LoginActivity extends AppCompatActivity {
             }
             case Wait: {
                 setContentView(R.layout.wait_for_activation_layout);
-                Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+                alarmIntent = new Intent(this, AlarmReceiver.class);
                 alarmIntent.setAction("Alarm");
                 pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
-                AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 //                long interval = INTERVAL_FIFTEEN_MINUTES;
 //                int interval = 60000;
 
@@ -273,9 +280,9 @@ public class LoginActivity extends AppCompatActivity {
             case Invalid:
             case Not_Saved:
             default: {
-                if (first) {
-                    setContentView(R.layout.waiting_layout);
-                } else {
+//                if (!first) {
+//                    setContentView(R.layout.waiting_layout);
+//                } else {
                     setContentView(R.layout.login_layout);
 
 
@@ -326,7 +333,7 @@ public class LoginActivity extends AppCompatActivity {
 //                Log.i("Successful Login ", "Welcome " + Name);
                         }
                     });
-                }
+//                }
 
             }
         }

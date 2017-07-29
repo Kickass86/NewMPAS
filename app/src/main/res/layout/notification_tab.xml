@@ -13,7 +13,7 @@
             android:id="@+id/list_notification"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="20dp">
 
         </ListView>
 
@@ -21,12 +21,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <TextView
-                android:id="@+id/empty"
+                android:id="@+id/empty1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:gravity="center"
-                android:text="No Message"
                 tools:ignore="ObsoleteLayoutParam" />
         </RelativeLayout>
     </FrameLayout>

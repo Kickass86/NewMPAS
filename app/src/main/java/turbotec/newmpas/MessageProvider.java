@@ -26,23 +26,11 @@ public class MessageProvider extends ContentProvider {
     static final String PROVIDER_NAME = "turbotec.newmpas.MessageProvider.messages";
     static final String URL = "content://" + PROVIDER_NAME + "/Messages";
     static final Uri CONTENT_URI = Uri.parse(URL);
-
-
-    private static HashMap<String, String> MESSAGES_PROJECTION_MAP;
     static final int Message_ID  = 1;
     static final int Unsent = 2;
-
     static final UriMatcher uriMatcher;
-    static{
-        uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(PROVIDER_NAME, "Messages", Message_ID);
-        uriMatcher.addURI(PROVIDER_NAME, "Messages/#", Unsent);
-    }
-
-    private DatabaseHandler dbHelper;
     // Table Name
     static final String TABLE_NAME = "MESSAGES";
-
     private static final String MESSAGE_ID = "_id";
     private static final String MESSAGE_Title = "MessageTitle";
     private static final String MESSAGE_BODY = "MessageBody";
@@ -51,16 +39,23 @@ public class MessageProvider extends ContentProvider {
     private static final String Seen = "Seen";
     private static final String SendSeen = "SendSeen";
     private static final String SendDelivered = "SendDelivered";
-    // Database Name
-    private static final String DATABASE_NAME = "MPAS";
     static final String CREATE_DB_TABLE =
             "CREATE TABLE " + TABLE_NAME + "(" +
                     MESSAGE_ID + " INTEGER PRIMARY KEY," +
                     MESSAGE_Title + " TEXT," + MESSAGE_BODY + " TEXT," + INSERT_DATE +
                     " TEXT," + Critical + " Boolean," + Seen + " Boolean,"
                     + SendDelivered + " Boolean," + SendSeen + " Boolean)";
+    // Database Name
+    private static final String DATABASE_NAME = "MPAS";
+    private static HashMap<String, String> MESSAGES_PROJECTION_MAP;
 
+    static {
+        uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        uriMatcher.addURI(PROVIDER_NAME, "Messages", Message_ID);
+        uriMatcher.addURI(PROVIDER_NAME, "Messages/#", Unsent);
+    }
 
+    private DatabaseHandler dbHelper;
 
     @Override
     public boolean onCreate() {
@@ -200,6 +195,11 @@ public class MessageProvider extends ContentProvider {
 
 
         @Override
+        public synchronized void close() {
+            super.close();
+        }
+
+        @Override
         public void onCreate(SQLiteDatabase db) {
 
             db.execSQL(CREATE_DB_TABLE);
@@ -225,7 +225,7 @@ public class MessageProvider extends ContentProvider {
 //            }
 
             if(sortOrder == null || sortOrder == "") {
-                sortOrder = "INSERT_DATE";
+                sortOrder = INSERT_DATE;
             }
             Cursor cursor = sqliteQueryBuilder.query(getReadableDatabase(),
                     projection,
@@ -247,7 +247,7 @@ public class MessageProvider extends ContentProvider {
 
 
             if(sortOrder == null || sortOrder == "") {
-                sortOrder = "INSERT_DATE";
+                sortOrder = INSERT_DATE;
             }
             Cursor cursor = sqliteQueryBuilder.query(getReadableDatabase(),
                     projection,

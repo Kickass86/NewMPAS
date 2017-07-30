@@ -84,6 +84,7 @@ public class LoginActivity extends AppCompatActivity {
     private String Password;
     private String DeviceID;
     private boolean first = false;
+    private boolean flag = false;
     //    private static String DeviceID;
 //    private static String username;
 //    private static String password;
@@ -120,7 +121,9 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
 
-        unregisterReceiver(broadcastReceiver);
+        if (flag) {
+            unregisterReceiver(broadcastReceiver);
+        }
         super.onDestroy();
 //        unregisterReceiver(NotifyReceiver);
     }
@@ -132,11 +135,11 @@ public class LoginActivity extends AppCompatActivity {
         super.onResume();
 
 //        isSelected = false;
-        if (share.GetStatus().equals("OK")) {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK| Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivity(intent);
-        }
+//        if (share.GetStatus().equals("OK")) {
+//            Intent intent = new Intent(this, MainActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK| Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//            startActivity(intent);
+//        }
 
 
 
@@ -156,8 +159,8 @@ public class LoginActivity extends AppCompatActivity {
         alarmIntent.setAction("Alarm");
         pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
-        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
+//        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+//        manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
 
         if(share.GetStatus().equals(getString(R.string.defaultValue)))
         {
@@ -173,48 +176,40 @@ public class LoginActivity extends AppCompatActivity {
         mNotificationManager.cancelAll();
 
 
-        Intent AL = new Intent(this, AlarmService.class);
-        startService(AL);
-
 //        Intent VC = new Intent(this,VersionUpdate.class);
 //        startService(VC);
 
-        Intent in = getIntent();
-
-        if (in != null) {
-            Bundle b = in.getExtras();
-            if(b != null) {
-
-                Intent showActivity = new Intent(LoginActivity.this, Message_Detail_Activity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString(getString(R.string.Title), b.getString(getString(R.string.Title)));
-                bundle.putString(getString(R.string.Body), b.getString(getString(R.string.Body)));
-                bundle.putInt(getString(R.string.ID), b.getInt(getString(R.string.ID)));
-                bundle.putBoolean(getString(R.string.Seen), b.getBoolean(getString(R.string.Seen)));
-                bundle.putBoolean(getString(R.string.Critical), b.getBoolean(getString(R.string.Critical)));
-                bundle.putBoolean(getString(R.string.SendSeen), b.getBoolean(getString(R.string.SendSeen)));
-
-                String s = b.getString(getString(R.string.Title));
-                if(s != null)
-                    if(!s.isEmpty()) {
-                        showActivity.putExtras(bundle);
-//            showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                        startActivity(showActivity);
-                    }
-            }
-        }
-
-
-        registerReceiver(broadcastReceiver, new IntentFilter("Alarm fire"));
+//        Intent in = getIntent();
+//
+//        if (in != null) {
+//            Bundle b = in.getExtras();
+//            if(b != null) {
+//
+//                Intent showActivity = new Intent(LoginActivity.this, Message_Detail_Activity.class);
+//                Bundle bundle = new Bundle();
+//                bundle.putString(getString(R.string.Title), b.getString(getString(R.string.Title)));
+//                bundle.putString(getString(R.string.Body), b.getString(getString(R.string.Body)));
+//                bundle.putInt(getString(R.string.ID), b.getInt(getString(R.string.ID)));
+//                bundle.putBoolean(getString(R.string.Seen), b.getBoolean(getString(R.string.Seen)));
+//                bundle.putBoolean(getString(R.string.Critical), b.getBoolean(getString(R.string.Critical)));
+//                bundle.putBoolean(getString(R.string.SendSeen), b.getBoolean(getString(R.string.SendSeen)));
+//
+//                String s = b.getString(getString(R.string.Title));
+//                if(s != null)
+//                    if(!s.isEmpty()) {
+//                        showActivity.putExtras(bundle);
+////            showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                        showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//
+//                        startActivity(showActivity);
+//                    }
+//            }
+//        }
 
 
-//        String[] UserDetails = {share.GetUsername(), share.GetPassword(), share.GetDeviceID()};
-//        NetworkAsyncTask task = new NetworkAsyncTask(this);
-//        task.execute(UserDetails);
-//        first = false;
-//        isSelected = false;
+
+
+
         setTitle(R.string.Connecting);
         String state = share.GetStatus();
 
@@ -229,7 +224,7 @@ public class LoginActivity extends AppCompatActivity {
                 alarmIntent.setAction("Alarm");
                 pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
-                manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 //                setTitle(R.string.Connecting);
 //                long interval = INTERVAL_FIFTEEN_MINUTES;
 //                    int interval = 60000;
@@ -260,7 +255,7 @@ public class LoginActivity extends AppCompatActivity {
                 alarmIntent.setAction("Alarm");
                 pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
-                manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 //                long interval = INTERVAL_FIFTEEN_MINUTES;
 //                int interval = 60000;
 
@@ -284,6 +279,8 @@ public class LoginActivity extends AppCompatActivity {
 //                    setContentView(R.layout.waiting_layout);
 //                } else {
                     setContentView(R.layout.login_layout);
+                registerReceiver(broadcastReceiver, new IntentFilter("Alarm fire"));
+                flag = true;
 
 
 //            new Thread(new Runnable() {

@@ -2,7 +2,6 @@ package turbotec.newmpas;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Base64;
@@ -28,6 +27,11 @@ import java.net.SocketAddress;
 public class SendStatusAsyncTask extends AsyncTask {
 
 
+    static final String PROVIDER_NAME = "turbotec.newmpas.MessageProvider.messages";
+    static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
+    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
+    static final Uri CONTENT_URI1 = Uri.parse(URL1);
+    static final Uri CONTENT_URI2 = Uri.parse(URL2);
     private final Context MyContext;
     private final String ip = "192.168.1.13";
     private final int port = 80;
@@ -38,12 +42,6 @@ public class SendStatusAsyncTask extends AsyncTask {
     private String SOAP_ACTION_DELIVERED = "Delivered";
     private String WSDL_TARGET_NAMESPACE;
     private String SOAP_ADDRESS;
-
-    static final String PROVIDER_NAME = "TURBOTEC.NEWMPAS.MESSAGEPROVIDER";
-    static final String URL1 = "content://" + PROVIDER_NAME + "/messages";
-    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/1";
-    static final Uri CONTENT_URI1 = Uri.parse(URL1);
-    static final Uri CONTENT_URI2 = Uri.parse(URL2);
 
 
 
@@ -157,7 +155,7 @@ public class SendStatusAsyncTask extends AsyncTask {
                     String[] MIDs = IDs.split(";");
                     for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                        MyContext.getContentResolver().update(CONTENT_URI1,values, "MessageID  = ?", new String[]{MID});
+                        MyContext.getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
                     }
 //                database.close();
                 } else if (response.toString().contains(MyContext.getString(R.string.Delivered))) {
@@ -167,7 +165,7 @@ public class SendStatusAsyncTask extends AsyncTask {
                     String[] MIDs = IDs.split(";");
                     for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                        MyContext.getContentResolver().update(CONTENT_URI1,values, "MessageID  = ?", new String[]{MID});
+                        MyContext.getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
                     }
 //                database.close();
                 }

@@ -22,8 +22,15 @@ public class NotificationFragment extends Fragment {
     static final String URL = "content://" + PROVIDER_NAME + "/messages";
     static final Uri CONTENT_URI = Uri.parse(URL);
 
+    static MainActivity acticity;
+
     public NotificationFragment() {
         // Required empty public constructor
+    }
+
+
+    static void set(MainActivity mainActivity) {
+        acticity = mainActivity;
     }
 
 
@@ -50,8 +57,10 @@ public class NotificationFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         ListView list = (ListView) view.findViewById(R.id.list_notification);
+//        getActivity();
+        CustomAdapter.set(acticity);
+        CustomAdapter adapter = CustomAdapter.getInstance(getContext());
 
-        CustomAdapter adapter = CustomAdapter.getInstance();
 
         TextView tv = (TextView) view.findViewById(R.id.empty1);
         tv.setText("No Message");

@@ -17,9 +17,9 @@ import android.widget.TextView;
 
 public class Message_Detail_Activity extends Activity {
 
-    static final String PROVIDER_NAME = "TURBOTEC.NEWMPAS.MESSAGEPROVIDER";
-    static final String URL1 = "content://" + PROVIDER_NAME + "/messages";
-    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/1";
+    static final String PROVIDER_NAME = "turbotec.newmpas.MessageProvider.messages";
+    static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
+    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
     static final Uri CONTENT_URI2 = Uri.parse(URL2);
 //    private static DatabaseHandler db;
@@ -73,7 +73,7 @@ public class Message_Detail_Activity extends Activity {
                         ContentValues values = new ContentValues();
                         values.put("Seen", true);
 
-                        getContentResolver().update(CONTENT_URI1,values, "MessageID  = ?", new String[]{String.valueOf(ID)});
+                        getContentResolver().update(Uri.parse(URL1 + ID), values, "_id  = ?", new String[]{String.valueOf(ID)});
 
 
 
@@ -111,7 +111,7 @@ public class Message_Detail_Activity extends Activity {
 
 //                                SQLiteDatabase database = db.getWritableDatabase();
 //                                database.delete("Messages", "MessageID  = ?", new String[]{String.valueOf(ID)});
-                                getContentResolver().delete(CONTENT_URI1, "MessageID  = ?", new String[]{String.valueOf(ID)});
+                                getContentResolver().delete(Uri.parse(URL1 + ID), "_id  = ?", new String[]{String.valueOf(ID)});
 //                                database.close();
                                 finish();
 

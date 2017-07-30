@@ -39,8 +39,8 @@ import java.util.List;
  */
 public class SyncService extends IntentService {
     static final String PROVIDER_NAME = "turbotec.newmpas.MessageProvider.messages";
-    static final String URL1 = "content://" + PROVIDER_NAME + "/messages";
-    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/MESSAGE_ID";
+    static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
+    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
     static final Uri CONTENT_URI2 = Uri.parse(URL2);
     // TODO: Rename actions, choose action names that describe tasks that this
@@ -304,7 +304,7 @@ public class SyncService extends IntentService {
                 SendSeen      = false;
 //                );
 //                if (db.CheckExist(Integer.valueOf(Message.getProperty(0).toString()), MyContext)) {
-                Cursor c = getContentResolver().query(CONTENT_URI2, new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(MessageID)}, null);
+                Cursor c = getContentResolver().query(Uri.parse(URL1 + MessageID), new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(MessageID)}, null);
                 if (c != null) {
                     if (c.moveToFirst()) {
                         index++;
@@ -425,7 +425,7 @@ public class SyncService extends IntentService {
                     String[] MIDs = IDs.split(";");
                     for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                        getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
+                        getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
                     }
 
                 } else if (response.toString().contains(MyContext.getString(R.string.Seen))) {
@@ -436,7 +436,7 @@ public class SyncService extends IntentService {
                     String[] MIDs = IDs.split(";");
                     for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                        getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
+                        getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
                     }
                 }
 
@@ -444,7 +444,7 @@ public class SyncService extends IntentService {
             }
 
 //            int undone = db.unSend(MyContext);
-            Cursor cursor = getContentResolver().query(CONTENT_URI1, new String[]{"*"}, null, null, null);
+            Cursor cursor = getContentResolver().query(CONTENT_URI2, new String[]{"*"}, null, null, null);
             if(cursor != null) {
                 if (cursor.moveToFirst()) {
 //                DatabaseHandler d = DatabaseHandler.getInstance(MyContext);
@@ -454,7 +454,7 @@ public class SyncService extends IntentService {
                             int f = 0;
                             IDs = "";
 //                Cursor cursor = database.rawQuery("SELECT * from Messages WHERE SendDelivered = 0;", null);
-                            cursor = getContentResolver().query(CONTENT_URI2, new String[]{String.valueOf(MessageID)}, "SendDelivered = ?", new String[]{"0"}, null);
+                            cursor = getContentResolver().query(CONTENT_URI2, null, "SendDelivered = ?", new String[]{"0"}, null);
                             try {
                                 if (cursor != null) {
                                     if (cursor.moveToFirst()) {
@@ -504,7 +504,7 @@ public class SyncService extends IntentService {
                                 String[] MIDs = IDs.split(";");
                                 for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                                    getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
+                                    getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
                                 }
 
                             }
@@ -514,7 +514,7 @@ public class SyncService extends IntentService {
                             int f = 1;
                             IDs = "";
 //                Cursor cursor = database.rawQuery("SELECT * from Messages WHERE SendSeen = 0  AND Seen = 1;", null);
-                            cursor = getContentResolver().query(CONTENT_URI2, new String[]{String.valueOf(MessageID)}, "SendDelivered = ?", new String[]{"0"}, null);
+                            cursor = getContentResolver().query(CONTENT_URI2, null, "SendDelivered = ?", new String[]{"0"}, null);
                             try {
                                 if (cursor != null) {
                                     if (cursor.moveToFirst()) {
@@ -565,7 +565,7 @@ public class SyncService extends IntentService {
                                 String[] MIDs = IDs.split(";");
                                 for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                                    getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
+                                    getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
                                 }
 
                             }

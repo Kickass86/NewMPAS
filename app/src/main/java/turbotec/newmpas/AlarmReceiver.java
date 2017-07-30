@@ -77,7 +77,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 //        if (intent.getAction().equals("Alarm")) {
 
 
-//            mContext.sendBroadcast(new Intent("Alarm fire"));
+            mContext.sendBroadcast(new Intent("Alarm fire"));
 
             Log.v("AAA", "Alarm fired now!");
 

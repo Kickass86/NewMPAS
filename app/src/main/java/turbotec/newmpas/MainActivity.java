@@ -1,5 +1,12 @@
 package turbotec.newmpas;
 
+import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -9,41 +16,81 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
 public class MainActivity extends AppCompatActivity {
 
 
-
-    /**
-     * The number of pages (wizard steps) to show in this demo.
-     */
+    static final String PROVIDER_NAME = "turbotec.newmpas.MessageProvider.messages";
+    static final String URL = "content://" + PROVIDER_NAME + "/messages/";
+    static final Uri CONTENT_URI = Uri.parse(URL);
     private static final int NUM_PAGES = 2;
-    static boolean[] mCheckedState;
-    int Scroll_Position = 0;
+    static boolean[] mCheckedState = new boolean[1];
+    static int Scroll_Position = 0;
+    static boolean Flag = true;
+    List<String> Mlist = new ArrayList<>(); //Messages List
+    List<String> Tlist = new ArrayList<>(); //Title List
+    List<Boolean> SList = new ArrayList<>(); //is Seen
+    List<Integer> IList = new ArrayList<>(); //Message ID
+    List<Boolean> CList = new ArrayList<>(); //Critical
+    List<Boolean> SSList = new ArrayList<>(); //SendSeen
     boolean isSelected = false;
     private Menu mMenu;
-    /**
-     * The pager widget, which handles animation and allows swiping horizontally to access previous
-     * and next wizard steps.
-     */
     private ViewPager mPager;
-
-    /**
-     * The pager adapter, which provides the pages to the view pager widget.
-     */
     private ScreenSlidePagerAdapter mPagerAdapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        CustomAdapter.getInstance(this);
+//        CustomAdapter.getInstance(this);
         setContentView(R.layout.activity_main);
-        mCheckedState = new boolean[0];
+        mCheckedState[0] = false;
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancelAll();
+
+
+//        Intent VC = new Intent(this,VersionUpdate.class);
+//        startService(VC);
+
+        Intent in = getIntent();
+
+        if (in != null) {
+            Bundle b = in.getExtras();
+            if (b != null) {
+
+                Intent showActivity = new Intent(MainActivity.this, Message_Detail_Activity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString(getString(R.string.Title), b.getString(getString(R.string.Title)));
+                bundle.putString(getString(R.string.Body), b.getString(getString(R.string.Body)));
+                bundle.putInt(getString(R.string.ID), b.getInt(getString(R.string.ID)));
+                bundle.putBoolean(getString(R.string.Seen), b.getBoolean(getString(R.string.Seen)));
+                bundle.putBoolean(getString(R.string.Critical), b.getBoolean(getString(R.string.Critical)));
+                bundle.putBoolean(getString(R.string.SendSeen), b.getBoolean(getString(R.string.SendSeen)));
+
+                String s = b.getString(getString(R.string.Title));
+                if (s != null)
+                    if (!s.isEmpty()) {
+                        showActivity.putExtras(bundle);
+//            showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                        startActivity(showActivity);
+                    }
+            }
+        }
+
+
+
+
+
 
 
         List<Fragment> fragments = new Vector<>();
@@ -60,6 +107,40 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Flag = true;
+        ListView lvno = (ListView) findViewById(R.id.list_notification);
+        ListView lvta = (ListView) findViewById(R.id.list_task);
+        if (lvno != null) {
+            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+            lvno.setAdapter(ad);
+            ad.notifyDataSetChanged();
+
+            lvno.post(new Runnable() {
+                @Override
+                public void run() {
+                    ListView lvno = (ListView) findViewById(R.id.list_notification);
+                    lvno.setSelection(Scroll_Position);
+                }
+            });
+
+        } else if (lvta != null) {
+            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+            lvta.setAdapter(ad);
+            ad.notifyDataSetChanged();
+            lvta.post(new Runnable() {
+                @Override
+                public void run() {
+                    ListView lvta = (ListView) findViewById(R.id.list_task);
+                    lvta.setSelection(Scroll_Position);
+                }
+            });
+        }
 
     }
 
@@ -98,35 +179,194 @@ public class MainActivity extends AppCompatActivity {
 
 //        mMenu.getItem(0).setVisible(false);
 //        mMenu.getItem(1).setVisible(false);
-        return super.onCreateOptionsMenu(menu);
+        return true;
     }
+
+
+    private void MarkAll() {
+        boolean opposite = true;
+//        MenuItem item_select = mMenu.findItem(R.id.menu_select_all);
+//        item_select.setTitle("Deselect All");
+//        item_select.setIcon(R.mipmap.ic_check_box_outline_blank_black_24dp);
+        int sum = 0;
+        for (boolean b : mCheckedState) {
+            sum += b ? 1 : 0;
+        }
+        if (sum == mCheckedState.length) {
+            opposite = false;
+//            item_select.setTitle("Deselect All");
+//            item_select.setIcon(R.mipmap.ic_check_box_outline_blank_black_24dp);
+        }
+
+        for (int i = 0; i < mCheckedState.length; i++) {
+            mCheckedState[i] = opposite;
+        }
+//        invalidateOptionsMenu();
+//        getContentResolver().notifyChange(CONTENT_URI, null, false);
+        ListView lvno = (ListView) findViewById(R.id.list_notification);
+        ListView lvta = (ListView) findViewById(R.id.list_task);
+        if (lvno != null) {
+            CustomAdapter.set(this);
+            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+            lvno.setAdapter(ad);
+            ad.notifyDataSetChanged();
+        } else if (lvta != null) {
+            CustomAdapter.set(this);
+            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+            lvta.setAdapter(ad);
+            ad.notifyDataSetChanged();
+        }
+    }
+
+
+    private void MarkDelete() {
+
+//        ListView lv = (ListView) findViewById(R.id.list1);
+//        CheckBox cb;
+
+//        SQLiteDatabase database = db.getWritableDatabase();
+        for (int i = 0; i < mCheckedState.length; i++) {
+//            cb = (CheckBox) lv.getChildAt(i).findViewById(R.id.checkbox1);
+
+            if (mCheckedState[i]) {
+                Integer ID;
+                ID = IList.get(i);
+//                database.delete("Messages", "MessageID  = ?", new String[]{String.valueOf(ID)});
+                getContentResolver().delete(Uri.parse(URL + ID), "_id  = ?", new String[]{String.valueOf(ID)});
+            }
+        }
+//        database.close();
+        isSelected = false;
+//        mMenu.clear();
+//        adapt.notifyDataSetChanged();
+        for (int i = 0; i < mCheckedState.length; i++) {
+            mCheckedState[i] = false;
+        }
+//        adapt.notifyDataSetChanged();
+        invalidateOptionsMenu();
+        ListView lvno = (ListView) findViewById(R.id.list_notification);
+        ListView lvta = (ListView) findViewById(R.id.list_task);
+        if (lvno != null) {
+            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+            lvno.setAdapter(ad);
+            ad.notifyDataSetChanged();
+        } else if (lvta != null) {
+            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+            lvta.setAdapter(ad);
+            ad.notifyDataSetChanged();
+        }
+
+//        UpdateUI(share.GetStatus());
+
+    }
+
+    private void MarkRead() {
+
+
+//        SQLiteDatabase database = db.getWritableDatabase();
+        for (int i = 0; i < mCheckedState.length; i++) {
+//            cb = (CheckBox) lv.getChildAt(i).findViewById(R.id.checkbox1);
+
+            if (mCheckedState[i]) {
+                Integer ID;
+                ID = IList.get(i);
+                ContentValues values = new ContentValues();
+                values.put("Seen", true);
+//                database.update("Messages", values, "MessageID  = ?", new String[]{String.valueOf(ID)});
+                getContentResolver().update(Uri.parse(URL + ID), values, "_id  = ?", new String[]{String.valueOf(ID)});
+            }
+        }
+//        database.close();
+        isSelected = false;
+//        mMenu.clear();
+//        adapt.notifyDataSetChanged();
+        for (int i = 0; i < mCheckedState.length; i++) {
+            mCheckedState[i] = false;
+        }
+//        adapt.notifyDataSetChanged();
+        invalidateOptionsMenu();
+        ListView lvno = (ListView) findViewById(R.id.list_notification);
+        ListView lvta = (ListView) findViewById(R.id.list_task);
+        if (lvno != null) {
+            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+            lvno.setAdapter(ad);
+            ad.notifyDataSetChanged();
+        } else if (lvta != null) {
+            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+            lvta.setAdapter(ad);
+            ad.notifyDataSetChanged();
+        }
+//        UpdateUI(share.GetStatus());
+
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.menu_delete:
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Toast.makeText(this, "Info about MPAS", Toast.LENGTH_SHORT).show();
-            return true;
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+
+                alertDialogBuilder.setPositiveButton("Yes",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                                MarkDelete();
+
+                            }
+                        })
+                        .setNegativeButton("No",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        dialog.cancel();
+
+                                    }
+                                })
+                        .setMessage(R.string.dialog_message)
+                        .setTitle(R.string.dialog_title);
+                AlertDialog adialog = alertDialogBuilder.create();
+                adialog.show();
+                return true;
+
+            case R.id.menu_read:
+                MarkRead();
+                return true;
+            case R.id.menu_select_all:
+                MarkAll();
+                return true;
+            case R.id.action_settings:
+                Toast.makeText(this, "Info about MPAS", Toast.LENGTH_SHORT).show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
+
+//        int id = item.getItemId();
+//
+//        //noinspection SimplifiableIfStatement
+//        if (id == R.id.action_settings) {
+//            Toast.makeText(this, "Info about MPAS", Toast.LENGTH_SHORT).show();
+//            return true;
+//        }
+//        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onBackPressed() {
-        if (mPager.getCurrentItem() == 0) {
+//        if (mPager.getCurrentItem() == 0) {
             // If the user is currently looking at the first step, allow the system to handle the
             // Back button. This calls finish() on this activity and pops the back stack.
             super.onBackPressed();
-        } else {
-            // Otherwise, select the previous step.
-            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
-        }
+//        } else {
+//            // Otherwise, select the previous step.
+//            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
+//        }
     }
 
     /**
@@ -152,6 +392,7 @@ public class MainActivity extends AppCompatActivity {
 
             switch (pos) {
                 case 0:
+                    NotificationFragment.set(MainActivity.this);
                     return new NotificationFragment();
                 case 1:
                     return new TaskFragment();

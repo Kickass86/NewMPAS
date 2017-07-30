@@ -1,7 +1,6 @@
 package turbotec.newmpas;
 
 import android.content.ContentProvider;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
@@ -24,7 +23,7 @@ public class MessageProvider extends ContentProvider {
 
 
     static final String PROVIDER_NAME = "turbotec.newmpas.MessageProvider.messages";
-    static final String URL = "content://" + PROVIDER_NAME + "/Messages";
+    static final String URL = "content://" + PROVIDER_NAME + "/messages";
     static final Uri CONTENT_URI = Uri.parse(URL);
     static final int Message_ID  = 1;
     static final int Unsent = 2;
@@ -51,8 +50,8 @@ public class MessageProvider extends ContentProvider {
 
     static {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(PROVIDER_NAME, "Messages", Message_ID);
-        uriMatcher.addURI(PROVIDER_NAME, "Messages/#", Unsent);
+        uriMatcher.addURI(PROVIDER_NAME, "/messages/#", Message_ID);
+        uriMatcher.addURI(PROVIDER_NAME, "/messages/unsent/", Unsent);
     }
 
     private DatabaseHandler dbHelper;
@@ -81,7 +80,7 @@ public class MessageProvider extends ContentProvider {
                         @Nullable String[] selectionArgs, @Nullable String sortOrder) {
 
 
-        String id = null;
+        String id;
         Cursor cursor;
         if(uriMatcher.match(uri) == Message_ID) {
             //Query is for one single image. Get the ID from the URI.
@@ -90,33 +89,12 @@ public class MessageProvider extends ContentProvider {
         }
 //        if(uriMatcher.match(uri) == Unsent){
         else{
-            cursor = dbHelper.getUnsend(projection, sortOrder);
+            cursor = dbHelper.getUnsend(projection, selection, selectionArgs, sortOrder);
         }
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+//        getContext().getContentResolver().notifyChange(uri, null);
         return cursor;
 
-//        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-//        qb.setTables(TABLE_NAME);
-//
-//        switch (uriMatcher.match(uri)) {
-//            case Message_ID:
-//                qb.setProjectionMap(MESSAGES_PROJECTION_MAP);
-//                break;
-//
-//            default:
-//        }
-//
-//        if (sortOrder == null || sortOrder == ""){
-//            /**
-//             * By default sort on student names
-//             */
-//            sortOrder = INSERT_DATE;
-//        }
-//
-//        Cursor c = qb.query(db,	projection,	selection,
-//                selectionArgs,null, null, sortOrder);
-//
-//        c.setNotificationUri(getContext().getContentResolver(), uri);
-//        return c;
     }
 
     @Nullable
@@ -127,7 +105,7 @@ public class MessageProvider extends ContentProvider {
              * Get all student records
              */
             case Message_ID:
-                return "vnd.android.cursor.dir/vnd.TURBOTEC.NEWMPAS.MESSAGEPROVIDER";
+                return "vnd.android.cursor.dir/vnd.TURBOTEC.NEWMPAS.MESSAGEPROVIDER.MESSAGES";
 
             default:
                 throw new IllegalArgumentException("Unsupported URI: " + uri);
@@ -141,9 +119,9 @@ public class MessageProvider extends ContentProvider {
 
         long rowID = dbHelper.addNewMessage(values);
         if (rowID > 0) {
-            Uri _uri = ContentUris.withAppendedId(CONTENT_URI, rowID);
-            getContext().getContentResolver().notifyChange(_uri, null);
-            return _uri;
+//            Uri _uri = ContentUris.withAppendedId(CONTENT_URI, rowID);
+//            getContext().getContentResolver().notifyChange(_uri, null);
+            return uri;
         }
         throw new SQLException("Failed to add a record into " + uri);
 
@@ -159,9 +137,9 @@ public class MessageProvider extends ContentProvider {
             id = uri.getPathSegments().get(1);
         }
 
-        int count = dbHelper.deleteMessage(id);
+        int count = dbHelper.deleteMessage(id, selection, selectionArgs);
 
-        getContext().getContentResolver().notifyChange(uri, null);
+//        getContext().getContentResolver().notifyChange(uri, null);
         return count;
     }
 
@@ -174,11 +152,12 @@ public class MessageProvider extends ContentProvider {
             //Update is for one single image. Get the ID from the URI.
             id = uri.getPathSegments().get(1);
         }
+        //TODO Update Multiple messages
 
         int count = dbHelper.updateMessage(id, values);
 
 
-        getContext().getContentResolver().notifyChange(uri, null);
+//        getContext().getContentResolver().notifyChange(uri, null);
         return count;
     }
 
@@ -225,7 +204,7 @@ public class MessageProvider extends ContentProvider {
 //            }
 
             if(sortOrder == null || sortOrder == "") {
-                sortOrder = INSERT_DATE;
+                sortOrder = INSERT_DATE + " DESC";
             }
             Cursor cursor = sqliteQueryBuilder.query(getReadableDatabase(),
                     projection,
@@ -238,21 +217,21 @@ public class MessageProvider extends ContentProvider {
         }
 
 
-        public Cursor getUnsend(String[] projection, String sortOrder) {
+        public Cursor getUnsend(String[] projection, String selection, String[] selectionArg, String sortOrder) {
             SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
             sqliteQueryBuilder.setTables(TABLE_NAME);
 
 
-            sqliteQueryBuilder.appendWhere("SendDelivered  = 0 OR (Seen = 1 AND SendSeen = 0)");
+//            sqliteQueryBuilder.appendWhere("SendDelivered  = 0 OR (Seen = 1 AND SendSeen = 0)");
 
 
             if(sortOrder == null || sortOrder == "") {
-                sortOrder = INSERT_DATE;
+                sortOrder = INSERT_DATE + " DESC";
             }
             Cursor cursor = sqliteQueryBuilder.query(getReadableDatabase(),
                     projection,
-                    null,
-                    null,
+                    selection,
+                    selectionArg,
                     null,
                     null,
                     sortOrder);
@@ -269,9 +248,9 @@ public class MessageProvider extends ContentProvider {
             return id;
         }
 
-        public int deleteMessage(String id) {
+        public int deleteMessage(String id, String selection, String[] selectionArg) {
             if(id == null) {
-                return getWritableDatabase().delete(TABLE_NAME, null , null);
+                return getWritableDatabase().delete(TABLE_NAME, selection, selectionArg);
             } else {
                 return getWritableDatabase().delete(TABLE_NAME, "_id=?", new String[]{id});
             }

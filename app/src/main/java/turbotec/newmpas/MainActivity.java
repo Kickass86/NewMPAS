@@ -104,6 +104,41 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mPager);
+        CustomAdapter.set(this);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                //do stuff here
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+                for (int i = 0; i < mCheckedState.length; i++) {
+                    mCheckedState[i] = false;
+                }
+//                CustomAdapter.set(MainActivity.this);
+                ListView lvno = (ListView) findViewById(R.id.list_notification);
+                ListView lvta = (ListView) findViewById(R.id.list_task);
+                if (lvno != null) {
+//                    CustomAdapter.set(this);
+                    CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+                    lvno.setAdapter(ad);
+                    ad.notifyDataSetChanged();
+                } else if (lvta != null) {
+//                    CustomAdapter.set(this);
+                    CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+                    lvta.setAdapter(ad);
+                    ad.notifyDataSetChanged();
+                }
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
 
 
@@ -171,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
         if (sum == mCheckedState.length) {
             item_select.setTitle(getString(R.string.menu_select_all));
             item_select.setIcon(R.mipmap.ic_check_box_black_24dp);
-        } else {
+        } else if (sum > 0) {
             item_select.setTitle(getString(R.string.menu_deselect_all));
             item_select.setIcon(R.mipmap.ic_check_box_outline_blank_black_24dp);
         }
@@ -359,14 +394,33 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-//        if (mPager.getCurrentItem() == 0) {
-            // If the user is currently looking at the first step, allow the system to handle the
-            // Back button. This calls finish() on this activity and pops the back stack.
+        boolean fl = false;
+//        boolean i;
+        for (boolean i : mCheckedState) {
+            if (i) {
+                fl = true;
+                break;
+            }
+        }
+
+        if (fl) {
+            for (int i = 0; i < mCheckedState.length; i++) {
+                mCheckedState[i] = false;
+            }
+            ListView lvno = (ListView) findViewById(R.id.list_notification);
+            ListView lvta = (ListView) findViewById(R.id.list_task);
+            if (lvno != null) {
+                CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+                lvno.setAdapter(ad);
+                ad.notifyDataSetChanged();
+            } else if (lvta != null) {
+                CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+                lvta.setAdapter(ad);
+                ad.notifyDataSetChanged();
+            }
+        } else {
             super.onBackPressed();
-//        } else {
-//            // Otherwise, select the previous step.
-//            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
-//        }
+        }
     }
 
     /**

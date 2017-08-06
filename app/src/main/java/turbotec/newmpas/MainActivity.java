@@ -26,11 +26,11 @@ import java.util.Vector;
 public class MainActivity extends AppCompatActivity {
 
 
-    static final String PROVIDER_NAME = "turbotec.newmpas.MessageProvider.messages";
+    static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
     static final String URL = "content://" + PROVIDER_NAME + "/messages/";
     static final Uri CONTENT_URI = Uri.parse(URL);
     private static final int NUM_PAGES = 2;
-    static boolean[] mCheckedState = new boolean[1];
+    static boolean[] mCheckedState;
     static int Scroll_Position = 0;
     static boolean Flag = true;
     List<String> Mlist = new ArrayList<>(); //Messages List
@@ -39,8 +39,9 @@ public class MainActivity extends AppCompatActivity {
     List<Integer> IList = new ArrayList<>(); //Message ID
     List<Boolean> CList = new ArrayList<>(); //Critical
     List<Boolean> SSList = new ArrayList<>(); //SendSeen
-    boolean isSelected = false;
-    private Menu mMenu;
+    //    boolean isSelected = false;
+//    private Menu mMenu;
+    private boolean first = true;
     private ViewPager mPager;
     private ScreenSlidePagerAdapter mPagerAdapter;
 
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 //        CustomAdapter.getInstance(this);
         setContentView(R.layout.activity_main);
-        mCheckedState[0] = false;
+//        mCheckedState[0] = false;
 
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -62,34 +63,35 @@ public class MainActivity extends AppCompatActivity {
 
         Intent in = getIntent();
 
-        if (in != null) {
-            Bundle b = in.getExtras();
-            if (b != null) {
+        if (savedInstanceState == null) {
+            if (in != null) {
+                Bundle b = in.getExtras();
+                if (b != null) {
 
-                Intent showActivity = new Intent(MainActivity.this, Message_Detail_Activity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString(getString(R.string.Title), b.getString(getString(R.string.Title)));
-                bundle.putString(getString(R.string.Body), b.getString(getString(R.string.Body)));
-                bundle.putInt(getString(R.string.ID), b.getInt(getString(R.string.ID)));
-                bundle.putBoolean(getString(R.string.Seen), b.getBoolean(getString(R.string.Seen)));
-                bundle.putBoolean(getString(R.string.Critical), b.getBoolean(getString(R.string.Critical)));
-                bundle.putBoolean(getString(R.string.SendSeen), b.getBoolean(getString(R.string.SendSeen)));
+                    Intent showActivity = new Intent(MainActivity.this, Message_Detail_Activity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString(getString(R.string.Title), b.getString(getString(R.string.Title)));
+                    bundle.putString(getString(R.string.Body), b.getString(getString(R.string.Body)));
+                    bundle.putInt(getString(R.string.ID), b.getInt(getString(R.string.ID)));
+                    bundle.putBoolean(getString(R.string.Seen), b.getBoolean(getString(R.string.Seen)));
+                    bundle.putBoolean(getString(R.string.Critical), b.getBoolean(getString(R.string.Critical)));
+                    bundle.putBoolean(getString(R.string.SendSeen), b.getBoolean(getString(R.string.SendSeen)));
 
-                String s = b.getString(getString(R.string.Title));
-                if (s != null)
-                    if (!s.isEmpty()) {
-                        showActivity.putExtras(bundle);
+                    String s = b.getString(getString(R.string.Title));
+                    if (s != null)
+                        if (!s.isEmpty()) {
+                            showActivity.putExtras(bundle);
 //            showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                        startActivity(showActivity);
-                    }
+                            startActivity(showActivity);
+                        }
+                }
             }
         }
 
 
-
-
+        CustomAdapter.set(this);
 
 
 
@@ -104,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mPager);
-        CustomAdapter.set(this);
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -143,6 +145,13 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        outState.putBoolean("first", first);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -218,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     private void MarkAll() {
         boolean opposite = true;
 //        MenuItem item_select = mMenu.findItem(R.id.menu_select_all);
@@ -236,17 +246,17 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < mCheckedState.length; i++) {
             mCheckedState[i] = opposite;
         }
-//        invalidateOptionsMenu();
+        invalidateOptionsMenu();
 //        getContentResolver().notifyChange(CONTENT_URI, null, false);
         ListView lvno = (ListView) findViewById(R.id.list_notification);
         ListView lvta = (ListView) findViewById(R.id.list_task);
         if (lvno != null) {
-            CustomAdapter.set(this);
+//            CustomAdapter.set(this);
             CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
             lvno.setAdapter(ad);
             ad.notifyDataSetChanged();
         } else if (lvta != null) {
-            CustomAdapter.set(this);
+//            CustomAdapter.set(this);
             CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
             lvta.setAdapter(ad);
             ad.notifyDataSetChanged();
@@ -271,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 //        database.close();
-        isSelected = false;
+//        isSelected = false;
 //        mMenu.clear();
 //        adapt.notifyDataSetChanged();
         for (int i = 0; i < mCheckedState.length; i++) {
@@ -312,7 +322,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 //        database.close();
-        isSelected = false;
+//        isSelected = false;
 //        mMenu.clear();
 //        adapt.notifyDataSetChanged();
         for (int i = 0; i < mCheckedState.length; i++) {
@@ -446,7 +456,7 @@ public class MainActivity extends AppCompatActivity {
 
             switch (pos) {
                 case 0:
-                    NotificationFragment.set(MainActivity.this);
+//                    NotificationFragment.set(MainActivity.this);
                     return new NotificationFragment();
                 case 1:
                     return new TaskFragment();

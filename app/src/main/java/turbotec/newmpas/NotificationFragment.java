@@ -22,16 +22,22 @@ public class NotificationFragment extends Fragment {
     static final String URL = "content://" + PROVIDER_NAME + "/messages";
     static final Uri CONTENT_URI = Uri.parse(URL);
 
-    static MainActivity acticity;
+//    static MainActivity acticity;
 
     public NotificationFragment() {
         // Required empty public constructor
     }
 
-
-    static void set(MainActivity mainActivity) {
-        acticity = mainActivity;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
+
+
+//    static void set(MainActivity mainActivity) {
+//        acticity = mainActivity;
+//    }
 
 
     @Override
@@ -58,7 +64,7 @@ public class NotificationFragment extends Fragment {
 
         ListView list = (ListView) view.findViewById(R.id.list_notification);
 //        getActivity();
-        CustomAdapter.set(acticity);
+//        CustomAdapter.set(acticity);
         CustomAdapter adapter = CustomAdapter.getInstance(getContext());
 
 

@@ -2,10 +2,8 @@ package turbotec.newmpas;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 
 import java.io.File;
@@ -14,8 +12,8 @@ import java.util.Calendar;
 public class InstallActivity extends AppCompatActivity {
 
 
-    static final String PROVIDER_NAME = "TURBOTEC.NEWMPAS.MESSAGEPROVIDER";
-    static final String URL = "content://" + PROVIDER_NAME + "/messages";
+    static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
+    static final String URL = "content://" + PROVIDER_NAME + "/messages/";
     static final Uri CONTENT_URI = Uri.parse(URL);
 
 
@@ -43,8 +41,6 @@ public class InstallActivity extends AppCompatActivity {
             e.printStackTrace();
             Calendar c = Calendar.getInstance();
 
-
-
             ContentValues contentValues = new ContentValues();
             contentValues.put("MessageID", 100000);
             contentValues.put("MessageTitle" , "Internal Error");
@@ -52,19 +48,11 @@ public class InstallActivity extends AppCompatActivity {
             contentValues.put("InsertDate", c.getTime().toString());
             contentValues.put("Critical", true);
             getContentResolver().insert(CONTENT_URI, contentValues);
-//            Toast.makeText(getBaseContext(), uri.toString(), Toast.LENGTH_LONG).show();
-//            refreshValuesFromContentProvider();
 
         }
 
     }
 
-//    private void refreshValuesFromContentProvider() {
-//        CursorLoader cursorLoader = new CursorLoader(getBaseContext(), CONTENT_URI,
-//                null, null, null, null);
-//        Cursor c = cursorLoader.loadInBackground();
-//        adapter.swapCursor(c);
-//    }
 
 
 }

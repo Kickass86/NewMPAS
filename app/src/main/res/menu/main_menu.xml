@@ -24,7 +24,7 @@
         android:icon="@mipmap/ic_done_all_black_24dp"
         android:textAllCaps="false"
         android:title="@string/menu_read"
-        app:showAsAction="always|withText" />
+        app:showAsAction="always" />
 
 
     <item
@@ -32,7 +32,7 @@
         android:icon="@mipmap/ic_delete_black_24dp"
         android:textAllCaps="false"
         android:title="@string/menu_delete"
-        app:showAsAction="always|withText" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_settings"

@@ -38,18 +38,21 @@ import java.util.List;
  * helper methods.
  */
 public class SyncService extends IntentService {
-    static final String PROVIDER_NAME = "turbotec.newmpas.MessageProvider.messages";
+    static final String PROVIDER_NAME = "turbotec.newmpas.MyProvider";
     static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
     static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
+    static final String URL3 = "content://" + PROVIDER_NAME + "/tasks/";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
     static final Uri CONTENT_URI2 = Uri.parse(URL2);
+    static final Uri CONTENT_URI3 = Uri.parse(URL3);
+    private static final int Timeout = 70000;
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_FOO = "turbotec.newmpas.action.FOO";
-    private static final String ACTION_BAZ = "turbotec.newmpas.action.BAZ";
-    // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "turbotec.newmpas.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "turbotec.newmpas.extra.PARAM2";
+//    private static final String ACTION_FOO = "turbotec.newmpas.action.FOO";
+//    private static final String ACTION_BAZ = "turbotec.newmpas.action.BAZ";
+//    // TODO: Rename parameters
+//    private static final String EXTRA_PARAM1 = "turbotec.newmpas.extra.PARAM1";
+//    private static final String EXTRA_PARAM2 = "turbotec.newmpas.extra.PARAM2";
     private final String ip = "192.168.1.13";
     private final int port = 80;
     private SharedPreferenceHandler share;
@@ -57,7 +60,9 @@ public class SyncService extends IntentService {
     private boolean New = false;
     private boolean isDuplicate = false;
     private String FLag = "Invalid";
-    private String IDs = "";
+    private String MIDs = "";
+    private String TIDs = "";
+    private String TID = "";
     private int MessageID;
     private String MessageTitle;
     private String MessageBody;
@@ -66,7 +71,12 @@ public class SyncService extends IntentService {
     private boolean Seen;
     private boolean SendDelivered;
     private boolean SendSeen;
-//    private boolean Flag_Change = false;
+    private String TaskID;
+    private String TaskTitle;
+    private String TaskDescription;
+    private String TaskDueDate;
+    private String TaskCreator;
+    private String TaskStatus;
     private String OPERATION_NAME_CHECK;
     private String OPERATION_NAME_DELIVERED;
     private String SOAP_ACTION_CHECK;
@@ -86,13 +96,13 @@ public class SyncService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionFoo(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, SyncService.class);
-        intent.setAction(ACTION_FOO);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
-    }
+//    public static void startActionFoo(Context context, String param1, String param2) {
+//        Intent intent = new Intent(context, SyncService.class);
+//        intent.setAction(ACTION_FOO);
+//        intent.putExtra(EXTRA_PARAM1, param1);
+//        intent.putExtra(EXTRA_PARAM2, param2);
+//        context.startService(intent);
+//    }
 
     /**
      * Starts this service to perform action Baz with the given parameters. If
@@ -101,13 +111,13 @@ public class SyncService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionBaz(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, SyncService.class);
-        intent.setAction(ACTION_BAZ);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
-    }
+//    public static void startActionBaz(Context context, String param1, String param2) {
+//        Intent intent = new Intent(context, SyncService.class);
+//        intent.setAction(ACTION_BAZ);
+//        intent.putExtra(EXTRA_PARAM1, param1);
+//        intent.putExtra(EXTRA_PARAM2, param2);
+//        context.startService(intent);
+//    }
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -155,9 +165,9 @@ public class SyncService extends IntentService {
 
             // This method will block no more than timeoutMs.
             // If the timeout occurs, SocketTimeoutException is thrown.
-//            int timeoutMs = 1000;   // 200 milliseconds
-//            sock.connect(sockaddr, timeoutMs);
-            sock.connect(sockaddr);
+            int timeoutMs = 5000;   // 200 milliseconds
+            sock.connect(sockaddr, timeoutMs);
+//            sock.connect(sockaddr);
             exists = true;
 
             sock.close();
@@ -235,16 +245,24 @@ public class SyncService extends IntentService {
             SoapObject message = (SoapObject) response1.getProperty(0);
             SoapObject token = (SoapObject) response1.getProperty(1);
             SoapObject auth = (SoapObject) response1.getProperty(2);
+            SoapObject tasks = (SoapObject) response1.getProperty(3);
 
 
+            String Taskresp = "";
             String Authresp = "";
             String Tokenresp = "";
+            Log.e("Response ", response1.toString());
 //            SoapObject Messagesresp = new SoapObject("http://mpas.migtco.com/", "CheckUser");
             SoapObject Messagesresp = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_CHECK);
 
             if (auth.getPropertyCount() > 0)
                 Authresp = auth.getProperty(0).toString();
             Log.e("Auth response", Authresp);
+
+
+            if (tasks.getPropertyCount() > 0)
+                Taskresp = tasks.getProperty(0).toString();
+            Log.e("Task response", Taskresp);
 
 
             if (token.getPropertyCount() > 0)
@@ -313,7 +331,7 @@ public class SyncService extends IntentService {
                 }
                 c.close();
                 New = true;
-                IDs = IDs + Message.getProperty(0).toString() + ";";
+                MIDs = MIDs + Message.getProperty(0).toString() + ";";
 //                MIDs[index] = Message.getProperty(0).toString();
 
 
@@ -388,11 +406,112 @@ public class SyncService extends IntentService {
 //                db.addMessage(temp);
                 index++;
             }
-//            database = db.getWritableDatabase();
+
+
+            index = 0;
+            while (index < tasks.getPropertyCount()) {
+
+                FLag = "OK";
+
+                SoapObject Task = (SoapObject) tasks.getProperty(index);
+
+
+                TaskID = Task.getProperty(0).toString();
+                TaskTitle = Task.getProperty(1).toString();
+                TaskDescription = Task.getProperty(2).toString();
+                TaskDueDate = Task.getProperty(3).toString();
+                TaskCreator = Task.getProperty(4).toString();
+                TaskStatus = Task.getProperty(5).toString();
+
+
+                Cursor c = getContentResolver().query(Uri.parse(URL3 + TaskID), new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(TaskID)}, null);
+                if (c != null) {
+                    if (c.moveToFirst()) {
+                        index++;
+                        continue;
+                    }
+                }
+                c.close();
+                New = true;
+                TID = TID + Task.getProperty(0).toString() + ";";
+//                MIDs[index] = Message.getProperty(0).toString();
+
+
+                isCritical = Boolean.valueOf(Task.getProperty(4).toString());
+
+
+                if (isCritical) {
+//
+
+                    long[] pattern = {1000, 1000, 1000, 1000, 1000};
+                    Vibrator vibrator = (Vibrator) MyContext.getSystemService(Context.VIBRATOR_SERVICE);
+                    vibrator.vibrate(pattern, -1);
+                    try {
+                        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                        Ringtone r = RingtoneManager.getRingtone(MyContext, notification);
+                        r.play();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    if (!isAppForeground(MyContext)) {
+
+                        Log.i("Notify", "is running");
+                        Intent nid = new Intent(MyContext, MainActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString(MyContext.getString(R.string.Title), MessageTitle);
+                        bundle.putString(MyContext.getString(R.string.Body), MessageBody);
+                        bundle.putBoolean(MyContext.getString(R.string.Critical), Critical);
+                        bundle.putBoolean(MyContext.getString(R.string.SendSeen), SendSeen);
+                        bundle.putInt(MyContext.getString(R.string.ID), MessageID);
+                        bundle.putBoolean(MyContext.getString(R.string.Seen), Seen);
+                        nid.putExtras(bundle);
+                        nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        PendingIntent ci = PendingIntent.getActivity(MyContext, MessageID, nid, 0);
+
+
+                        mBuilder =
+                                new android.support.v4.app.NotificationCompat.Builder(MyContext)
+                                        .setSmallIcon(R.mipmap.ic_launcher)
+//                                                .setSmallIcon(MyContext.getResources().getDrawable(R.mipmap.ic_launcher))
+                                        .setContentTitle(MessageTitle)
+                                        .setContentIntent(ci)
+                                        .setAutoCancel(true)
+//                                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+//                                        .setDefaults(isDuplicate ? Notification.S : Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
+//                                        .setDefaults(Notification.DEFAULT_ALL)
+//                                        .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
+                                        .setContentText(MessageBody);
+                        if (!isDuplicate) {
+                            mBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
+                        }
+
+
+                        mNotificationManager.notify(MessageID, mBuilder.build());
+                        isDuplicate = true;
+                    }
+                }
+
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("_id", Integer.valueOf(Task.getProperty(0).toString()));
+                contentValues.put("MessageTitle", Task.getProperty(1).toString().trim());
+                contentValues.put("MessageBody", Task.getProperty(2).toString().trim());
+                contentValues.put("InsertDate", Task.getProperty(3).toString());
+                contentValues.put("Critical", Boolean.valueOf(Task.getProperty(4).toString()));
+                contentValues.put("Seen", false);
+                contentValues.put("SendDelivered", false);
+                contentValues.put("SendSeen", false);
+                getContentResolver().insert(CONTENT_URI3, contentValues);
+                index++;
+            }
+
+
+
             isDuplicate = false;
             if (New) {
                 String Status = "0";
-                String plaintxt = "value1=" + IDs + ",value2=" + share.GetToken()
+                String plaintxt = "value1=" + TID + ",value2=" + share.GetToken()
                         + ",value3=" + Status;
 
 
@@ -422,10 +541,10 @@ public class SyncService extends IntentService {
 
                     ContentValues values = new ContentValues();
                     values.put("SendDelivered", true);
-                    String[] MIDs = IDs.split(";");
-                    for (String MID : MIDs) {
+                    String[] TIDs = this.TID.split(";");
+                    for (String TID : TIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                        getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
+                        getContentResolver().update(Uri.parse(URL1 + TID), values, "_id  = ?", new String[]{TID});
                     }
 
                 } else if (response.toString().contains(MyContext.getString(R.string.Seen))) {
@@ -433,10 +552,10 @@ public class SyncService extends IntentService {
                     ContentValues values = new ContentValues();
                     values.put("SendSeen", true);
                     values.put("SendDelivered", true);
-                    String[] MIDs = IDs.split(";");
-                    for (String MID : MIDs) {
+                    String[] TIDs = this.TID.split(";");
+                    for (String TID : TIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                        getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
+                        getContentResolver().update(Uri.parse(URL3 + TID), values, "_id  = ?", new String[]{TID});
                     }
                 }
 
@@ -444,7 +563,7 @@ public class SyncService extends IntentService {
             }
 
 //            int undone = db.unSend(MyContext);
-            Cursor cursor = getContentResolver().query(CONTENT_URI2, new String[]{"*"}, null, null, null);
+            Cursor cursor = getContentResolver().query(CONTENT_URI3, new String[]{"*"}, null, null, null);
             if(cursor != null) {
                 if (cursor.moveToFirst()) {
 //                DatabaseHandler d = DatabaseHandler.getInstance(MyContext);
@@ -452,14 +571,14 @@ public class SyncService extends IntentService {
 
                         if ("1".equals(cursor.getString(6))) {
                             int f = 0;
-                            IDs = "";
+                            TID = "";
 //                Cursor cursor = database.rawQuery("SELECT * from Messages WHERE SendDelivered = 0;", null);
-                            cursor = getContentResolver().query(CONTENT_URI2, null, "SendDelivered = ?", new String[]{"0"}, null);
+                            cursor = getContentResolver().query(CONTENT_URI3, null, "SendDelivered = ?", new String[]{"0"}, null);
                             try {
                                 if (cursor != null) {
                                     if (cursor.moveToFirst()) {
                                         do {
-                                            IDs = IDs + cursor.getInt(0) + ";";
+                                            TID = TID + cursor.getInt(0) + ";";
 
                                         } while (cursor.moveToNext());
                                     }
@@ -472,7 +591,7 @@ public class SyncService extends IntentService {
 
 
                             String Status = "0";
-                            String plaintxt = "value1=" + IDs + ",value2=" + share.GetToken()
+                            String plaintxt = "value1=" + TID + ",value2=" + share.GetToken()
                                     + ",value3=" + Status;
 
 
@@ -501,10 +620,10 @@ public class SyncService extends IntentService {
                             if (response.toString().contains(MyContext.getString(R.string.Delivered))) {
                                 ContentValues values = new ContentValues();
                                 values.put("SendDelivered", true);
-                                String[] MIDs = IDs.split(";");
-                                for (String MID : MIDs) {
+                                String[] TIDs = this.TID.split(";");
+                                for (String MID : TIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                                    getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
+                                    getContentResolver().update(Uri.parse(URL3 + TID), values, "_id  = ?", new String[]{TID});
                                 }
 
                             }
@@ -512,14 +631,14 @@ public class SyncService extends IntentService {
 //            } else if (undone == 2) {
 //                DatabaseHandler d = DatabaseHandler.getInstance(MyContext);
                             int f = 1;
-                            IDs = "";
+                            TIDs = "";
 //                Cursor cursor = database.rawQuery("SELECT * from Messages WHERE SendSeen = 0  AND Seen = 1;", null);
-                            cursor = getContentResolver().query(CONTENT_URI2, null, "SendDelivered = ?", new String[]{"0"}, null);
+                            cursor = getContentResolver().query(CONTENT_URI3, null, "SendDelivered = ?", new String[]{"0"}, null);
                             try {
                                 if (cursor != null) {
                                     if (cursor.moveToFirst()) {
                                         do {
-                                            IDs = IDs + cursor.getInt(0) + ";";
+                                            TID = TID + cursor.getInt(0) + ";";
 
                                         } while (cursor.moveToNext());
                                     }
@@ -532,7 +651,7 @@ public class SyncService extends IntentService {
 
 
                             String Status = "1";
-                            String plaintxt = "value1=" + IDs + ",value2=" + share.GetToken()
+                            String plaintxt = "value1=" + TID + ",value2=" + share.GetToken()
                                     + ",value3=" + Status;
 
 
@@ -562,10 +681,10 @@ public class SyncService extends IntentService {
                                 ContentValues values = new ContentValues();
                                 values.put("SendSeen", true);
                                 values.put("SendDelivered", true);
-                                String[] MIDs = IDs.split(";");
-                                for (String MID : MIDs) {
+                                String[] TIDs = this.TID.split(";");
+                                for (String TID : TIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                                    getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
+                                    getContentResolver().update(Uri.parse(URL1 + TID), values, "_id  = ?", new String[]{TID});
                                 }
 
                             }

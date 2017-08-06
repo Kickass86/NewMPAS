@@ -24,12 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-//import android.widget.Toast;
 
-//import android.graphics.Color;
-
-//import android.net.ConnectivityManager;
-//import android.net.NetworkInfo;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -41,12 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     List<Integer> IList = new ArrayList<>(); //Message ID
     List<Boolean> CList = new ArrayList<>(); //Critical
     List<Boolean> SSList = new ArrayList<>(); //SendSeen
-    //    private static DatabaseHandler db;
-    //    private static int numrun = 0;
-//    private static List<MessageObject> MESSAGES;
-    //    public static SQLiteDatabase database;
-//    private int Message_Number = 0;
-    //    private SharedPreferenceHandler sp;
+
     private SharedPreferenceHandler share;
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -62,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (stat.contains("OK")) {
 //                    UpdateUI(share.GetStatus());
                     intent = new Intent(context, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent);
 
                     Log.i("is this ", "BroadcastReceiver");
@@ -134,16 +124,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-//        isSelected = false;
-//        if (share.GetStatus().equals("OK")) {
-//            Intent intent = new Intent(this, MainActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK| Intent.FLAG_ACTIVITY_NO_ANIMATION);
-//            startActivity(intent);
-//        }
-
-
-
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,8 +141,6 @@ public class LoginActivity extends AppCompatActivity {
         alarmIntent.setAction("Alarm");
         pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
-//        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//        manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
 
         if(share.GetStatus().equals(getString(R.string.defaultValue)))
         {
@@ -176,35 +156,6 @@ public class LoginActivity extends AppCompatActivity {
         mNotificationManager.cancelAll();
 
 
-//        Intent VC = new Intent(this,VersionUpdate.class);
-//        startService(VC);
-
-//        Intent in = getIntent();
-//
-//        if (in != null) {
-//            Bundle b = in.getExtras();
-//            if(b != null) {
-//
-//                Intent showActivity = new Intent(LoginActivity.this, Message_Detail_Activity.class);
-//                Bundle bundle = new Bundle();
-//                bundle.putString(getString(R.string.Title), b.getString(getString(R.string.Title)));
-//                bundle.putString(getString(R.string.Body), b.getString(getString(R.string.Body)));
-//                bundle.putInt(getString(R.string.ID), b.getInt(getString(R.string.ID)));
-//                bundle.putBoolean(getString(R.string.Seen), b.getBoolean(getString(R.string.Seen)));
-//                bundle.putBoolean(getString(R.string.Critical), b.getBoolean(getString(R.string.Critical)));
-//                bundle.putBoolean(getString(R.string.SendSeen), b.getBoolean(getString(R.string.SendSeen)));
-//
-//                String s = b.getString(getString(R.string.Title));
-//                if(s != null)
-//                    if(!s.isEmpty()) {
-//                        showActivity.putExtras(bundle);
-////            showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                        showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//
-//                        startActivity(showActivity);
-//                    }
-//            }
-//        }
 
 
 
@@ -225,27 +176,13 @@ public class LoginActivity extends AppCompatActivity {
                 pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
                 AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//                setTitle(R.string.Connecting);
-//                long interval = INTERVAL_FIFTEEN_MINUTES;
-//                    int interval = 60000;
 
-//                manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(), interval, pendingIntent);
                 manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
-//                Toast.makeText(this, "Alarm Set", Toast.LENGTH_SHORT).show();
                 Log.i("Alarm", "Set");
                 Intent intent = new Intent(this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK| Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(intent);
-//                    if (share.GetActivation().equals(getString(R.string.Active))) {
-////                    GetMessagesfromDB();
-////                    ShowMessages();
-//                GetMessagesfromDB();
-//                ShowMessages();
 
-//                GetMessages oo = new GetMessages();
-//                oo.execute("");
-//                UpdateUI();
-//                    }
 
                 break;
             }
@@ -256,20 +193,11 @@ public class LoginActivity extends AppCompatActivity {
                 pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
                 AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//                long interval = INTERVAL_FIFTEEN_MINUTES;
-//                int interval = 60000;
 
-//                manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(), interval, pendingIntent);
-//                setTitle(R.string.Connecting);
                 manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
-//            Toast.makeText(this, "Alarm Set", Toast.LENGTH_SHORT).show();
+
                 Log.i("Alarm", "Set");
-//                if (share.GetActivation().equals(getString(R.string.Active))) {
-////                GetMessagesfromDB();
-////                ShowMessages();
-//                    GetMessages oo = new GetMessages();
-//                    oo.execute("");
-//                }
+
                 break;
             }
             case Invalid:

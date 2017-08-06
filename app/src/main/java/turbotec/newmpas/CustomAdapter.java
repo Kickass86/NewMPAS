@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 
 public class CustomAdapter extends BaseAdapter {
-    static final String PROVIDER_NAME = "turbotec.newmpas.MessageProvider.messages";
+    static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
     static final String URL1 = "content://" + PROVIDER_NAME + "/messages/1";
     static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent/";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
@@ -43,7 +43,10 @@ public class CustomAdapter extends BaseAdapter {
     }
 
     public static void set(MainActivity mainActivity) {
+//        if(activity == null) {
         activity = mainActivity;
+//        }
+
     }
 
     public static CustomAdapter getInstance(Context context) {
@@ -174,7 +177,7 @@ public class CustomAdapter extends BaseAdapter {
                     holder.cb.setVisibility(View.VISIBLE);
 
                     activity.invalidateOptionsMenu();
-                    notifyDataSetChanged();
+//                    notifyDataSetChanged();
                 }
 
 
@@ -194,12 +197,13 @@ public class CustomAdapter extends BaseAdapter {
                 holder.cb.setVisibility(View.VISIBLE);
             activity.invalidateOptionsMenu();
 
-        } else if (activity.isSelected) {
-            if (holder.cb != null)
-                holder.cb.setVisibility(View.GONE);
-            activity.invalidateOptionsMenu();
-
         }
+//        else if (activity.isSelected) {
+//            if (holder.cb != null)
+//                holder.cb.setVisibility(View.GONE);
+//            activity.invalidateOptionsMenu();
+//
+//        }
 
 
         rowView.setOnClickListener(new View.OnClickListener() {
@@ -279,15 +283,15 @@ public class CustomAdapter extends BaseAdapter {
 //                        htemp.cb.setChecked(true);
 
 
-                    if (!activity.isSelected) {
+//                    if (!activity.isSelected) {
 
                         activity.invalidateOptionsMenu();
 
-                        activity.isSelected = true;
-                    } else {
-
-                        activity.invalidateOptionsMenu();
-                    }
+//                        activity.isSelected = true;
+//                    } else {
+//
+//                        activity.invalidateOptionsMenu();
+//                    }
 
 
                 }

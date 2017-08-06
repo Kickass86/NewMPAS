@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 public class Message_Detail_Activity extends Activity {
 
-    static final String PROVIDER_NAME = "turbotec.newmpas.MessageProvider.messages";
+    static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
     static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
     static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);

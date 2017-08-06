@@ -4,7 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -18,14 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <provider
-            android:name="turbotec.newmpas.MessageProvider"
-            android:authorities="turbotec.newmpas.MessageProvider.messages"
-            android:enabled="true"
-            android:exported="false"></provider>
 
         <activity android:name=".MainActivity">
-
         </activity>
 
         <activity
@@ -33,18 +27,17 @@
             android:exported="false"
             android:label="@string/app_name"></activity>
 
-
-        <service
-            android:name=".SyncService"
-            android:exported="false"></service>
-
-        <activity android:name=".LoginActivity">
+        <activity android:name=".StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".LoginActivity"></activity>InstallActivity
+
+        <activity android:name=".InstallActivity"></activity>
 
         <receiver
             android:name=".AlarmReceiver"
@@ -54,6 +47,22 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
+
+        <provider
+            android:name=".MyProvider"
+            android:authorities="turbotec.newmpas.MyProvider"
+            android:enabled="true"
+            android:exported="false"></provider>
+
+        <service
+            android:name=".SyncService"
+            android:exported="false"></service>
+
+        <service
+            android:name=".VersionUpdate"
+            android:exported="false"></service>
+
+
     </application>
 
 </manifest>

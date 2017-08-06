@@ -1,7 +1,6 @@
 package turbotec.newmpas;
 
 import android.app.DownloadManager;
-import android.app.IntentService;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -76,19 +75,6 @@ public class VersionUpdate extends Service {
                         Log.d("Downloaded!", "2");
                         if (downloadReference == referenceId) {
 
-
-//                            PackageManager pm = getPackageManager();
-//                            pm.setComponentEnabledSetting(new ComponentName(context, turbotec.mpas.MainActivity.class),
-//                                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-//                            pm.setComponentEnabledSetting(new ComponentName(context, turbotec.mpas.Message_Detail_Activity.class),
-//                                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-//
-//                            Intent installIntent = new Intent(Intent.ACTION_VIEW);
-//                            installIntent.setDataAndType(Uri.fromFile(myFile),
-//                                    "application/vnd.android.package-archive");
-//                            installIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-
                             Intent InstallIntent = new Intent(context, InstallActivity.class);
                             InstallIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION|Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -97,13 +83,9 @@ public class VersionUpdate extends Service {
                             InstallIntent.putExtras(bundle);
                             startActivity(InstallIntent);
 
-//                            stopSelf();
-
 
                         }
 
-
-//                        }
 
 
                     } else {
@@ -112,6 +94,7 @@ public class VersionUpdate extends Service {
 
                     }
                 }
+                c.close();
 
 
             }
@@ -122,11 +105,8 @@ public class VersionUpdate extends Service {
 
 
     public VersionUpdate() {
-//        super("Version Check");
         super();
-
         share = SharedPreferenceHandler.getInstance(this);
-
 
     }
 
@@ -140,7 +120,6 @@ public class VersionUpdate extends Service {
                 Process.THREAD_PRIORITY_FOREGROUND);
         thread.start();
 
-        // Get the HandlerThread's Looper and use it for our Handler
         mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
     }
@@ -173,7 +152,7 @@ public class VersionUpdate extends Service {
 
             // This method will block no more than timeoutMs.
             // If the timeout occurs, SocketTimeoutException is thrown.
-            int timeoutMs = 800;   // 200 milliseconds
+            int timeoutMs = 5000;   // 800 milliseconds
             sock.connect(sockaddr, timeoutMs);
             exists = true;
 
@@ -243,7 +222,7 @@ public class VersionUpdate extends Service {
                     c.connect();
 
 //
-//            URL url = new URL(requestString);
+//            URL1 url = new URL1(requestString);
 //            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 //            urlConnection.connect();
                     int code = c.getResponseCode();
@@ -315,13 +294,6 @@ public class VersionUpdate extends Service {
                 if (((latestVersion == 0) & (v > VersionCode)) & (myFile.exists()))// file downloaded before
                 {
 
-//                    PackageManager pm = getPackageManager();
-//                    pm.setComponentEnabledSetting(new ComponentName(this, turbotec.mpas.MainActivity.class),
-//                            PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-//                    pm.setComponentEnabledSetting(new ComponentName(this, turbotec.mpas.Message_Detail_Activity.class),
-//                            PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-
-
                     Intent InstallIntent = new Intent(getApplicationContext(), InstallActivity.class);
                     InstallIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION|Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -329,15 +301,6 @@ public class VersionUpdate extends Service {
                     bundle.putString(getString(R.string.MyFile), MyFileAddress);
                     InstallIntent.putExtras(bundle);
                     startActivity(InstallIntent);
-
-
-//                    Intent installIntent = new Intent(Intent.ACTION_VIEW);
-//                    installIntent.setDataAndType(Uri.fromFile(myFile),
-//                            "application/vnd.android.package-archive");
-//                    installIntent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-
-//                finish();
 
                 } else {
 
@@ -353,19 +316,6 @@ public class VersionUpdate extends Service {
                             myFile = new File(MyFileAddress);
                             if (myFile.exists()) // file downloaded before
                             {
-
-//                                PackageManager pm = getPackageManager();
-//                                pm.setComponentEnabledSetting(new ComponentName(this, turbotec.mpas.MainActivity.class),
-//                                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-//                                pm.setComponentEnabledSetting(new ComponentName(this, turbotec.mpas.Message_Detail_Activity.class),
-//                                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-
-
-//                                Intent installIntent = new Intent(Intent.ACTION_VIEW);
-//                                installIntent.setDataAndType(Uri.fromFile(myFile),
-//                                        "application/vnd.android.package-archive");
-//                                installIntent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
 
                                 Intent InstallIntent = new Intent(getApplicationContext(), InstallActivity.class);
                                 InstallIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION|Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -412,187 +362,4 @@ public class VersionUpdate extends Service {
         }
     }
 
-//    @Override
-//    protected void onHandleIntent(Intent intent) {
-//
-//        boolean up = intent.getBooleanExtra("Update", false);
-//        IntentFilter filter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
-//        registerReceiver(downloadReceiver,filter);
-//        if (isLocalReachable()) {
-//            requestString = "http://192.168.1.13/Andr/CheckVersion.ashx?Value=";
-//            downloadString = "http://192.168.1.13/Andr/Download.ashx";
-//
-//        } else {
-//            requestString = "https://mpas.migtco.com:3000/Andr/CheckVersion.ashx?Value=";
-//            downloadString = "https://mpas.migtco.com:3000/Andr/Download.ashx";
-//
-//        }
-//
-////        String requestString = intent.getStringExtra(REQUEST_STRING);
-//        Log.v("Intent Service", "Check Request");
-//        int responseMessage = 0;
-//        String value = "Val1=" + share.GetDeviceID() + ",Val2=" + share.GetToken();
-//        requestString = requestString + new String(Base64.encode(value.getBytes(), Base64.DEFAULT));
-////        downloadString = downloadString + new String(Base64.encode(value.getBytes(), Base64.DEFAULT));
-//        requestString = requestString.replaceAll("\n", "");
-////        downloadString = downloadString.replaceAll("\n", "");
-//
-//        try {
-//
-//
-//            url = new URL(requestString);
-//            HttpURLConnection c = (HttpURLConnection) url.openConnection();
-//            c.setRequestMethod("GET");
-////            c.setDoOutput(true);
-//            c.connect();
-//
-////
-////            URL url = new URL(requestString);
-////            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-////            urlConnection.connect();
-//            int code = c.getResponseCode();
-//            String s = "";
-//            if (code == 200) {
-//
-////                String s = urlConnection.getResponseMessage();
-//                final InputStream is = c.getInputStream();
-//
-//                if (is != null) {
-//                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
-//                    String line = "";
-//
-//                    while ((line = bufferedReader.readLine()) != null)
-//                        s += line;
-//                    is.close();
-//                }
-//
-//            }
-//            c.disconnect();
-//            if (!(s.contains("Invalid") | s.contains("Error") | s.contains("Unable") | (s.contains("unexpected")))) {
-//                responseMessage = Integer.valueOf(s);
-//            } else {
-//                responseMessage = 0;
-//            }
-//
-//
-//        } catch (Exception e) {
-//            Log.w("HTTP:", e);
-//            responseMessage = 0;
-//        }
-//
-//
-//
-////        if(up) {
-//            latestVersion = responseMessage;
-//            String appURI = downloadString;
-//
-//            String fv = share.GetFileVersion();
-//
-//            PackageInfo pInfo = null;
-//            int VersionCode = 0;
-//            try {
-//                pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-//
-//                VersionCode = pInfo.versionCode;
-//            } catch (PackageManager.NameNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//
-//            //get the app version Code for checking
-//
-//            int v = 0;
-//            if (!fv.equals(getString(R.string.defaultValue))) {
-//                v = Integer.valueOf(fv);
-//            }
-//
-//            myFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/MPAS-V" + fv + ".apk");
-//
-//            if (((latestVersion == 0) & (v > VersionCode)) & (myFile.exists()))// file downloaded before
-//            {
-//
-//                PackageManager pm = getPackageManager();
-//                pm.setComponentEnabledSetting(new ComponentName(this, turbotec.mpas.MainActivity.class),
-//                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-//                pm.setComponentEnabledSetting(new ComponentName(this, turbotec.mpas.Message_Detail_Activity.class),
-//                        PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-//
-//
-//                Intent installIntent = new Intent(Intent.ACTION_VIEW);
-//                installIntent.setDataAndType(Uri.fromFile(myFile),
-//                        "application/vnd.android.package-archive");
-//                installIntent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-//
-////                finish();
-//                return;
-//            } else {
-//
-//                try {
-////
-//
-//                    if ((latestVersion != 0) & (latestVersion > (VersionCode))) {
-//
-//
-//                        //check if we need to upgrade?
-//                        myFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/MPAS-V" + latestVersion + ".apk");
-//                        if (myFile.exists()) // file downloaded before
-//                        {
-//
-//                            PackageManager pm = getPackageManager();
-//                            pm.setComponentEnabledSetting(new ComponentName(this, turbotec.mpas.MainActivity.class),
-//                                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-//                            pm.setComponentEnabledSetting(new ComponentName(this, turbotec.mpas.Message_Detail_Activity.class),
-//                                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
-//
-//
-//                            Intent installIntent = new Intent(Intent.ACTION_VIEW);
-//                            installIntent.setDataAndType(Uri.fromFile(myFile),
-//                                    "application/vnd.android.package-archive");
-//                            installIntent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-//
-//
-//                            return;
-//                        }
-//
-//                        //oh yeah we do need an upgrade, let the user know send an alert message
-//
-//                        //start downloading the file using the download manager
-//                        DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-//                        Uri Download_Uri = Uri.parse(appURI);
-//                        DownloadManager.Request request = new DownloadManager.Request(Download_Uri);
-//
-//
-//                        request.setDestinationUri(Uri.fromFile(myFile));
-//                        request.setMimeType("application/vnd.android.package-archive");
-//                        downloadReference = downloadManager.enqueue(request);
-//                        Log.d("Downloaded!", "3");
-//
-//
-//                    }
-//
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//
-//
-//            }
-////        }
-////        else
-////        {
-////            Intent broadcastIntent = new Intent();
-////            broadcastIntent.setAction(SplashActivity.VersionCheckReceiver.PROCESS_RESPONSE);
-////            broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-////            broadcastIntent.putExtra(RESPONSE_MESSAGE, responseMessage);
-////            broadcastIntent.putExtra(REQUEST_DOWNLOAD, downloadString);
-////            Log.e("Version Check", " +1");
-////            sendBroadcast(broadcastIntent);
-////            Calendar c = Calendar.getInstance();
-////            share.SaveLastCheckDay(c.get(Calendar.DAY_OF_YEAR));
-////            share.SaveLastCheckHour(c.get(Calendar.HOUR_OF_DAY));
-////
-////        }
-//
-//    }
 }

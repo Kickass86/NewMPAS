@@ -27,17 +27,18 @@ import java.net.SocketAddress;
 public class SendStatusAsyncTask extends AsyncTask {
 
 
-    static final String PROVIDER_NAME = "turbotec.newmpas.MessageProvider.messages";
+    static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
     static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
     static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
     static final Uri CONTENT_URI2 = Uri.parse(URL2);
+    //    private final DatabaseHandler db;
+//    private final SQLiteDatabase database;
+    private static final int Timeout = 70000;
     private final Context MyContext;
     private final String ip = "192.168.1.13";
     private final int port = 80;
     private final SharedPreferenceHandler share;
-//    private final DatabaseHandler db;
-//    private final SQLiteDatabase database;
     private final String OPERATION_NAME_DELIVERED = "Delivered";
     private String SOAP_ACTION_DELIVERED = "Delivered";
     private String WSDL_TARGET_NAMESPACE;

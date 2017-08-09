@@ -21,16 +21,16 @@ public class MyProvider extends ContentProvider {
 
 
     static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
-    static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
-    static final String URL2 = "content://" + PROVIDER_NAME + "/tasks/";
-    static final Uri CONTENT_URI = Uri.parse(URL1);
+    //    static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
+//    static final String URL2 = "content://" + PROVIDER_NAME + "/tasks/";
+//    static final Uri CONTENT_URI = Uri.parse(URL1);
     static final int Message_ID  = 1;
     static final int Unsent = 2;
     static final int Tasks = 3;
     static final UriMatcher uriMatcher;
     // Table Name
     static final String TABLE_MESSAGES = "MESSAGES";
-    static final String TABLE_TASKS = "MESSAGES";
+    static final String TABLE_TASKS = "TASKS";
     private static final String MESSAGE_ID = "_id";
     private static final String MESSAGE_Title = "MessageTitle";
     private static final String MESSAGE_BODY = "MessageBody";
@@ -46,16 +46,17 @@ public class MyProvider extends ContentProvider {
                     " TEXT," + Critical + " Boolean," + Seen + " Boolean,"
                     + SendDelivered + " Boolean," + SendSeen + " Boolean)";
     private static final String TASK_ID = "_id";
-    private static final String TASK_Title = "MessageTitle";
-    private static final String Task_Description = "MessageBody";
-    private static final String TASK_DueDate = "InsertDate";
-    private static final String TASK_Creator = "Critical";
-    private static final String TASK_Status = "Seen";
+    private static final String TASK_Title = "TaskTitle";
+    private static final String Task_Description = "TaskDescription";
+    private static final String TASK_DueDate = "DueDate";
+    private static final String TASK_Creator = "TaskCreator";
+    private static final String TASK_Status = "TaskStatus";
+    private static final String isSeen = "isSeen";
     static final String CREATE_TASKS_TABLE =
             "CREATE TABLE " + TABLE_TASKS + "(" +
                     TASK_ID + " TEXT PRIMARY KEY," +
                     TASK_Title + " TEXT," + Task_Description + " TEXT," + TASK_DueDate +
-                    " TEXT," + TASK_Creator + " TEXT," + TASK_Status + " TEXT)";
+                    " TEXT," + TASK_Creator + " TEXT," + TASK_Status + " TEXT," + isSeen + " Boolean," + SendDelivered + " Boolean)";
 
     private static final String DATABASE_NAME = "MPAS";
 //    private static HashMap<String, String> MESSAGES_PROJECTION_MAP;
@@ -64,7 +65,8 @@ public class MyProvider extends ContentProvider {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(PROVIDER_NAME, "/messages/#", Message_ID);
         uriMatcher.addURI(PROVIDER_NAME, "/messages/unsent/", Unsent);
-        uriMatcher.addURI(PROVIDER_NAME, "/tasks/", Tasks);
+        uriMatcher.addURI(PROVIDER_NAME, "/tasks/*", Tasks);
+        uriMatcher.addURI(PROVIDER_NAME, "/tasks/unsent/", Tasks);
     }
 
     private DatabaseHandler dbHelper;
@@ -95,12 +97,13 @@ public class MyProvider extends ContentProvider {
             id = uri.getPathSegments().get(1);
             cursor = dbHelper.getMessages(id, projection, selection, selectionArgs, sortOrder);
         } else if (uriMatcher.match(uri) == Unsent) {
-            cursor = dbHelper.getUnsend(projection, selection, selectionArgs, sortOrder);
+            cursor = dbHelper.getUnsendMessage(projection, selection, selectionArgs, sortOrder);
         } else if (uriMatcher.match(uri) == Tasks) {
-            id = uri.getPathSegments().get(1);
-            cursor = dbHelper.getTasks(id, projection, selection, selectionArgs, sortOrder);
+//            id = uri.getPathSegments().get(1);
+//            cursor = dbHelper.getTasks(id, projection, selection, selectionArgs, sortOrder);
+            cursor = dbHelper.getTasks("", projection, selection, selectionArgs, sortOrder);
         } else {
-            cursor = dbHelper.getUnsend(projection, selection, selectionArgs, sortOrder);
+            cursor = dbHelper.getTasks("", projection, selection, selectionArgs, sortOrder);
         }
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
 //        getContext().getContentResolver().notifyChange(uri, null);
@@ -272,8 +275,7 @@ public class MyProvider extends ContentProvider {
         }
 
 
-
-        public Cursor getUnsend(String[] projection, String selection, String[] selectionArg, String sortOrder) {
+        public Cursor getUnsendMessage(String[] projection, String selection, String[] selectionArg, String sortOrder) {
             SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
             sqliteQueryBuilder.setTables(TABLE_MESSAGES);
 
@@ -289,6 +291,24 @@ public class MyProvider extends ContentProvider {
                     sortOrder);
             return cursor;
         }
+
+        public Cursor getUnsendTask(String[] projection, String selection, String[] selectionArg, String sortOrder) {
+            SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
+            sqliteQueryBuilder.setTables(TABLE_TASKS);
+
+            if (sortOrder == null || sortOrder == "") {
+                sortOrder = TASK_DueDate + " DESC";
+            }
+            Cursor cursor = sqliteQueryBuilder.query(getReadableDatabase(),
+                    projection,
+                    selection,
+                    selectionArg,
+                    null,
+                    null,
+                    sortOrder);
+            return cursor;
+        }
+
 
 
         public long addNewMessage(ContentValues values) throws SQLException {

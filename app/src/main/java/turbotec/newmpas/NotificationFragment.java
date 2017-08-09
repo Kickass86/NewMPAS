@@ -49,8 +49,7 @@ public class NotificationFragment extends Fragment {
 //        ListView list = (ListView)view.findViewById(R.id.list);
 
 
-
-//        m_adapter = new SimpleCursorAdapter(getContext(), R.layout.list_row_layout, null, new String[]{}, new int[]{1}, 0);
+//        m_adapter = new SimpleCursorAdapter(getContext(), R.layout.list_row_layout_message, null, new String[]{}, new int[]{1}, 0);
 
 //        list.setAdapter(m_adapter);
 //        refreshValuesFromContentProvider();
@@ -63,9 +62,10 @@ public class NotificationFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         ListView list = (ListView) view.findViewById(R.id.list_notification);
+        list.setScrollingCacheEnabled(false);
 //        getActivity();
-//        CustomAdapter.set(acticity);
-        CustomAdapter adapter = CustomAdapter.getInstance(getContext());
+//        NotificationsAdapter.set(acticity);
+        NotificationsAdapter adapter = NotificationsAdapter.getInstance(getContext());
 
 
         TextView tv = (TextView) view.findViewById(R.id.empty1);

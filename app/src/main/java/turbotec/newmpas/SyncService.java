@@ -19,10 +19,12 @@ import android.util.Base64;
 import android.util.Log;
 
 import org.ksoap2.SoapEnvelope;
+import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -44,8 +46,15 @@ public class SyncService extends IntentService {
     static final String URL3 = "content://" + PROVIDER_NAME + "/tasks/";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
     static final Uri CONTENT_URI2 = Uri.parse(URL2);
-    static final Uri CONTENT_URI3 = Uri.parse(URL3);
+    //    static final Uri CONTENT_URI3 = Uri.parse(URL3);
     private static final int Timeout = 70000;
+    private static final String TASK_ID = "_id";
+    private static final String TASK_Title = "TaskTitle";
+    private static final String Task_Description = "TaskDescription";
+    private static final String TASK_DueDate = "DueDate";
+    private static final String TASK_Creator = "TaskCreator";
+    private static final String TASK_Status = "TaskStatus";
+    private static final String isSeen = "isSeen";
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
 //    private static final String ACTION_FOO = "turbotec.newmpas.action.FOO";
@@ -56,11 +65,16 @@ public class SyncService extends IntentService {
     private final String ip = "192.168.1.13";
     private final int port = 80;
     private SharedPreferenceHandler share;
+    private NotificationManager mNotificationManager;
+    private NotificationCompat.Builder mBuilder;
+    private HttpTransportSE httpTransport;
+    private SoapSerializationEnvelope envelopeDel;
+    private Object response;
     private boolean isCritical = false;
     private boolean New = false;
     private boolean isDuplicate = false;
     private String FLag = "Invalid";
-    private String MIDs = "";
+    private String IDs = "";
     private String TIDs = "";
     private String TID = "";
     private int MessageID;
@@ -187,8 +201,8 @@ public class SyncService extends IntentService {
         // TODO: Handle action Foo
 //        throw new UnsupportedOperationException("Not yet implemented");
 
-        NotificationCompat.Builder mBuilder;
-        NotificationManager mNotificationManager =
+
+        mNotificationManager =
                 (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
 
@@ -211,11 +225,9 @@ public class SyncService extends IntentService {
             }
 
 
-
             plaintext = new String(Base64.encode(plaintext.getBytes(), Base64.DEFAULT));
 
             plaintext = plaintext.replaceAll("\n", "");
-//            SoapObject request = new SoapObject("http://mpas.migtco.com/", "CheckUser");
             SoapObject request = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_CHECK);
             PropertyInfo pi = new PropertyInfo();
             pi.setName("Value");
@@ -230,12 +242,9 @@ public class SyncService extends IntentService {
 
             envelope.setOutputSoapObject(request);
 
-//            HttpTransportSE httpTransport = new HttpTransportSE("http://mpas.migtco.com/Andr/WS.asmx");
-            HttpTransportSE httpTransport = new HttpTransportSE(SOAP_ADDRESS);
-//            Object response = null;
-            Object response;
+            httpTransport = new HttpTransportSE(SOAP_ADDRESS);
 
-//            httpTransport.call("http://mpas.migtco.com/CheckUser", envelope);
+
             httpTransport.call(SOAP_ACTION_CHECK, envelope);
 
             response = envelope.getResponse();
@@ -252,7 +261,7 @@ public class SyncService extends IntentService {
             String Authresp = "";
             String Tokenresp = "";
             Log.e("Response ", response1.toString());
-//            SoapObject Messagesresp = new SoapObject("http://mpas.migtco.com/", "CheckUser");
+
             SoapObject Messagesresp = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_CHECK);
 
             if (auth.getPropertyCount() > 0)
@@ -269,436 +278,37 @@ public class SyncService extends IntentService {
                 Tokenresp = token.getProperty(0).toString();
             Log.e("Token Response", Tokenresp);
 
-            FLag = (Authresp + " : " + Tokenresp);
-
-//            if (message.getPropertyCount() > 0)
-//                Messagesresp = (SoapObject) message.getProperty(0);
+            FLag = (Authresp + Tokenresp);
 
 
             if (Authresp.contains("Invalid") | Authresp.contains("Error")) {
-//                share.SaveActivation(MyContext.getString(R.string.NotActive));
                 FLag = Authresp;
             } else if (Authresp.contains("Wait")) {
-//                share.SaveActivation(MyContext.getString(R.string.NotActive));
-//                share.SaveStatus("OK");
-                if (share.GetStatus().equals("Wait")) {
-//                    Flag_Change = false;
-                }
+
                 FLag = "Wait";
             } else { //(Authresp.contains("No Message"))
                 if (share.GetStatus().equals("OK")) {
-//                    Flag_Change = false;
                 }
-//                share.SaveActivation(MyContext.getString(R.string.Active));
                 FLag = "OK";
             }
             if (!Tokenresp.isEmpty()) {
-////                    share.SaveActivation(MyContext.getString(R.string.Active));
                 share.SaveToken(Tokenresp);
             }
 
+            InsertMessages(message);
 
-            int index = 0;
-
-            while (index < message.getPropertyCount()) {
-//                if(!share.GetStatus().equals("OK")){
-//                Flag_Change = true;
-//                }
-//                share.SaveActivation(MyContext.getString(R.string.Active));
-                FLag = "OK";
-
-//                MessageObject temp;
-                SoapObject Message = (SoapObject) message.getProperty(index);
-
-
-//                temp = new MessageObject(
-                MessageID     = Integer.valueOf(Message.getProperty(0).toString());
-                MessageTitle  = Message.getProperty(1).toString().trim();
-                MessageBody   = Message.getProperty(2).toString().trim();
-                InsertDate    = Message.getProperty(3).toString();
-                Critical      = Boolean.valueOf(Message.getProperty(4).toString());
-                Seen          = false;
-                SendDelivered = false;
-                SendSeen      = false;
-//                );
-//                if (db.CheckExist(Integer.valueOf(Message.getProperty(0).toString()), MyContext)) {
-                Cursor c = getContentResolver().query(Uri.parse(URL1 + MessageID), new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(MessageID)}, null);
-                if (c != null) {
-                    if (c.moveToFirst()) {
-                        index++;
-                        continue;
-                    }
-                }
-                c.close();
-                New = true;
-                MIDs = MIDs + Message.getProperty(0).toString() + ";";
-//                MIDs[index] = Message.getProperty(0).toString();
-
-
-                isCritical = Boolean.valueOf(Message.getProperty(4).toString());
-
-
-                if (isCritical) {
-//
-
-                    long[] pattern = {1000, 1000, 1000, 1000, 1000};
-                    Vibrator vibrator = (Vibrator) MyContext.getSystemService(Context.VIBRATOR_SERVICE);
-                    vibrator.vibrate(pattern, -1);
-                    try {
-                        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                        Ringtone r = RingtoneManager.getRingtone(MyContext, notification);
-                        r.play();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                } else {
-                    if (!isAppForeground(MyContext)) {
-
-                        Log.i("Notify", "is running");
-                        Intent nid = new Intent(MyContext, MainActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putString(MyContext.getString(R.string.Title), MessageTitle);
-                        bundle.putString(MyContext.getString(R.string.Body), MessageBody);
-                        bundle.putBoolean(MyContext.getString(R.string.Critical), Critical);
-                        bundle.putBoolean(MyContext.getString(R.string.SendSeen), SendSeen);
-                        bundle.putInt(MyContext.getString(R.string.ID), MessageID);
-                        bundle.putBoolean(MyContext.getString(R.string.Seen), Seen);
-                        nid.putExtras(bundle);
-                        nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        PendingIntent ci = PendingIntent.getActivity(MyContext, MessageID, nid, 0);
-
-
-                        mBuilder =
-                                new android.support.v4.app.NotificationCompat.Builder(MyContext)
-                                        .setSmallIcon(R.mipmap.ic_launcher)
-//                                                .setSmallIcon(MyContext.getResources().getDrawable(R.mipmap.ic_launcher))
-                                        .setContentTitle(MessageTitle)
-                                        .setContentIntent(ci)
-                                        .setAutoCancel(true)
-//                                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
-//                                        .setDefaults(isDuplicate ? Notification.S : Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
-//                                        .setDefaults(Notification.DEFAULT_ALL)
-//                                        .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
-                                        .setContentText(MessageBody);
-                        if (!isDuplicate) {
-                            mBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
-                        }
-
-
-                        mNotificationManager.notify(MessageID, mBuilder.build());
-                        isDuplicate = true;
-                    }
-                }
-
-                ContentValues contentValues = new ContentValues();
-                contentValues.put("_id", Integer.valueOf(Message.getProperty(0).toString()));
-                contentValues.put("MessageTitle" , Message.getProperty(1).toString().trim());
-                contentValues.put("MessageBody", Message.getProperty(2).toString().trim());
-                contentValues.put("InsertDate", Message.getProperty(3).toString());
-                contentValues.put("Critical", Boolean.valueOf(Message.getProperty(4).toString()));
-                contentValues.put("Seen", false);
-                contentValues.put("SendDelivered", false);
-                contentValues.put("SendSeen", false);
-                getContentResolver().insert(CONTENT_URI1, contentValues);
-
-
-//                db.addMessage(temp);
-                index++;
-            }
-
-
-            index = 0;
-            while (index < tasks.getPropertyCount()) {
-
-                FLag = "OK";
-
-                SoapObject Task = (SoapObject) tasks.getProperty(index);
-
-
-                TaskID = Task.getProperty(0).toString();
-                TaskTitle = Task.getProperty(1).toString();
-                TaskDescription = Task.getProperty(2).toString();
-                TaskDueDate = Task.getProperty(3).toString();
-                TaskCreator = Task.getProperty(4).toString();
-                TaskStatus = Task.getProperty(5).toString();
-
-
-                Cursor c = getContentResolver().query(Uri.parse(URL3 + TaskID), new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(TaskID)}, null);
-                if (c != null) {
-                    if (c.moveToFirst()) {
-                        index++;
-                        continue;
-                    }
-                }
-                c.close();
-                New = true;
-                TID = TID + Task.getProperty(0).toString() + ";";
-//                MIDs[index] = Message.getProperty(0).toString();
-
-
-                isCritical = Boolean.valueOf(Task.getProperty(4).toString());
-
-
-                if (isCritical) {
-//
-
-                    long[] pattern = {1000, 1000, 1000, 1000, 1000};
-                    Vibrator vibrator = (Vibrator) MyContext.getSystemService(Context.VIBRATOR_SERVICE);
-                    vibrator.vibrate(pattern, -1);
-                    try {
-                        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                        Ringtone r = RingtoneManager.getRingtone(MyContext, notification);
-                        r.play();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                } else {
-                    if (!isAppForeground(MyContext)) {
-
-                        Log.i("Notify", "is running");
-                        Intent nid = new Intent(MyContext, MainActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putString(MyContext.getString(R.string.Title), MessageTitle);
-                        bundle.putString(MyContext.getString(R.string.Body), MessageBody);
-                        bundle.putBoolean(MyContext.getString(R.string.Critical), Critical);
-                        bundle.putBoolean(MyContext.getString(R.string.SendSeen), SendSeen);
-                        bundle.putInt(MyContext.getString(R.string.ID), MessageID);
-                        bundle.putBoolean(MyContext.getString(R.string.Seen), Seen);
-                        nid.putExtras(bundle);
-                        nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        PendingIntent ci = PendingIntent.getActivity(MyContext, MessageID, nid, 0);
-
-
-                        mBuilder =
-                                new android.support.v4.app.NotificationCompat.Builder(MyContext)
-                                        .setSmallIcon(R.mipmap.ic_launcher)
-//                                                .setSmallIcon(MyContext.getResources().getDrawable(R.mipmap.ic_launcher))
-                                        .setContentTitle(MessageTitle)
-                                        .setContentIntent(ci)
-                                        .setAutoCancel(true)
-//                                        .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
-//                                        .setDefaults(isDuplicate ? Notification.S : Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS)
-//                                        .setDefaults(Notification.DEFAULT_ALL)
-//                                        .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
-                                        .setContentText(MessageBody);
-                        if (!isDuplicate) {
-                            mBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
-                        }
-
-
-                        mNotificationManager.notify(MessageID, mBuilder.build());
-                        isDuplicate = true;
-                    }
-                }
-
-                ContentValues contentValues = new ContentValues();
-                contentValues.put("_id", Integer.valueOf(Task.getProperty(0).toString()));
-                contentValues.put("MessageTitle", Task.getProperty(1).toString().trim());
-                contentValues.put("MessageBody", Task.getProperty(2).toString().trim());
-                contentValues.put("InsertDate", Task.getProperty(3).toString());
-                contentValues.put("Critical", Boolean.valueOf(Task.getProperty(4).toString()));
-                contentValues.put("Seen", false);
-                contentValues.put("SendDelivered", false);
-                contentValues.put("SendSeen", false);
-                getContentResolver().insert(CONTENT_URI3, contentValues);
-                index++;
-            }
-
-
+            InsertTasks(tasks);
 
             isDuplicate = false;
-            if (New) {
-                String Status = "0";
-                String plaintxt = "value1=" + TID + ",value2=" + share.GetToken()
-                        + ",value3=" + Status;
 
+            HandleUnsendDelivery();
 
-                plaintxt = new String(Base64.encode(plaintxt.getBytes(), Base64.DEFAULT));
-                plaintxt = plaintxt.replaceAll("\n", "");
-
-                SoapObject requestDel = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_DELIVERED);
-                PropertyInfo Pinf = new PropertyInfo();
-                Pinf.setName("Value");
-                Pinf.setValue(plaintxt);
-                Pinf.setType(String.class);
-                requestDel.addProperty(Pinf);
-
-
-                SoapSerializationEnvelope envelopeDel = new SoapSerializationEnvelope(
-                        SoapEnvelope.VER11);
-                envelopeDel.dotNet = true;
-
-                envelopeDel.setOutputSoapObject(requestDel);
-
-
-                httpTransport.call(SOAP_ACTION_DELIVERED, envelopeDel);
-                response = envelopeDel.getResponse();
-
-
-                if (response.toString().contains(MyContext.getString(R.string.Delivered))) {
-
-                    ContentValues values = new ContentValues();
-                    values.put("SendDelivered", true);
-                    String[] TIDs = this.TID.split(";");
-                    for (String TID : TIDs) {
-//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                        getContentResolver().update(Uri.parse(URL1 + TID), values, "_id  = ?", new String[]{TID});
-                    }
-
-                } else if (response.toString().contains(MyContext.getString(R.string.Seen))) {
-
-                    ContentValues values = new ContentValues();
-                    values.put("SendSeen", true);
-                    values.put("SendDelivered", true);
-                    String[] TIDs = this.TID.split(";");
-                    for (String TID : TIDs) {
-//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                        getContentResolver().update(Uri.parse(URL3 + TID), values, "_id  = ?", new String[]{TID});
-                    }
-                }
-
-
-            }
-
-//            int undone = db.unSend(MyContext);
-            Cursor cursor = getContentResolver().query(CONTENT_URI3, new String[]{"*"}, null, null, null);
-            if(cursor != null) {
-                if (cursor.moveToFirst()) {
-//                DatabaseHandler d = DatabaseHandler.getInstance(MyContext);
-                    do {
-
-                        if ("1".equals(cursor.getString(6))) {
-                            int f = 0;
-                            TID = "";
-//                Cursor cursor = database.rawQuery("SELECT * from Messages WHERE SendDelivered = 0;", null);
-                            cursor = getContentResolver().query(CONTENT_URI3, null, "SendDelivered = ?", new String[]{"0"}, null);
-                            try {
-                                if (cursor != null) {
-                                    if (cursor.moveToFirst()) {
-                                        do {
-                                            TID = TID + cursor.getInt(0) + ";";
-
-                                        } while (cursor.moveToNext());
-                                    }
-                                    cursor.close();
-                                }
-
-                            } catch (Exception e) {
-                                e.getStackTrace();
-                            }
-
-
-                            String Status = "0";
-                            String plaintxt = "value1=" + TID + ",value2=" + share.GetToken()
-                                    + ",value3=" + Status;
-
-
-                            plaintxt = new String(Base64.encode(plaintxt.getBytes(), Base64.DEFAULT));
-                            plaintxt = plaintxt.replaceAll("\n", "");
-
-                            SoapObject requestDel = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_DELIVERED);
-                            PropertyInfo Pinf = new PropertyInfo();
-                            Pinf.setName("Value");
-                            Pinf.setValue(plaintxt);
-                            Pinf.setType(String.class);
-                            requestDel.addProperty(Pinf);
-
-
-                            SoapSerializationEnvelope envelopeDel = new SoapSerializationEnvelope(
-                                    SoapEnvelope.VER11);
-                            envelopeDel.dotNet = true;
-
-                            envelopeDel.setOutputSoapObject(requestDel);
-
-
-                            httpTransport.call(SOAP_ACTION_DELIVERED, envelopeDel);
-                            response = envelopeDel.getResponse();
-
-
-                            if (response.toString().contains(MyContext.getString(R.string.Delivered))) {
-                                ContentValues values = new ContentValues();
-                                values.put("SendDelivered", true);
-                                String[] TIDs = this.TID.split(";");
-                                for (String MID : TIDs) {
-//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                                    getContentResolver().update(Uri.parse(URL3 + TID), values, "_id  = ?", new String[]{TID});
-                                }
-
-                            }
-                        } else {
-//            } else if (undone == 2) {
-//                DatabaseHandler d = DatabaseHandler.getInstance(MyContext);
-                            int f = 1;
-                            TIDs = "";
-//                Cursor cursor = database.rawQuery("SELECT * from Messages WHERE SendSeen = 0  AND Seen = 1;", null);
-                            cursor = getContentResolver().query(CONTENT_URI3, null, "SendDelivered = ?", new String[]{"0"}, null);
-                            try {
-                                if (cursor != null) {
-                                    if (cursor.moveToFirst()) {
-                                        do {
-                                            TID = TID + cursor.getInt(0) + ";";
-
-                                        } while (cursor.moveToNext());
-                                    }
-                                    cursor.close();
-                                }
-
-                            } catch (Exception e) {
-                                e.getStackTrace();
-                            }
-
-
-                            String Status = "1";
-                            String plaintxt = "value1=" + TID + ",value2=" + share.GetToken()
-                                    + ",value3=" + Status;
-
-
-                            plaintxt = new String(Base64.encode(plaintxt.getBytes(), Base64.DEFAULT));
-                            plaintxt = plaintxt.replaceAll("\n", "");
-
-                            SoapObject requestDel = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_DELIVERED);
-                            PropertyInfo Pinf = new PropertyInfo();
-                            Pinf.setName("Value");
-                            Pinf.setValue(plaintxt);
-                            Pinf.setType(String.class);
-                            requestDel.addProperty(Pinf);
-
-
-                            SoapSerializationEnvelope envelopeDel = new SoapSerializationEnvelope(
-                                    SoapEnvelope.VER11);
-                            envelopeDel.dotNet = true;
-
-                            envelopeDel.setOutputSoapObject(requestDel);
-
-
-                            httpTransport.call(SOAP_ACTION_DELIVERED, envelopeDel);
-                            response = envelopeDel.getResponse();
-
-
-                            if (response.toString().contains(MyContext.getString(R.string.Seen))) {
-                                ContentValues values = new ContentValues();
-                                values.put("SendSeen", true);
-                                values.put("SendDelivered", true);
-                                String[] TIDs = this.TID.split(";");
-                                for (String TID : TIDs) {
-//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                                    getContentResolver().update(Uri.parse(URL1 + TID), values, "_id  = ?", new String[]{TID});
-                                }
-
-                            }
-                        }
-                    } while (cursor.moveToNext());
-                }
-            }
-            cursor.close();
-
-
-
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+
+
 
 
         if ((FLag.equals(MyContext.getString(R.string.OK))) | (FLag.equals(MyContext.getString(R.string.Wait))))
@@ -711,13 +321,279 @@ public class SyncService extends IntentService {
             mNotificationManager.cancelAll();
             if ((FLag.equals(MyContext.getString(R.string.OK))) | (FLag.equals(MyContext.getString(R.string.Wait))))
                 share.SaveStatus(FLag);
-//            return FLag;
+
 
         }
 
 
+    }
+
+    private void HandleUnsendDelivery() {
+
+        Cursor cursor = getContentResolver().query(CONTENT_URI2, null, "SendDelivered = ?", new String[]{"0"}, null);
+        try {
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        IDs = IDs + cursor.getInt(0) + ";";
+
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+            }
+
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
+        String Status = "0";
+        String plaintxt = "value1=" + IDs + ",value2=" + share.GetToken()
+                + ",value3=" + Status;
 
 
+        plaintxt = new String(Base64.encode(plaintxt.getBytes(), Base64.DEFAULT));
+        plaintxt = plaintxt.replaceAll("\n", "");
+
+        SoapObject requestDel = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_DELIVERED);
+        PropertyInfo Pinf = new PropertyInfo();
+        Pinf.setName("Value");
+        Pinf.setValue(plaintxt);
+        Pinf.setType(String.class);
+        requestDel.addProperty(Pinf);
+
+
+        envelopeDel = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+        envelopeDel.dotNet = true;
+
+        envelopeDel.setOutputSoapObject(requestDel);
+
+
+        try {
+            httpTransport.call(SOAP_ACTION_DELIVERED, envelopeDel);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        }
+        try {
+            response = envelopeDel.getResponse();
+        } catch (SoapFault soapFault) {
+            soapFault.printStackTrace();
+        }
+
+
+        if (response.toString().contains(MyContext.getString(R.string.Delivered))) {
+
+            ContentValues values = new ContentValues();
+            values.put("SendDelivered", true);
+            String[] MIDs = IDs.split(";");
+            for (String MID : MIDs) {
+//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
+                getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
+            }
+
+        } else if (response.toString().contains(MyContext.getString(R.string.Seen))) {
+
+            ContentValues values = new ContentValues();
+            values.put("SendSeen", true);
+            values.put("SendDelivered", true);
+            String[] MIDs = IDs.split(";");
+            for (String MID : MIDs) {
+//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
+                getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
+            }
+        }
+
+    }
+
+    private void InsertTasks(SoapObject tasks) {
+
+
+        int index = 0;
+        while (index < tasks.getPropertyCount()) {
+
+            FLag = "OK";
+
+            SoapObject Task = (SoapObject) tasks.getProperty(index);
+
+
+            TaskID = Task.getProperty(0).toString();
+            TaskTitle = Task.getProperty(1).toString();
+            TaskDescription = Task.getProperty(2).toString();
+            TaskDueDate = Task.getProperty(3).toString();
+            TaskCreator = Task.getProperty(4).toString();
+            TaskStatus = Task.getProperty(5).toString();
+
+
+            Cursor c = getContentResolver().query(Uri.parse(URL3 + TaskID), new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(TaskID)}, null);
+            if (c != null) {
+                if (c.getCount() > 0) {
+                    index++;
+                    continue;
+                } else {
+                    TID = TID + Task.getProperty(0).toString() + ";";
+                }
+            }
+            c.close();
+
+            long[] pattern = {1000, 1000, 1000, 1000, 1000};
+            Vibrator vibrator = (Vibrator) MyContext.getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(pattern, -1);
+            try {
+                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                Ringtone r = RingtoneManager.getRingtone(MyContext, notification);
+                r.play();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (!isAppForeground(MyContext)) {
+
+                Log.i("Notify", "is running");
+//                Intent nid = new Intent(MyContext, .class);
+                Bundle bundle = new Bundle();
+//                bundle.putInt(MyContext.getString(R.string.ID), TaskID);
+                bundle.putString(MyContext.getString(R.string.Title), TaskTitle);
+                bundle.putString(MyContext.getString(R.string.Body), TaskDescription);
+//                bundle.putBoolean(MyContext.getString(R.string.Critical), TaskDueDate);
+//                bundle.putBoolean(MyContext.getString(R.string.SendSeen), TaskCreator);
+//                bundle.putBoolean(MyContext.getString(R.string.Seen), TaskStatus);
+//                nid.putExtras(bundle);
+//                nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                PendingIntent ci = PendingIntent.getActivity(MyContext, MessageID, nid, 0);
+
+                mBuilder =
+                        new android.support.v4.app.NotificationCompat.Builder(MyContext)
+                                .setSmallIcon(R.mipmap.ic_assignment_black_24dp)
+                                .setContentTitle(MessageTitle)
+//                                .setContentIntent(ci)
+                                .setAutoCancel(true)
+                                .setContentText(MessageBody);
+                if (!isDuplicate) {
+                    mBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
+                }
+
+
+                mNotificationManager.notify(MessageID, mBuilder.build());
+                isDuplicate = true;
+            }
+
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(TASK_ID, Task.getProperty(0).toString());
+            contentValues.put(TASK_Title, Task.getProperty(1).toString().trim());
+            contentValues.put(Task_Description, Task.getProperty(2).toString().trim());
+            contentValues.put(TASK_DueDate, Task.getProperty(3).toString());
+            contentValues.put(TASK_Creator, Task.getProperty(4).toString());
+            contentValues.put(TASK_Status, Task.getProperty(5).toString());
+            contentValues.put(isSeen, false);
+
+            getContentResolver().insert(Uri.parse(URL3 + TaskID), contentValues);
+
+            index++;
+        }
+
+
+    }
+
+    private void InsertMessages(SoapObject message) {
+
+        int index = 0;
+
+        while (index < message.getPropertyCount()) {
+
+            FLag = "OK";
+
+            SoapObject Message = (SoapObject) message.getProperty(index);
+
+
+            MessageID = Integer.valueOf(Message.getProperty(0).toString());
+            MessageTitle = Message.getProperty(1).toString().trim();
+            MessageBody = Message.getProperty(2).toString().trim();
+            InsertDate = Message.getProperty(3).toString();
+            Critical = Boolean.valueOf(Message.getProperty(4).toString());
+            Seen = false;
+            SendDelivered = false;
+            SendSeen = false;
+
+            Cursor c = getContentResolver().query(Uri.parse(URL1 + MessageID), new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(MessageID)}, null);
+            if (c != null) {
+                if (c.getCount() > 0) {
+                    index++;
+                    continue;
+                }
+            }
+            c.close();
+
+            IDs = IDs + Message.getProperty(0).toString() + ";";
+
+
+            isCritical = Boolean.valueOf(Message.getProperty(4).toString());
+
+
+            if (isCritical) {
+
+
+                long[] pattern = {1000, 1000, 1000, 1000, 1000};
+                Vibrator vibrator = (Vibrator) MyContext.getSystemService(Context.VIBRATOR_SERVICE);
+                vibrator.vibrate(pattern, -1);
+                try {
+                    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                    Ringtone r = RingtoneManager.getRingtone(MyContext, notification);
+                    r.play();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            } else {
+                if (!isAppForeground(MyContext)) {
+
+                    Log.i("Notify", "is running");
+                    Intent nid = new Intent(MyContext, MainActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString(MyContext.getString(R.string.Title), MessageTitle);
+                    bundle.putString(MyContext.getString(R.string.Body), MessageBody);
+                    bundle.putBoolean(MyContext.getString(R.string.Critical), Critical);
+                    bundle.putBoolean(MyContext.getString(R.string.SendSeen), SendSeen);
+                    bundle.putInt(MyContext.getString(R.string.ID), MessageID);
+                    bundle.putBoolean(MyContext.getString(R.string.Seen), Seen);
+                    nid.putExtras(bundle);
+                    nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    PendingIntent ci = PendingIntent.getActivity(MyContext, MessageID, nid, 0);
+
+
+                    mBuilder =
+                            new android.support.v4.app.NotificationCompat.Builder(MyContext)
+                                    .setSmallIcon(R.mipmap.ic_message_black_24dp)
+                                    .setContentTitle(MessageTitle)
+                                    .setContentIntent(ci)
+                                    .setAutoCancel(true)
+                                    .setContentText(MessageBody);
+                    if (!isDuplicate) {
+                        mBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
+                    }
+
+
+                    mNotificationManager.notify(MessageID, mBuilder.build());
+                    isDuplicate = true;
+                }
+            }
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("_id", Integer.valueOf(Message.getProperty(0).toString()));
+            contentValues.put("MessageTitle", Message.getProperty(1).toString().trim());
+            contentValues.put("MessageBody", Message.getProperty(2).toString().trim());
+            contentValues.put("InsertDate", Message.getProperty(3).toString());
+            contentValues.put("Critical", Boolean.valueOf(Message.getProperty(4).toString()));
+            contentValues.put("Seen", false);
+            contentValues.put("SendDelivered", false);
+            contentValues.put("SendSeen", false);
+            getContentResolver().insert(Uri.parse(URL1 + MessageID), contentValues);
+
+            index++;
+        }
 
 
     }

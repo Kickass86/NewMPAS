@@ -132,7 +132,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
 
-//        CustomAdapter.getInstance(this);
+//        NotificationsAdapter.getInstance(this);
         share = SharedPreferenceHandler.getInstance(this);
         first = true;
         mCheckedState = new boolean[0];

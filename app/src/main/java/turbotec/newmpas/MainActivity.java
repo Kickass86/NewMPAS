@@ -2,18 +2,22 @@ package turbotec.newmpas;
 
 import android.app.AlertDialog;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -27,39 +31,80 @@ public class MainActivity extends AppCompatActivity {
 
 
     static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
-    static final String URL = "content://" + PROVIDER_NAME + "/messages/";
-    static final Uri CONTENT_URI = Uri.parse(URL);
+    static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
+    static final String URL2 = "content://" + PROVIDER_NAME + "/tasks/";
+    static final Uri CONTENT_URI = Uri.parse(URL1);
     private static final int NUM_PAGES = 2;
-    static boolean[] mCheckedState;
+    static boolean[] NotiCheckedState;
+    static boolean[] TaskCheckedState;
     static int Scroll_Position = 0;
-    static boolean Flag = true;
-    List<String> Mlist = new ArrayList<>(); //Messages List
-    List<String> Tlist = new ArrayList<>(); //Title List
-    List<Boolean> SList = new ArrayList<>(); //is Seen
+    static boolean NFlag = true;
+    static boolean TFlag = true;
+    static boolean Gone = false;
+    //    List<String> Mlist = new ArrayList<>(); //Messages List
+//    List<String> Tlist = new ArrayList<>(); //Title List
+//    List<Boolean> SList = new ArrayList<>(); //is Seen
     List<Integer> IList = new ArrayList<>(); //Message ID
-    List<Boolean> CList = new ArrayList<>(); //Critical
-    List<Boolean> SSList = new ArrayList<>(); //SendSeen
+    List<String> IDList = new ArrayList<>();
+    private SharedPreferenceHandler share = SharedPreferenceHandler.getInstance(this);
+    //    List<Boolean> CList = new ArrayList<>(); //Critical
+//    List<Boolean> SSList = new ArrayList<>(); //SendSeen
     //    boolean isSelected = false;
 //    private Menu mMenu;
     private boolean first = true;
     private ViewPager mPager;
     private ScreenSlidePagerAdapter mPagerAdapter;
+    private TabLayout tabLayout;
+
+
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+
+            String action = intent.getAction();
+
+            setTitle(getString(R.string.app_name));
+            if (action.equals("Alarm fire")) {
+
+                String stat = share.GetStatus();
+                if (stat.contains("OK")) {
+
+                    ListView lvno = (ListView) findViewById(R.id.list_notification);
+                    ListView lvta = (ListView) findViewById(R.id.list_task);
+                    if (tabLayout.getSelectedTabPosition() == 0) {
+
+                        NotificationsAdapter ad = NotificationsAdapter.getInstance(context);
+                        lvno.setAdapter(ad);
+                        ad.notifyDataSetChanged();
+
+                    } else if (tabLayout.getSelectedTabPosition() == 1) {
+
+                        TasksAdapter ad = TasksAdapter.getInstance(context);
+                        lvta.setAdapter(ad);
+                        ad.notifyDataSetChanged();
+                    }
+                    Log.i("is this ", "BroadcastReceiver");
+                }
+
+
+            }
+        }
+    };
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        CustomAdapter.getInstance(this);
+//        NotificationsAdapter.getInstance(this);
         setContentView(R.layout.activity_main);
-//        mCheckedState[0] = false;
+//        NotiCheckedState[0] = false;
 
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancelAll();
 
 
-//        Intent VC = new Intent(this,VersionUpdate.class);
-//        startService(VC);
 
         Intent in = getIntent();
 
@@ -90,9 +135,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        registerReceiver(broadcastReceiver, new IntentFilter("Alarm fire"));
 
-        CustomAdapter.set(this);
-
+        NotificationsAdapter.set(this);
+        TasksAdapter.set(this);
 
 
         List<Fragment> fragments = new Vector<>();
@@ -104,35 +150,67 @@ public class MainActivity extends AppCompatActivity {
 
         mPager.setAdapter(mPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mPager);
 
+        mPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 //do stuff here
+//                switch (tab.getPosition()) {
+//                    case 0: {
+//                        ListView lvno = (ListView) findViewById(R.id.list_notification);
+//                        lvno.setSelection(Scroll_Position);
+//                    }
+//                    case 1: {
+//                        ListView lvta = (ListView) findViewById(R.id.list_task);
+//                        lvta.setSelection(Scroll_Position);
+//                    }
+//                }
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
 
-                for (int i = 0; i < mCheckedState.length; i++) {
-                    mCheckedState[i] = false;
+                final TabLayout.Tab tb = tab;
+                int sumN = 0;
+                for (int i = 0; i < NotiCheckedState.length; i++) {
+                    sumN += NotiCheckedState[i] ? 1 : 0;
+                    NotiCheckedState[i] = false;
                 }
-//                CustomAdapter.set(MainActivity.this);
-                ListView lvno = (ListView) findViewById(R.id.list_notification);
-                ListView lvta = (ListView) findViewById(R.id.list_task);
-                if (lvno != null) {
-//                    CustomAdapter.set(this);
-                    CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
-                    lvno.setAdapter(ad);
-                    ad.notifyDataSetChanged();
-                } else if (lvta != null) {
-//                    CustomAdapter.set(this);
-                    CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
-                    lvta.setAdapter(ad);
-                    ad.notifyDataSetChanged();
+                int sumT = 0;
+                for (int i = 0; i < TaskCheckedState.length; i++) {
+                    sumT += TaskCheckedState[i] ? 1 : 0;
+                    TaskCheckedState[i] = false;
                 }
+
+                switch (tb.getPosition()) {
+                    case 0: {
+                        if (sumN > 0) {
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+                                    NotificationsAdapter NAda = NotificationsAdapter.getInstance();
+                                    NAda.notifyDataSetChanged();
+                                }
+                            }, 300);
+                        }
+                        break;
+                    }
+                    case 1: {
+                        if (sumT > 0) {
+                            new Handler().postDelayed(new Runnable() {
+                                public void run() {
+
+                                    TasksAdapter TAda = TasksAdapter.getInstance();
+                                    TAda.notifyDataSetChanged();
+                                }
+                            }, 300);
+                        }
+                        break;
+                    }
+                }
+
                 invalidateOptionsMenu();
             }
 
@@ -143,7 +221,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
 
+    @Override
+    protected void onDestroy() {
+
+        unregisterReceiver(broadcastReceiver);
+        super.onDestroy();
 
     }
 
@@ -152,45 +236,36 @@ public class MainActivity extends AppCompatActivity {
 
         outState.putBoolean("first", first);
         super.onSaveInstanceState(outState);
-    }
+        }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Flag = true;
-        ListView lvno = (ListView) findViewById(R.id.list_notification);
-        ListView lvta = (ListView) findViewById(R.id.list_task);
-        if (lvno != null) {
-            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
-            lvno.setAdapter(ad);
-            ad.notifyDataSetChanged();
+        NFlag = true;
+        TFlag = true;
+        if (Gone) {
+            ListView lvno = (ListView) findViewById(R.id.list_notification);
+            ListView lvta = (ListView) findViewById(R.id.list_task);
+            if (tabLayout.getSelectedTabPosition() == 0) {
 
-            lvno.post(new Runnable() {
-                @Override
-                public void run() {
-                    ListView lvno = (ListView) findViewById(R.id.list_notification);
-                    lvno.setSelection(Scroll_Position);
-                }
-            });
+                NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
+                lvno.setAdapter(ad);
+                ad.notifyDataSetChanged();
 
-        } else if (lvta != null) {
-            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
-            lvta.setAdapter(ad);
-            ad.notifyDataSetChanged();
-            lvta.post(new Runnable() {
-                @Override
-                public void run() {
-                    ListView lvta = (ListView) findViewById(R.id.list_task);
-                    lvta.setSelection(Scroll_Position);
-                }
-            });
+            } else if (tabLayout.getSelectedTabPosition() == 1) {
+
+                TasksAdapter ad = TasksAdapter.getInstance(this);
+                lvta.setAdapter(ad);
+                ad.notifyDataSetChanged();
+            }
+            Gone = false;
         }
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.main_menu, menu);
         MenuItem item_read = menu.findItem(R.id.menu_read);
         MenuItem item_delete = menu.findItem(R.id.menu_delete);
@@ -199,8 +274,18 @@ public class MainActivity extends AppCompatActivity {
 //        main_menu.findItem(R.id.menu_delete).setVisible(false);
 //        mMenu = menu;
         int sum = 0;
-        for (boolean b : mCheckedState) {
-            sum += b ? 1 : 0;
+        int total = 0;
+        if (tabLayout.getSelectedTabPosition() == 0) {
+            for (boolean b : NotiCheckedState) {
+                sum += b ? 1 : 0;
+            }
+            total = NotiCheckedState.length;
+
+        } else if (tabLayout.getSelectedTabPosition() == 1) {
+            for (boolean b : TaskCheckedState) {
+                sum += b ? 1 : 0;
+            }
+            total = TaskCheckedState.length;
         }
 
         if (sum > 0) {
@@ -212,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
             item_delete.setVisible(false);
             item_select.setVisible(false);
         }
-        if (sum == mCheckedState.length) {
+        if (sum == total) {
             item_select.setTitle(getString(R.string.menu_select_all));
             item_select.setIcon(R.mipmap.ic_check_box_black_24dp);
         } else if (sum > 0) {
@@ -234,123 +319,126 @@ public class MainActivity extends AppCompatActivity {
 //        item_select.setTitle("Deselect All");
 //        item_select.setIcon(R.mipmap.ic_check_box_outline_blank_black_24dp);
         int sum = 0;
-        for (boolean b : mCheckedState) {
-            sum += b ? 1 : 0;
-        }
-        if (sum == mCheckedState.length) {
-            opposite = false;
-//            item_select.setTitle("Deselect All");
-//            item_select.setIcon(R.mipmap.ic_check_box_outline_blank_black_24dp);
+        int total = 0;
+        if (tabLayout.getSelectedTabPosition() == 0) {
+            for (boolean b : NotiCheckedState) {
+                sum += b ? 1 : 0;
+            }
+            total = NotiCheckedState.length;
+
+        } else if (tabLayout.getSelectedTabPosition() == 1) {
+            for (boolean b : TaskCheckedState) {
+                sum += b ? 1 : 0;
+            }
+            total = TaskCheckedState.length;
         }
 
-        for (int i = 0; i < mCheckedState.length; i++) {
-            mCheckedState[i] = opposite;
+
+        if (sum == total) {
+            opposite = false;
         }
+
+        if (tabLayout.getSelectedTabPosition() == 0) {
+            for (int i = 0; i < total; i++) {
+                NotiCheckedState[i] = opposite;
+            }
+            NotificationsAdapter ad = NotificationsAdapter.getInstance();
+            ad.notifyDataSetChanged();
+
+        } else if (tabLayout.getSelectedTabPosition() == 1) {
+            for (int i = 0; i < total; i++) {
+                TaskCheckedState[i] = opposite;
+            }
+            TasksAdapter ad = TasksAdapter.getInstance();
+            ad.notifyDataSetChanged();
+        }
+
         invalidateOptionsMenu();
-//        getContentResolver().notifyChange(CONTENT_URI, null, false);
-        ListView lvno = (ListView) findViewById(R.id.list_notification);
-        ListView lvta = (ListView) findViewById(R.id.list_task);
-        if (lvno != null) {
-//            CustomAdapter.set(this);
-            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
-            lvno.setAdapter(ad);
-            ad.notifyDataSetChanged();
-        } else if (lvta != null) {
-//            CustomAdapter.set(this);
-            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
-            lvta.setAdapter(ad);
-            ad.notifyDataSetChanged();
-        }
+
     }
 
 
     private void MarkDelete() {
 
-//        ListView lv = (ListView) findViewById(R.id.list1);
-//        CheckBox cb;
 
-//        SQLiteDatabase database = db.getWritableDatabase();
-        for (int i = 0; i < mCheckedState.length; i++) {
-//            cb = (CheckBox) lv.getChildAt(i).findViewById(R.id.checkbox1);
+        if (tabLayout.getSelectedTabPosition() == 0) {
+            for (int i = 0; i < NotiCheckedState.length; i++) {
 
-            if (mCheckedState[i]) {
-                Integer ID;
-                ID = IList.get(i);
-//                database.delete("Messages", "MessageID  = ?", new String[]{String.valueOf(ID)});
-                getContentResolver().delete(Uri.parse(URL + ID), "_id  = ?", new String[]{String.valueOf(ID)});
+                if (NotiCheckedState[i]) {
+                    Integer ID;
+                    ID = IList.get(i);
+                    getContentResolver().delete(Uri.parse(URL1 + ID), "_id  = ?", new String[]{String.valueOf(ID)});
+                }
             }
-        }
-//        database.close();
-//        isSelected = false;
-//        mMenu.clear();
-//        adapt.notifyDataSetChanged();
-        for (int i = 0; i < mCheckedState.length; i++) {
-            mCheckedState[i] = false;
-        }
-//        adapt.notifyDataSetChanged();
-        invalidateOptionsMenu();
-        ListView lvno = (ListView) findViewById(R.id.list_notification);
-        ListView lvta = (ListView) findViewById(R.id.list_task);
-        if (lvno != null) {
-            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
-            lvno.setAdapter(ad);
+
+            for (int i = 0; i < NotiCheckedState.length; i++) {
+                NotiCheckedState[i] = false;
+            }
+            NotificationsAdapter ad = NotificationsAdapter.getInstance();
             ad.notifyDataSetChanged();
-        } else if (lvta != null) {
-            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
-            lvta.setAdapter(ad);
+
+        } else if (tabLayout.getSelectedTabPosition() == 1) {
+            for (int i = 0; i < TaskCheckedState.length; i++) {
+
+                if (TaskCheckedState[i]) {
+                    String ID;
+                    ID = IDList.get(i);
+                    getContentResolver().delete(Uri.parse(URL2 + ID), "_id  = ?", new String[]{String.valueOf(ID)});
+                }
+            }
+            for (int i = 0; i < TaskCheckedState.length; i++) {
+                TaskCheckedState[i] = false;
+            }
+            TasksAdapter ad = TasksAdapter.getInstance();
             ad.notifyDataSetChanged();
         }
 
-//        UpdateUI(share.GetStatus());
+        invalidateOptionsMenu();
+
 
     }
 
     private void MarkRead() {
 
+        if (tabLayout.getSelectedTabPosition() == 0) {
+            for (int i = 0; i < NotiCheckedState.length; i++) {
 
-//        SQLiteDatabase database = db.getWritableDatabase();
-        for (int i = 0; i < mCheckedState.length; i++) {
-//            cb = (CheckBox) lv.getChildAt(i).findViewById(R.id.checkbox1);
+                if (NotiCheckedState[i]) {
+                    Integer ID;
+                    ID = IList.get(i);
+                    ContentValues values = new ContentValues();
+                    values.put("Seen", true);
+                    getContentResolver().update(Uri.parse(URL1 + ID), values, "_id  = ?", new String[]{String.valueOf(ID)});
+                }
+            }
+            for (int i = 0; i < NotiCheckedState.length; i++) {
+                NotiCheckedState[i] = false;
+            }
+        } else if (tabLayout.getSelectedTabPosition() == 1) {
+            for (int i = 0; i < TaskCheckedState.length; i++) {
 
-            if (mCheckedState[i]) {
-                Integer ID;
-                ID = IList.get(i);
-                ContentValues values = new ContentValues();
-                values.put("Seen", true);
-//                database.update("Messages", values, "MessageID  = ?", new String[]{String.valueOf(ID)});
-                getContentResolver().update(Uri.parse(URL + ID), values, "_id  = ?", new String[]{String.valueOf(ID)});
+                if (TaskCheckedState[i]) {
+                    String ID;
+                    ID = IDList.get(i);
+                    ContentValues values = new ContentValues();
+                    values.put("isSeen", true);
+                    getContentResolver().update(Uri.parse(URL2 + ID), values, "_id  = ?", new String[]{String.valueOf(ID)});
+                }
+            }
+            for (int i = 0; i < TaskCheckedState.length; i++) {
+                TaskCheckedState[i] = false;
             }
         }
-//        database.close();
-//        isSelected = false;
-//        mMenu.clear();
-//        adapt.notifyDataSetChanged();
-        for (int i = 0; i < mCheckedState.length; i++) {
-            mCheckedState[i] = false;
-        }
-//        adapt.notifyDataSetChanged();
+
         invalidateOptionsMenu();
-        ListView lvno = (ListView) findViewById(R.id.list_notification);
-        ListView lvta = (ListView) findViewById(R.id.list_task);
-        if (lvno != null) {
-            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
-            lvno.setAdapter(ad);
-            ad.notifyDataSetChanged();
-        } else if (lvta != null) {
-            CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
-            lvta.setAdapter(ad);
-            ad.notifyDataSetChanged();
-        }
-//        UpdateUI(share.GetStatus());
+
 
     }
 
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         switch (item.getItemId()) {
             case R.id.menu_delete:
 
@@ -392,21 +480,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            Toast.makeText(this, "Info about MPAS", Toast.LENGTH_SHORT).show();
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
+
     }
 
     @Override
     public void onBackPressed() {
         boolean fl = false;
 //        boolean i;
-        for (boolean i : mCheckedState) {
+        for (boolean i : NotiCheckedState) {
             if (i) {
                 fl = true;
                 break;
@@ -414,17 +495,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (fl) {
-            for (int i = 0; i < mCheckedState.length; i++) {
-                mCheckedState[i] = false;
+            for (int i = 0; i < NotiCheckedState.length; i++) {
+                NotiCheckedState[i] = false;
+            }
+            for (int i = 0; i < TaskCheckedState.length; i++) {
+                TaskCheckedState[i] = false;
             }
             ListView lvno = (ListView) findViewById(R.id.list_notification);
             ListView lvta = (ListView) findViewById(R.id.list_task);
             if (lvno != null) {
-                CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+                NotificationsAdapter ad = NotificationsAdapter.getInstance(getBaseContext());
                 lvno.setAdapter(ad);
                 ad.notifyDataSetChanged();
             } else if (lvta != null) {
-                CustomAdapter ad = CustomAdapter.getInstance(getBaseContext());
+                TasksAdapter ad = TasksAdapter.getInstance(getBaseContext());
                 lvta.setAdapter(ad);
                 ad.notifyDataSetChanged();
             }
@@ -433,47 +517,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
-     * sequence.
-     */
+
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-//        public ScreenSlidePagerAdapter(FragmentManager fm) {
-//            super(fm);
-//        }
 
 
-        private final List<Fragment> fragments;
+        private List<Fragment> mfragments;
 
-        //On fournit à l'adapter la liste des fragments à afficher
+        //On fournit à l'adapter la liste des mfragments à afficher
         public ScreenSlidePagerAdapter(FragmentManager fm, List fragments) {
             super(fm);
-            this.fragments = fragments;
+            this.mfragments = fragments;
         }
 
         @Override
         public Fragment getItem(int pos) {
 
-            switch (pos) {
-                case 0:
-//                    NotificationFragment.set(MainActivity.this);
-                    return new NotificationFragment();
-                case 1:
-                    return new TaskFragment();
-//                case 2:
-//                    return new FragmentThree();
-//
-                default:
-                    break;
+
+            if (mfragments != null) {
+                return mfragments.get(pos);
             }
             return null;
-//            return this.fragments.get(pos);
-//            return new NotificationFragment();
+
         }
 
         @Override
         public int getCount() {
-//            return this.fragments.size();
+//            return this.mfragments.size();
             return NUM_PAGES;
         }
 
@@ -495,56 +564,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-//    public static class ArrayListFragment extends ListFragment {
-//        int mNum;
-//
-//
-//        static ArrayListFragment newInstance(int num) {
-//            ArrayListFragment f = new ArrayListFragment();
-//
-//            // Supply num input as an argument.
-//            Bundle args = new Bundle();
-//            args.putInt("num", num);
-//            f.setArguments(args);
-//
-//            return f;
-//        }
-//
-//        /**
-//         * When creating, retrieve this instance's number from its arguments.
-//         */
-//        @Override
-//        public void onCreate(Bundle savedInstanceState) {
-//            super.onCreate(savedInstanceState);
-//            mNum = getArguments() != null ? getArguments().getInt("num") : 1;
-//        }
-//
-//        /**
-//         * The Fragment's UI is just a simple text view showing its
-//         * instance number.
-//         */
-//        @Override
-//        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                                 Bundle savedInstanceState) {
-//            View v = inflater.inflate(R.layout.notification_tab, container, false);
-//            View tv = v.findViewById(R.id.empty);
-//            ((TextView)tv).setText("Fragment #" + mNum);
-//            return v;
-//        }
-//
-//        @Override
-//        public void onActivityCreated(Bundle savedInstanceState) {
-//            super.onActivityCreated(savedInstanceState);
-//            setListAdapter(new ArrayAdapter<>(getActivity(),
-//                    android.R.layout.simple_list_item_1, new String[]{"1","2","3"}));
-//        }
-//
-//        @Override
-//        public void onListItemClick(ListView l, View v, int position, long id) {
-//            Log.i("FragmentList", "Item clicked: " + id);
-//        }
-//    }
 
 
 

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/linearLayout1"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_centerInParent="true">
 
 
     <CheckBox
-        android:id="@+id/checkbox1"
+        android:id="@+id/tcheckbox"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginBottom="5dip"
@@ -15,9 +15,8 @@
         android:checked="false"
         android:visibility="gone" />
 
-
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/ttitle"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginBottom="5dip"
@@ -29,7 +28,7 @@
         android:maxLines="1"
 
 
-        android:textAlignment="gravity"
+        android:textAlignment="center"
         android:textColor="#000000"
 
         android:textSize="16sp"
@@ -40,38 +39,60 @@
 
     <Space
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="5" />
 
     <TextView
-        android:id="@+id/body"
+        android:id="@+id/tdes"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
         android:layout_marginBottom="5dip"
         android:layout_marginEnd="8dip"
         android:layout_marginRight="8dip"
         android:layout_marginTop="5dip"
         android:layout_weight="35"
         android:ellipsize="end"
+        android:gravity="center_vertical"
         android:maxLines="1"
         android:textAlignment="gravity"
         android:textColor="#000000"
         android:textSize="16sp" />
     <!--android:layout_alignParentRight="true"-->
 
-    <ImageView
-        android:id="@+id/Critical"
+    <!--<ImageView-->
+    <!--android:id="@+id/Critical"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginBottom="5dip"-->
+    <!--android:layout_marginTop="5dip"-->
+    <!--android:layout_weight="10"-->
+    <!--android:textSize="16sp" />-->
+
+    <Space
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="5" />
+
+    <TextView
+        android:id="@+id/tdate"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
         android:layout_marginBottom="5dip"
+        android:layout_marginEnd="8dip"
+        android:layout_marginRight="8dip"
         android:layout_marginTop="5dip"
-        android:layout_weight="10"
+        android:layout_weight="35"
+        android:gravity="right"
+        android:maxLines="1"
+        android:textColor="#000000"
         android:textSize="16sp" />
 
     <ImageView
-        android:id="@+id/state"
+        android:id="@+id/tstate"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginBottom="5dip"
         android:layout_marginTop="5dip"
         android:layout_weight="10"

@@ -60,8 +60,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         share = SharedPreferenceHandler.getInstance(mContext);
 
         String action = intent.getAction();
-        if (action.equals(BOOT_COMPLETED) ||
-                action.equals(QUICKBOOT_POWERON)) {
+        if ((action.equals(BOOT_COMPLETED) || action.equals(QUICKBOOT_POWERON))
+                & (share.GetStatus().equals("OK") || share.GetStatus().contains("Wait"))) {
             Intent alarmIntent = new Intent(context, AlarmReceiver.class);
             alarmIntent.setAction("Alarm");
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);

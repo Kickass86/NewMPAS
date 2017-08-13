@@ -29,9 +29,9 @@ public class SendStatusAsyncTask extends AsyncTask {
 
     static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
     static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
-    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
+    //    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
-    static final Uri CONTENT_URI2 = Uri.parse(URL2);
+    //    static final Uri CONTENT_URI2 = Uri.parse(URL2);
     //    private final DatabaseHandler db;
 //    private final SQLiteDatabase database;
     private static final int Timeout = 70000;
@@ -156,7 +156,7 @@ public class SendStatusAsyncTask extends AsyncTask {
                     String[] MIDs = IDs.split(";");
                     for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                        MyContext.getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
+                        MyContext.getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
                     }
 //                database.close();
                 } else if (response.toString().contains(MyContext.getString(R.string.Delivered))) {
@@ -166,7 +166,7 @@ public class SendStatusAsyncTask extends AsyncTask {
                     String[] MIDs = IDs.split(";");
                     for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                        MyContext.getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
+                        MyContext.getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
                     }
 //                database.close();
                 }

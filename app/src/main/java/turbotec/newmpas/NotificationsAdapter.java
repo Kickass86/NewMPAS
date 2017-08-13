@@ -22,10 +22,10 @@ import java.util.List;
 
 public class NotificationsAdapter extends BaseAdapter {
     static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
-    static final String URL1 = "content://" + PROVIDER_NAME + "/messages/1";
-    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent/";
+    static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
+    //    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent/";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
-    static final Uri CONTENT_URI2 = Uri.parse(URL2);
+    //    static final Uri CONTENT_URI2 = Uri.parse(URL2);
     static MainActivity activity;
     static CheckBox c;
     static List<String> Tlist = new ArrayList<>();

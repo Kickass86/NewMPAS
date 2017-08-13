@@ -78,7 +78,7 @@ public class NotificationFragment extends Fragment {
     }
 
 //    private void refreshValuesFromContentProvider() {
-//        CursorLoader cursorLoader = new CursorLoader(getContext(), CONTENT_URI,
+//        CursorLoader cursorLoader = new CursorLoader(getContext(), CONTENT_URI1,
 //                null, null, null, null);
 //        Cursor c = cursorLoader.loadInBackground();
 //        m_adapter.swapCursor(c);

@@ -33,7 +33,8 @@ public class MainActivity extends AppCompatActivity {
     static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
     static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
     static final String URL2 = "content://" + PROVIDER_NAME + "/tasks/";
-    static final Uri CONTENT_URI = Uri.parse(URL1);
+    static final Uri CONTENT_URI1 = Uri.parse(URL1);
+    static final Uri CONTENT_URI2 = Uri.parse(URL2);
     private static final int NUM_PAGES = 2;
     static boolean[] NotiCheckedState;
     static boolean[] TaskCheckedState;
@@ -67,8 +68,8 @@ public class MainActivity extends AppCompatActivity {
             setTitle(getString(R.string.app_name));
             if (action.equals("Alarm fire")) {
 
-                String stat = share.GetStatus();
-                if (stat.contains("OK")) {
+                boolean stat = share.GetChange();
+                if (stat) {
 
                     ListView lvno = (ListView) findViewById(R.id.list_notification);
                     ListView lvta = (ListView) findViewById(R.id.list_task);
@@ -247,10 +248,10 @@ public class MainActivity extends AppCompatActivity {
             ListView lvno = (ListView) findViewById(R.id.list_notification);
             ListView lvta = (ListView) findViewById(R.id.list_task);
             if (tabLayout.getSelectedTabPosition() == 0) {
-
                 NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
                 lvno.setAdapter(ad);
                 ad.notifyDataSetChanged();
+                lvno.setSelection(Scroll_Position);
 
             } else if (tabLayout.getSelectedTabPosition() == 1) {
 
@@ -260,6 +261,17 @@ public class MainActivity extends AppCompatActivity {
             }
             Gone = false;
         }
+
+//        ListView lv = (ListView) findViewById(R.id.list_notification);
+//        if ((tabLayout.getSelectedTabPosition() == 0)&(lv != null)) {
+//            lv.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    ListView lv = (ListView) findViewById(R.id.list_notification);
+//                    lv.setSelection(Scroll_Position);
+//                }
+//            });
+//        }
 
     }
 
@@ -367,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
                 if (NotiCheckedState[i]) {
                     Integer ID;
                     ID = IList.get(i);
-                    getContentResolver().delete(Uri.parse(URL1 + ID), "_id  = ?", new String[]{String.valueOf(ID)});
+                    getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{String.valueOf(ID)});
                 }
             }
 
@@ -383,7 +395,7 @@ public class MainActivity extends AppCompatActivity {
                 if (TaskCheckedState[i]) {
                     String ID;
                     ID = IDList.get(i);
-                    getContentResolver().delete(Uri.parse(URL2 + ID), "_id  = ?", new String[]{String.valueOf(ID)});
+                    getContentResolver().delete(CONTENT_URI2, "_id  = ?", new String[]{String.valueOf(ID)});
                 }
             }
             for (int i = 0; i < TaskCheckedState.length; i++) {
@@ -408,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
                     ID = IList.get(i);
                     ContentValues values = new ContentValues();
                     values.put("Seen", true);
-                    getContentResolver().update(Uri.parse(URL1 + ID), values, "_id  = ?", new String[]{String.valueOf(ID)});
+                    getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{String.valueOf(ID)});
                 }
             }
             for (int i = 0; i < NotiCheckedState.length; i++) {
@@ -422,7 +434,7 @@ public class MainActivity extends AppCompatActivity {
                     ID = IDList.get(i);
                     ContentValues values = new ContentValues();
                     values.put("isSeen", true);
-                    getContentResolver().update(Uri.parse(URL2 + ID), values, "_id  = ?", new String[]{String.valueOf(ID)});
+                    getContentResolver().update(CONTENT_URI2, values, "_id  = ?", new String[]{String.valueOf(ID)});
                 }
             }
             for (int i = 0; i < TaskCheckedState.length; i++) {
@@ -461,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 })
                         .setMessage(R.string.dialog_message)
-                        .setTitle(R.string.dialog_title);
+                        .setTitle(R.string.Delete_Button);
                 AlertDialog adialog = alertDialogBuilder.create();
                 adialog.show();
                 return true;

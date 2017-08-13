@@ -31,6 +31,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.List;
+import java.util.Random;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -44,8 +45,11 @@ public class SyncService extends IntentService {
     static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
     static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
     static final String URL3 = "content://" + PROVIDER_NAME + "/tasks/";
+    static final String URL4 = "content://" + PROVIDER_NAME + "/tasks/unsent/";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
     static final Uri CONTENT_URI2 = Uri.parse(URL2);
+    static final Uri CONTENT_URI3 = Uri.parse(URL3);
+    static final Uri CONTENT_URI4 = Uri.parse(URL4);
     //    static final Uri CONTENT_URI3 = Uri.parse(URL3);
     private static final int Timeout = 70000;
     private static final String TASK_ID = "_id";
@@ -54,6 +58,8 @@ public class SyncService extends IntentService {
     private static final String TASK_DueDate = "DueDate";
     private static final String TASK_Creator = "TaskCreator";
     private static final String TASK_Status = "TaskStatus";
+    private static final String TASK_Editable = "isEditable";
+    private static final String TASK_ReplyAble = "ReplyAble";
     private static final String isSeen = "isSeen";
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
@@ -71,9 +77,9 @@ public class SyncService extends IntentService {
     private SoapSerializationEnvelope envelopeDel;
     private Object response;
     private boolean isCritical = false;
-    private boolean New = false;
+    private String Change;
     private boolean isDuplicate = false;
-    private String FLag = "Invalid";
+    private boolean FlagChange = false;
     private String IDs = "";
     private String TIDs = "";
     private String TID = "";
@@ -91,6 +97,8 @@ public class SyncService extends IntentService {
     private String TaskDueDate;
     private String TaskCreator;
     private String TaskStatus;
+    private boolean TEditable;
+    private boolean TReplyAble;
     private String OPERATION_NAME_CHECK;
     private String OPERATION_NAME_DELIVERED;
     private String SOAP_ACTION_CHECK;
@@ -212,6 +220,8 @@ public class SyncService extends IntentService {
         String DeviceID = share.GetDeviceID();
         String Token = share.GetToken();
 
+        Change = share.GetStatus();
+
 
 
         try {
@@ -278,18 +288,18 @@ public class SyncService extends IntentService {
                 Tokenresp = token.getProperty(0).toString();
             Log.e("Token Response", Tokenresp);
 
-            FLag = (Authresp + Tokenresp);
+//            FLag = (Authresp + Tokenresp);
 
 
             if (Authresp.contains("Invalid") | Authresp.contains("Error")) {
-                FLag = Authresp;
+//                FLag = Authresp;
             } else if (Authresp.contains("Wait")) {
-
-                FLag = "Wait";
+                Change = "Wait";
+//                FLag = "Wait";
             } else { //(Authresp.contains("No Message"))
-                if (share.GetStatus().equals("OK")) {
-                }
-                FLag = "OK";
+
+                Change = "OK";
+//                FLag = "OK";
             }
             if (!Tokenresp.isEmpty()) {
                 share.SaveToken(Tokenresp);
@@ -307,23 +317,36 @@ public class SyncService extends IntentService {
             e.printStackTrace();
         }
 
-
-
-
-
-        if ((FLag.equals(MyContext.getString(R.string.OK))) | (FLag.equals(MyContext.getString(R.string.Wait))))
-            share.SaveStatus(FLag);
-
-        if ((isCritical) & (!isAppForeground(MyContext))) {
-            Intent i = new Intent(MyContext, MainActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(i);
-            mNotificationManager.cancelAll();
-            if ((FLag.equals(MyContext.getString(R.string.OK))) | (FLag.equals(MyContext.getString(R.string.Wait))))
-                share.SaveStatus(FLag);
-
-
+        String now = share.GetStatus();
+        if (!Change.equals(now)) {
+            FlagChange = true;
         }
+
+
+        share.SaveChange(FlagChange);
+
+//        if (FlagChange)
+//        {
+//            share.SaveStatus(Change);
+//            if(isAppForeground(MyContext))
+//            {
+//                Intent i = new Intent(MyContext, MainActivity.class);
+//                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//                startActivity(i);
+//                mNotificationManager.cancelAll();
+//            }
+//            if ((isCritical) & (!isAppForeground(MyContext))) {
+//                Intent i = new Intent(MyContext, MainActivity.class);
+//                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//                startActivity(i);
+//                mNotificationManager.cancelAll();
+//            }
+//        }else{
+//            Intent i = new Intent(MyContext, LoginActivity.class);
+//            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//            startActivity(i);
+//        }
+
 
 
     }
@@ -331,6 +354,7 @@ public class SyncService extends IntentService {
     private void HandleUnsendDelivery() {
 
         Cursor cursor = getContentResolver().query(CONTENT_URI2, null, "SendDelivered = ?", new String[]{"0"}, null);
+        IDs = "";
         try {
             if (cursor != null) {
                 if (cursor.moveToFirst()) {
@@ -346,9 +370,28 @@ public class SyncService extends IntentService {
             e.getStackTrace();
         }
 
+
+        cursor = getContentResolver().query(CONTENT_URI4, null, "SendDelivered = ?", new String[]{"0"}, null);
+        TIDs = "";
+        try {
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        TIDs = TIDs + cursor.getString(0) + ";";
+
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+            }
+
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
+
         String Status = "0";
         String plaintxt = "value1=" + IDs + ",value2=" + share.GetToken()
-                + ",value3=" + Status;
+                + ",value3=" + Status + ",value4=" + TIDs;
 
 
         plaintxt = new String(Base64.encode(plaintxt.getBytes(), Base64.DEFAULT));
@@ -390,18 +433,28 @@ public class SyncService extends IntentService {
             String[] MIDs = IDs.split(";");
             for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
+                getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
+            }
+            String[] TDs = TIDs.split(";");
+            for (String TID : TDs) {
+//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
+                getContentResolver().update(CONTENT_URI3, values, "_id  = ?", new String[]{TID});
             }
 
         } else if (response.toString().contains(MyContext.getString(R.string.Seen))) {
 
             ContentValues values = new ContentValues();
-            values.put("SendSeen", true);
+//            values.put("SendSeen", true);
             values.put("SendDelivered", true);
             String[] MIDs = IDs.split(";");
             for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                getContentResolver().update(Uri.parse(URL1 + MID), values, "_id  = ?", new String[]{MID});
+                getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
+            }
+            String[] TDs = TIDs.split(";");
+            for (String TID : TDs) {
+//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
+                getContentResolver().update(CONTENT_URI3, values, "_id  = ?", new String[]{TID});
             }
         }
 
@@ -413,7 +466,10 @@ public class SyncService extends IntentService {
         int index = 0;
         while (index < tasks.getPropertyCount()) {
 
-            FLag = "OK";
+//            FLag = "OK";
+            Change = "OK";
+            FlagChange = true;
+
 
             SoapObject Task = (SoapObject) tasks.getProperty(index);
 
@@ -424,9 +480,10 @@ public class SyncService extends IntentService {
             TaskDueDate = Task.getProperty(3).toString();
             TaskCreator = Task.getProperty(4).toString();
             TaskStatus = Task.getProperty(5).toString();
+            TReplyAble = Boolean.valueOf("1".equals(Task.getProperty(6).toString()));
+            TEditable = Boolean.valueOf("1".equals(Task.getProperty(7).toString()));
 
-
-            Cursor c = getContentResolver().query(Uri.parse(URL3 + TaskID), new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(TaskID)}, null);
+            Cursor c = getContentResolver().query(CONTENT_URI3, new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(TaskID)}, null);
             if (c != null) {
                 if (c.getCount() > 0) {
                     index++;
@@ -443,7 +500,10 @@ public class SyncService extends IntentService {
             try {
                 Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 Ringtone r = RingtoneManager.getRingtone(MyContext, notification);
-                r.play();
+                if (!isDuplicate) {
+                    r.play();
+                }
+                isDuplicate = true;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -451,23 +511,26 @@ public class SyncService extends IntentService {
             if (!isAppForeground(MyContext)) {
 
                 Log.i("Notify", "is running");
-//                Intent nid = new Intent(MyContext, .class);
+                Intent nid = new Intent(MyContext, Task_Detail_Activity.class);
                 Bundle bundle = new Bundle();
-//                bundle.putInt(MyContext.getString(R.string.ID), TaskID);
-                bundle.putString(MyContext.getString(R.string.Title), TaskTitle);
-                bundle.putString(MyContext.getString(R.string.Body), TaskDescription);
-//                bundle.putBoolean(MyContext.getString(R.string.Critical), TaskDueDate);
-//                bundle.putBoolean(MyContext.getString(R.string.SendSeen), TaskCreator);
-//                bundle.putBoolean(MyContext.getString(R.string.Seen), TaskStatus);
-//                nid.putExtras(bundle);
-//                nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                PendingIntent ci = PendingIntent.getActivity(MyContext, MessageID, nid, 0);
+                bundle.putString(MyContext.getString(R.string.TID), TaskID);
+                bundle.putString(MyContext.getString(R.string.Subject), TaskTitle);
+                bundle.putString(MyContext.getString(R.string.TDescription), TaskDescription);
+                bundle.putString(MyContext.getString(R.string.DueDate), TaskDueDate);
+                bundle.putString(MyContext.getString(R.string.TCreator), TaskCreator);
+                bundle.putString(MyContext.getString(R.string.TStatus), TaskStatus);
+                bundle.putBoolean(MyContext.getString(R.string.TEditable), TEditable);
+                bundle.putBoolean(MyContext.getString(R.string.TReplyAble), TReplyAble);
+                nid.putExtras(bundle);
+                nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                Random i = new Random();
+                PendingIntent ci = PendingIntent.getActivity(MyContext, i.nextInt(), nid, 0);
 
                 mBuilder =
                         new android.support.v4.app.NotificationCompat.Builder(MyContext)
                                 .setSmallIcon(R.mipmap.ic_assignment_black_24dp)
                                 .setContentTitle(MessageTitle)
-//                                .setContentIntent(ci)
+                                .setContentIntent(ci)
                                 .setAutoCancel(true)
                                 .setContentText(MessageBody);
                 if (!isDuplicate) {
@@ -487,9 +550,11 @@ public class SyncService extends IntentService {
             contentValues.put(TASK_DueDate, Task.getProperty(3).toString());
             contentValues.put(TASK_Creator, Task.getProperty(4).toString());
             contentValues.put(TASK_Status, Task.getProperty(5).toString());
+            contentValues.put(TASK_Editable, Boolean.valueOf(Task.getProperty(6).toString()));
+            contentValues.put(TASK_ReplyAble, Boolean.valueOf(Task.getProperty(6).toString()));
             contentValues.put(isSeen, false);
 
-            getContentResolver().insert(Uri.parse(URL3 + TaskID), contentValues);
+            getContentResolver().insert(CONTENT_URI3, contentValues);
 
             index++;
         }
@@ -503,7 +568,9 @@ public class SyncService extends IntentService {
 
         while (index < message.getPropertyCount()) {
 
-            FLag = "OK";
+//            FLag = "OK";
+            Change = "OK";
+            FlagChange = true;
 
             SoapObject Message = (SoapObject) message.getProperty(index);
 
@@ -517,7 +584,7 @@ public class SyncService extends IntentService {
             SendDelivered = false;
             SendSeen = false;
 
-            Cursor c = getContentResolver().query(Uri.parse(URL1 + MessageID), new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(MessageID)}, null);
+            Cursor c = getContentResolver().query(CONTENT_URI1, new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(MessageID)}, null);
             if (c != null) {
                 if (c.getCount() > 0) {
                     index++;
@@ -526,7 +593,7 @@ public class SyncService extends IntentService {
             }
             c.close();
 
-            IDs = IDs + Message.getProperty(0).toString() + ";";
+//            IDs = IDs + Message.getProperty(0).toString() + ";";
 
 
             isCritical = Boolean.valueOf(Message.getProperty(4).toString());
@@ -541,7 +608,10 @@ public class SyncService extends IntentService {
                 try {
                     Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                     Ringtone r = RingtoneManager.getRingtone(MyContext, notification);
-                    r.play();
+                    if (!isDuplicate) {
+                        r.play();
+                    }
+                    isDuplicate = true;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -560,7 +630,7 @@ public class SyncService extends IntentService {
                     bundle.putInt(MyContext.getString(R.string.ID), MessageID);
                     bundle.putBoolean(MyContext.getString(R.string.Seen), Seen);
                     nid.putExtras(bundle);
-                    nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     PendingIntent ci = PendingIntent.getActivity(MyContext, MessageID, nid, 0);
 
 
@@ -590,7 +660,7 @@ public class SyncService extends IntentService {
             contentValues.put("Seen", false);
             contentValues.put("SendDelivered", false);
             contentValues.put("SendSeen", false);
-            getContentResolver().insert(Uri.parse(URL1 + MessageID), contentValues);
+            getContentResolver().insert(CONTENT_URI1, contentValues);
 
             index++;
         }
@@ -598,12 +668,5 @@ public class SyncService extends IntentService {
 
     }
 
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionBaz(String param1, String param2) {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+
 }

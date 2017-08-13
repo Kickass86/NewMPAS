@@ -55,6 +55,19 @@ public class SharedPreferenceHandler {
 //    }
 
 
+    public void SaveChange(boolean Change) {
+
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(context.getString(R.string.Chnage), Change);
+        editor.apply();
+
+    }
+
+
+
+
+
     public void SaveToken(String Token) {
 
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
@@ -142,6 +155,15 @@ public class SharedPreferenceHandler {
         editor.apply();
 
     }
+
+
+    public boolean GetChange() {
+
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
+        return sharedPref.getBoolean(context.getString(R.string.Chnage), false);
+
+    }
+
 
 
     public int GetLastCheckDay() {

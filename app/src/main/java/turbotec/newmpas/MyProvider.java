@@ -23,10 +23,13 @@ public class MyProvider extends ContentProvider {
     static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
     //    static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
 //    static final String URL2 = "content://" + PROVIDER_NAME + "/tasks/";
-//    static final Uri CONTENT_URI = Uri.parse(URL1);
+//    static final Uri CONTENT_URI1 = Uri.parse(URL1);
     static final int Message_ID  = 1;
-    static final int Unsent = 2;
+    static final int UnsentM = 2;
     static final int Tasks = 3;
+    static final int TasksT = 4;
+    //    static final int MID = 5;
+//    static final int TID = 6;
     static final UriMatcher uriMatcher;
     // Table Name
     static final String TABLE_MESSAGES = "MESSAGES";
@@ -52,21 +55,27 @@ public class MyProvider extends ContentProvider {
     private static final String TASK_Creator = "TaskCreator";
     private static final String TASK_Status = "TaskStatus";
     private static final String isSeen = "isSeen";
+    private static final String Editable = "isEditable";
+    private static final String ReplyAble = "ReplyAble";
     static final String CREATE_TASKS_TABLE =
             "CREATE TABLE " + TABLE_TASKS + "(" +
                     TASK_ID + " TEXT PRIMARY KEY," +
                     TASK_Title + " TEXT," + Task_Description + " TEXT," + TASK_DueDate +
-                    " TEXT," + TASK_Creator + " TEXT," + TASK_Status + " TEXT," + isSeen + " Boolean," + SendDelivered + " Boolean)";
+                    " TEXT," + TASK_Creator + " TEXT," + TASK_Status + " TEXT," + isSeen + " Boolean,"
+                    + SendDelivered + " Boolean," + Editable + " Boolean," + ReplyAble + " Boolean)";
 
     private static final String DATABASE_NAME = "MPAS";
 //    private static HashMap<String, String> MESSAGES_PROJECTION_MAP;
 
     static {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(PROVIDER_NAME, "/messages/#", Message_ID);
-        uriMatcher.addURI(PROVIDER_NAME, "/messages/unsent/", Unsent);
-        uriMatcher.addURI(PROVIDER_NAME, "/tasks/*", Tasks);
-        uriMatcher.addURI(PROVIDER_NAME, "/tasks/unsent/", Tasks);
+        uriMatcher.addURI(PROVIDER_NAME, "/messages/", Message_ID);
+        uriMatcher.addURI(PROVIDER_NAME, "/messages/unsent/", UnsentM);
+        uriMatcher.addURI(PROVIDER_NAME, "/tasks/", Tasks);
+        uriMatcher.addURI(PROVIDER_NAME, "/tasks/unsent/", TasksT);
+
+//        uriMatcher.addURI(PROVIDER_NAME, "/messages/#", MID);
+//        uriMatcher.addURI(PROVIDER_NAME, "/tasks/*", TID);
     }
 
     private DatabaseHandler dbHelper;
@@ -90,20 +99,24 @@ public class MyProvider extends ContentProvider {
                         @Nullable String[] selectionArgs, @Nullable String sortOrder) {
 
 
-        String id;
-        Cursor cursor;
+        String id = "";
+        Cursor cursor = null;
         if(uriMatcher.match(uri) == Message_ID) {
-            //Query is for one single image. Get the ID from the URI.
-            id = uri.getPathSegments().get(1);
+
+//            if(uriMatcher.match(uri) == MID) {
+//                id = uri.getPathSegments().get(1);
+//            }
             cursor = dbHelper.getMessages(id, projection, selection, selectionArgs, sortOrder);
-        } else if (uriMatcher.match(uri) == Unsent) {
+        } else if (uriMatcher.match(uri) == UnsentM) {
             cursor = dbHelper.getUnsendMessage(projection, selection, selectionArgs, sortOrder);
         } else if (uriMatcher.match(uri) == Tasks) {
-//            id = uri.getPathSegments().get(1);
-//            cursor = dbHelper.getTasks(id, projection, selection, selectionArgs, sortOrder);
-            cursor = dbHelper.getTasks("", projection, selection, selectionArgs, sortOrder);
-        } else {
-            cursor = dbHelper.getTasks("", projection, selection, selectionArgs, sortOrder);
+//            if(uriMatcher.match(uri) == TID) {
+//                id = uri.getPathSegments().get(1);
+//            }
+            cursor = dbHelper.getTasks(id, projection, selection, selectionArgs, sortOrder);
+//            cursor = dbHelper.getTasks("", projection, selection, selectionArgs, sortOrder);
+        } else if (uriMatcher.match(uri) == TasksT) {
+            cursor = dbHelper.getUnsendTask(projection, selection, selectionArgs, sortOrder);
         }
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
 //        getContext().getContentResolver().notifyChange(uri, null);
@@ -142,7 +155,7 @@ public class MyProvider extends ContentProvider {
 
             long rowID = dbHelper.addNewMessage(values);
             if (rowID > 0) {
-//            Uri _uri = ContentUris.withAppendedId(CONTENT_URI, rowID);
+//            Uri _uri = ContentUris.withAppendedId(CONTENT_URI1, rowID);
 //            getContext().getContentResolver().notifyChange(_uri, null);
                 return uri;
             }
@@ -150,7 +163,7 @@ public class MyProvider extends ContentProvider {
         if (uriMatcher.match(uri) == Tasks) {
             long rowID = dbHelper.addNewTask(values);
             if (rowID > 0) {
-//            Uri _uri = ContentUris.withAppendedId(CONTENT_URI, rowID);
+//            Uri _uri = ContentUris.withAppendedId(CONTENT_URI1, rowID);
 //            getContext().getContentResolver().notifyChange(_uri, null);
                 return uri;
             }
@@ -189,16 +202,19 @@ public class MyProvider extends ContentProvider {
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
 
 
-        String id = null;
+        String id = "";
+        int count = 0;
         if(uriMatcher.match(uri) == Message_ID) {
-            //Update is for one single image. Get the ID from the URI.
-            id = uri.getPathSegments().get(1);
+//            //Update is for one single image. Get the ID from the URI.
+//            id = uri.getPathSegments().get(1);
+//        }
+            //TODO Update Multiple messages
+
+            count = dbHelper.updateMessage(values, selection, selectionArgs);
+
+        } else {
+            count = dbHelper.updateTask(values, selection, selectionArgs);
         }
-        //TODO Update Multiple messages
-
-        int count = dbHelper.updateMessage(id, values);
-
-
 //        getContext().getContentResolver().notifyChange(uri, null);
         return count;
     }
@@ -348,14 +364,22 @@ public class MyProvider extends ContentProvider {
         }
 
 
-        public int updateMessage(String id, ContentValues values) {
-            if(id == null) {
-                return getWritableDatabase().update(TABLE_MESSAGES, values, null, null);
-            } else {
-                return getWritableDatabase().update(TABLE_MESSAGES, values, "_id=?", new String[]{id});
-            }
+        public int updateMessage(ContentValues values, String selection, String[] selectionArg) {
+//            if(id == null) {
+//                return getWritableDatabase().update(TABLE_MESSAGES, values, null, null);
+//            } else {
+            return getWritableDatabase().update(TABLE_MESSAGES, values, selection, selectionArg);
+//            }
         }
 
+
+        public int updateTask(ContentValues values, String selection, String[] selectionArg) {
+//            if(id == null) {
+//                return getWritableDatabase().update(TABLE_MESSAGES, values, null, null);
+//            } else {
+            return getWritableDatabase().update(TABLE_TASKS, values, selection, selectionArg);
+//            }
+        }
 
 
     }

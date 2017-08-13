@@ -19,9 +19,9 @@ public class Message_Detail_Activity extends Activity {
 
     static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
     static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
-    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
+    //    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
-    static final Uri CONTENT_URI2 = Uri.parse(URL2);
+    //    static final Uri CONTENT_URI2 = Uri.parse(URL2);
 //    private static DatabaseHandler db;
     //    private final Context main_menu;
     //    SQLiteDatabase database;
@@ -73,7 +73,7 @@ public class Message_Detail_Activity extends Activity {
                         ContentValues values = new ContentValues();
                         values.put("Seen", true);
 
-                        getContentResolver().update(Uri.parse(URL1 + ID), values, "_id  = ?", new String[]{String.valueOf(ID)});
+                        getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{String.valueOf(ID)});
 
 
 
@@ -111,7 +111,7 @@ public class Message_Detail_Activity extends Activity {
 
 //                                SQLiteDatabase database = db.getWritableDatabase();
 //                                database.delete("Messages", "MessageID  = ?", new String[]{String.valueOf(ID)});
-                                getContentResolver().delete(Uri.parse(URL1 + ID), "_id  = ?", new String[]{String.valueOf(ID)});
+                                getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{String.valueOf(ID)});
 //                                database.close();
                                 finish();
 
@@ -126,7 +126,7 @@ public class Message_Detail_Activity extends Activity {
                                     }
                                 })
                         .setMessage(R.string.dialog_message)
-                        .setTitle(R.string.dialog_title);
+                        .setTitle(R.string.Delete_Button);
                 AlertDialog adialog = alertDialogBuilder.create();
                 adialog.show();
 

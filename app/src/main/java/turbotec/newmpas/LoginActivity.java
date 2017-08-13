@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (stat.contains("OK")) {
 //                    UpdateUI(share.GetStatus());
                     intent = new Intent(context, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
 
                     Log.i("is this ", "BroadcastReceiver");
@@ -161,7 +161,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-        setTitle(R.string.Connecting);
+
         String state = share.GetStatus();
 
         State st = State.valueOf(state);
@@ -180,7 +180,7 @@ public class LoginActivity extends AppCompatActivity {
                 manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
                 Log.i("Alarm", "Set");
                 Intent intent = new Intent(this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
 
 
@@ -206,7 +206,7 @@ public class LoginActivity extends AppCompatActivity {
 //                if (!first) {
 //                    setContentView(R.layout.waiting_layout);
 //                } else {
-                    setContentView(R.layout.login_layout);
+                setContentView(R.layout.login_layout);
                 registerReceiver(broadcastReceiver, new IntentFilter("Alarm fire"));
                 flag = true;
 
@@ -215,38 +215,22 @@ public class LoginActivity extends AppCompatActivity {
 //                @Override
 //                public void run() {
 
-                    UsernameView = (EditText) findViewById(R.id.editText2);
-                    PasswordView = (EditText) findViewById(R.id.editText);
-                    Button registerButton = (Button) findViewById(R.id.button);
-                    PasswordView.setOnKeyListener(new View.OnKeyListener() {
+                UsernameView = (EditText) findViewById(R.id.editText2);
+                PasswordView = (EditText) findViewById(R.id.editText);
+                Button registerButton = (Button) findViewById(R.id.button);
 
-                        @Override
-                        public boolean onKey(View v, int keyCode, KeyEvent event) {
-                            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+                UsernameView.requestFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
 
-                                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                PasswordView.setOnKeyListener(new View.OnKeyListener() {
 
-                                String Username = UsernameView.getText().toString();
-                                String Password = PasswordView.getText().toString();
-                                String DeviceID = getUniquePsuedoID();
-                                share.SaveLoginDetails(Username, Password);
-                                share.SaveDeviceID(DeviceID);
-
-                                attemptLogin(Username, Password, DeviceID);
-                            }
-                            return false;
-                        }
-                    });
-
-
-                    registerButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
+                    @Override
+                    public boolean onKey(View v, int keyCode, KeyEvent event) {
+                        if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
 
                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-
+                            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
                             String Username = UsernameView.getText().toString();
                             String Password = PasswordView.getText().toString();
@@ -255,9 +239,30 @@ public class LoginActivity extends AppCompatActivity {
                             share.SaveDeviceID(DeviceID);
 
                             attemptLogin(Username, Password, DeviceID);
-//                Log.i("Successful Login ", "Welcome " + Name);
                         }
-                    });
+                        return false;
+                    }
+                });
+
+
+                registerButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+
+                        String Username = UsernameView.getText().toString();
+                        String Password = PasswordView.getText().toString();
+                        String DeviceID = getUniquePsuedoID();
+                        share.SaveLoginDetails(Username, Password);
+                        share.SaveDeviceID(DeviceID);
+
+                        attemptLogin(Username, Password, DeviceID);
+//                Log.i("Successful Login ", "Welcome " + Name);
+                    }
+                });
 //                }
 
             }
@@ -323,7 +328,7 @@ public class LoginActivity extends AppCompatActivity {
 //            task.execute(Userdata);
             Intent AL = new Intent(this, SyncService.class);
             startService(AL);
-
+            setTitle(R.string.Connecting);
             setContentView(R.layout.waiting_layout);
 
 //            UpdateUI(username, password, DeviceID, null);

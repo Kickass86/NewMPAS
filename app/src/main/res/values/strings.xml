@@ -5,6 +5,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="PREFERENCE_FILE">turbotec.mpas.PREFERENCE_FILE</string>
     <string name="DeviceID">Device Unique ID</string>
+    <string name="Chnage">Change</string>
     <string name="Token">Token</string>
     <string name="FileVersion">FileVersion</string>
     <string name="defaultValue">Not_Saved</string>
@@ -21,6 +22,8 @@
 
     <string name="OK">OK</string>
     <string name="Wait">Wait</string>
+
+
     <string name="ID">Unique ID</string>
     <string name="Title">Title</string>
     <string name="Body">Body</string>
@@ -30,6 +33,17 @@
     <string name="SendSeen">SendSeen</string>
     <string name="error_invalid_password">Error! Password is empty.</string>
     <string name="error_field_required">Error! Username is empty.</string>
+
+
+    <string name="TID">TID</string>
+    <string name="Subject">Subject</string>
+    <string name="TCreator">TCreator</string>
+    <string name="DueDate">DueDate</string>
+    <string name="TStatus">TStatus</string>
+    <string name="TDescription">TDescription</string>
+    <string name="TEditable">TEditable</string>
+    <string name="TReplyAble">TReplyAble</string>
+
 
     <string name="WaitForActivation">Please wait for activation</string>
     <string name="Waiting">Please wait</string>
@@ -45,7 +59,9 @@
     <string name="action_help">Help</string>
 
     <string name="dialog_message">Are you sure?</string>
-    <string name="dialog_title">Delete</string>
+    <string name="Delete_Button">Delete</string>
+    <string name="Reply_Button">Reply</string>
+    <string name="Edit_Button">Edit</string>
 
 
 </resources>

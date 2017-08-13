@@ -33,6 +33,8 @@ public class TasksAdapter extends BaseAdapter {
     static List<String> Tlist = new ArrayList<>();
     static List<String> DesList = new ArrayList<>();
     static List<Boolean> isSeen = new ArrayList<>();
+    static List<Boolean> EList = new ArrayList<>();
+    static List<Boolean> RList = new ArrayList<>();
     //    static List<String> IDList = new ArrayList<>();
     static List<String> CrList = new ArrayList<>();
     static List<String> StList = new ArrayList<>();
@@ -73,6 +75,8 @@ public class TasksAdapter extends BaseAdapter {
         Tlist = new ArrayList<>();
         DesList = new ArrayList<>();
         isSeen = new ArrayList<>();
+        EList = new ArrayList<>();
+        RList = new ArrayList<>();
         activity.IDList = new ArrayList<>();
         CrList = new ArrayList<>();
         StList = new ArrayList<>();
@@ -90,6 +94,8 @@ public class TasksAdapter extends BaseAdapter {
                     StList.add(cursor.getString(4));
                     CrList.add(cursor.getString(5));
                     isSeen.add("1".equals(cursor.getString(6)));
+                    EList.add("1".equals(cursor.getString(8)));
+                    RList.add("1".equals(cursor.getString(9)));
 //                        }
 //                    activity.TaskCheckedState = new boolean[activity.IList.size()];
 //                    activity.num_selected = 0;
@@ -238,20 +244,23 @@ public class TasksAdapter extends BaseAdapter {
 
                     v.setBackgroundColor(ContextCompat.getColor(activity.getApplicationContext(), R.color.SelectColor1));
 
-                    Intent showActivity = new Intent(activity, Message_Detail_Activity.class);
+                    Intent showActivity = new Intent(activity, Task_Detail_Activity.class);
                     Bundle bundle = new Bundle();
-                    bundle.putString(activity.getString(R.string.Title), Tlist.get(position));
-                    bundle.putString(activity.getString(R.string.Body), DesList.get(position));
-                    bundle.putString(activity.getString(R.string.Critical), CrList.get(position));
-                    bundle.putString(activity.getString(R.string.SendSeen), StList.get(position));
-                    bundle.putString(activity.getString(R.string.ID), activity.IDList.get(position));
-                    bundle.putBoolean(activity.getString(R.string.Seen), isSeen.get(position));
+                    bundle.putString(activity.getString(R.string.Subject), Tlist.get(position));
+                    bundle.putString(activity.getString(R.string.TCreator), CrList.get(position));
+                    bundle.putString(activity.getString(R.string.DueDate), DateList.get(position));
+                    bundle.putString(activity.getString(R.string.TStatus), StList.get(position));
+                    bundle.putString(activity.getString(R.string.TDescription), DesList.get(position));
+                    bundle.putBoolean(activity.getString(R.string.TEditable), EList.get(position));
+                    bundle.putBoolean(activity.getString(R.string.TReplyAble), RList.get(position));
+                    bundle.putString(activity.getString(R.string.TID), activity.IDList.get(position));
                     showActivity.putExtras(bundle);
                     MainActivity.Scroll_Position = position;
+                    MainActivity.Gone = true;
                     showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     Log.i("Task Detail", Tlist.get(position));
 //                    finish();
-//                    activity.startActivity(showActivity);
+                    activity.startActivity(showActivity);
                 }
 
 

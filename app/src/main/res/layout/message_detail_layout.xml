@@ -77,12 +77,12 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/titledetail2"
             android:layout_centerHorizontal="true"
+            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dip"
             android:layout_marginTop="10dp"
             android:layout_toLeftOf="@id/statedetail2"
             android:layout_toStartOf="@id/statedetail2"
             android:gravity="start"
-            android:layout_marginLeft="15dp"
-            android:layout_marginStart="15dip"
             android:textAlignment="viewStart"
             android:textColor="#000000"
             android:textSize="16sp" />
@@ -95,7 +95,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginStart="15dip"
             android:layout_marginTop="10dp"
-            android:text="@string/dialog_title"
+            android:text="@string/Delete_Button"
             android:textAllCaps="false" />
     </RelativeLayout>
 

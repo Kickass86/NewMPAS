@@ -334,6 +334,26 @@ public class VersionUpdate extends Service {
                                 Uri Download_Uri = Uri.parse(appURI);
                                 DownloadManager.Request request = new DownloadManager.Request(Download_Uri);
 
+                                DownloadManager.Query q = new DownloadManager.Query();
+                                q.setFilterByStatus(DownloadManager.STATUS_RUNNING | DownloadManager.STATUS_PENDING | DownloadManager.STATUS_PAUSED | DownloadManager.STATUS_FAILED);
+
+                                Cursor cursor = downloadManager.query(q);
+                                if (cursor.moveToFirst()) {
+                                    boolean flag = false;
+                                    long did = 0;
+                                    do {
+                                        String targetURL = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_URI));
+                                        if (targetURL.equals(Download_Uri.toString())) {
+                                            did = Integer.valueOf(cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_ID)));
+                                            flag = true;
+                                            break;
+                                        }
+                                    } while (cursor.moveToNext());
+                                    if (flag) {
+                                        downloadManager.remove(did);
+                                    }
+                                }
+
 
                                 request.setDestinationUri(Uri.fromFile(myFile));
                                 request.setMimeType("application/vnd.android.package-archive");

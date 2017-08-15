@@ -29,10 +29,11 @@ public class AlarmService extends Service {
         alarmIntent.setAction("Alarm");
         pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
+
         AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 //                long interval = INTERVAL_FIFTEEN_MINUTES;
 //                    int interval = 60000;
-
+        manager.cancel(pendingIntent);
 //                manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, System.currentTimeMillis(), interval, pendingIntent);
         manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
         super.onTaskRemoved(rootIntent);

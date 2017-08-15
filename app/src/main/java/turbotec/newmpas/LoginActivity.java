@@ -177,6 +177,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
+                manager.cancel(pendingIntent);
+
                 manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
                 Log.i("Alarm", "Set");
                 Intent intent = new Intent(this, MainActivity.class);
@@ -193,6 +195,8 @@ public class LoginActivity extends AppCompatActivity {
                 pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
                 AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+                manager.cancel(pendingIntent);
 
                 manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
 

@@ -1,11 +1,13 @@
 package turbotec.newmpas;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -15,7 +17,7 @@ import android.widget.TextView;
 //import android.content.Intent;
 //import android.support.annotation.Nullable;
 
-public class Message_Detail_Activity extends Activity {
+public class Message_Detail_Activity extends AppCompatActivity {
 
     static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
     static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
@@ -32,7 +34,10 @@ public class Message_Detail_Activity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.message_detail_layout);
-//        db = DatabaseHandler.getInstance(this);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
         Bundle b = getIntent().getExtras();
         String Title;
         String Body;
@@ -136,6 +141,18 @@ public class Message_Detail_Activity extends Activity {
 
 
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 
 
 //    private class DatabaseDeleteOperation extends AsyncTask<String, String, String> {

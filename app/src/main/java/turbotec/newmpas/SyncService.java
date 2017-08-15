@@ -352,6 +352,7 @@ public class SyncService extends IntentService {
     }
 
     private void HandleUnsendDelivery() {
+        int num = 0;
 
         Cursor cursor = getContentResolver().query(CONTENT_URI2, null, "SendDelivered = ?", new String[]{"0"}, null);
         IDs = "";
@@ -360,7 +361,7 @@ public class SyncService extends IntentService {
                 if (cursor.moveToFirst()) {
                     do {
                         IDs = IDs + cursor.getInt(0) + ";";
-
+                        num = num + 1;
                     } while (cursor.moveToNext());
                 }
                 cursor.close();
@@ -378,7 +379,7 @@ public class SyncService extends IntentService {
                 if (cursor.moveToFirst()) {
                     do {
                         TIDs = TIDs + cursor.getString(0) + ";";
-
+                        num = num + 1;
                     } while (cursor.moveToNext());
                 }
                 cursor.close();
@@ -389,72 +390,74 @@ public class SyncService extends IntentService {
         }
 
 
-        String Status = "0";
-        String plaintxt = "value1=" + IDs + ",value2=" + share.GetToken()
-                + ",value3=" + Status + ",value4=" + TIDs;
+        if (num > 0) {
+            String Status = "0";
+            String plaintxt = "value1=" + IDs + ",value2=" + share.GetToken()
+                    + ",value3=" + Status + ",value4=" + TIDs;
 
 
-        plaintxt = new String(Base64.encode(plaintxt.getBytes(), Base64.DEFAULT));
-        plaintxt = plaintxt.replaceAll("\n", "");
+            plaintxt = new String(Base64.encode(plaintxt.getBytes(), Base64.DEFAULT));
+            plaintxt = plaintxt.replaceAll("\n", "");
 
-        SoapObject requestDel = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_DELIVERED);
-        PropertyInfo Pinf = new PropertyInfo();
-        Pinf.setName("Value");
-        Pinf.setValue(plaintxt);
-        Pinf.setType(String.class);
-        requestDel.addProperty(Pinf);
-
-
-        envelopeDel = new SoapSerializationEnvelope(
-                SoapEnvelope.VER11);
-        envelopeDel.dotNet = true;
-
-        envelopeDel.setOutputSoapObject(requestDel);
+            SoapObject requestDel = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_DELIVERED);
+            PropertyInfo Pinf = new PropertyInfo();
+            Pinf.setName("Value");
+            Pinf.setValue(plaintxt);
+            Pinf.setType(String.class);
+            requestDel.addProperty(Pinf);
 
 
-        try {
-            httpTransport.call(SOAP_ACTION_DELIVERED, envelopeDel);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        }
-        try {
-            response = envelopeDel.getResponse();
-        } catch (SoapFault soapFault) {
-            soapFault.printStackTrace();
-        }
+            envelopeDel = new SoapSerializationEnvelope(
+                    SoapEnvelope.VER11);
+            envelopeDel.dotNet = true;
+
+            envelopeDel.setOutputSoapObject(requestDel);
 
 
-        if (response.toString().contains(MyContext.getString(R.string.Delivered))) {
-
-            ContentValues values = new ContentValues();
-            values.put("SendDelivered", true);
-            String[] MIDs = IDs.split(";");
-            for (String MID : MIDs) {
-//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
+            try {
+                httpTransport.call(SOAP_ACTION_DELIVERED, envelopeDel);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
             }
-            String[] TDs = TIDs.split(";");
-            for (String TID : TDs) {
-//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                getContentResolver().update(CONTENT_URI3, values, "_id  = ?", new String[]{TID});
+            try {
+                response = envelopeDel.getResponse();
+            } catch (SoapFault soapFault) {
+                soapFault.printStackTrace();
             }
 
-        } else if (response.toString().contains(MyContext.getString(R.string.Seen))) {
 
-            ContentValues values = new ContentValues();
+            if (response.toString().contains(MyContext.getString(R.string.Delivered))) {
+
+                ContentValues values = new ContentValues();
+                values.put("SendDelivered", true);
+                String[] MIDs = IDs.split(";");
+                for (String MID : MIDs) {
+//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
+                    getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
+                }
+                String[] TDs = TIDs.split(";");
+                for (String TID : TDs) {
+//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
+                    getContentResolver().update(CONTENT_URI3, values, "_id  = ?", new String[]{TID});
+                }
+
+            } else if (response.toString().contains(MyContext.getString(R.string.Seen))) {
+
+                ContentValues values = new ContentValues();
 //            values.put("SendSeen", true);
-            values.put("SendDelivered", true);
-            String[] MIDs = IDs.split(";");
-            for (String MID : MIDs) {
+                values.put("SendDelivered", true);
+                String[] MIDs = IDs.split(";");
+                for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
-            }
-            String[] TDs = TIDs.split(";");
-            for (String TID : TDs) {
+                    getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
+                }
+                String[] TDs = TIDs.split(";");
+                for (String TID : TDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                getContentResolver().update(CONTENT_URI3, values, "_id  = ?", new String[]{TID});
+                    getContentResolver().update(CONTENT_URI3, values, "_id  = ?", new String[]{TID});
+                }
             }
         }
 
@@ -486,8 +489,27 @@ public class SyncService extends IntentService {
             Cursor c = getContentResolver().query(CONTENT_URI3, new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(TaskID)}, null);
             if (c != null) {
                 if (c.getCount() > 0) {
-                    index++;
-                    continue;
+                    if (c.getString(5).equals(TaskStatus)) {
+                        index++;
+                        continue;
+                    } else {
+                        ContentValues values = new ContentValues();
+                        values.put(TASK_ID, TaskID);
+                        values.put(TASK_Title, TaskTitle);
+                        values.put(Task_Description, TaskDescription);
+                        values.put(TASK_DueDate, TaskDueDate);
+                        values.put(TASK_Creator, TaskCreator);
+                        values.put(TASK_Status, TaskStatus);
+                        values.put(TASK_Editable, TEditable);
+                        values.put(TASK_ReplyAble, TReplyAble);
+                        values.put("SendDelivered", false);
+                        values.put(isSeen, false);
+
+                        getContentResolver().update(CONTENT_URI3, values, "_id  = ?", new String[]{String.valueOf(TaskID)});
+
+                        index++;
+                        continue;
+                    }
                 } else {
                     TID = TID + Task.getProperty(0).toString() + ";";
                 }
@@ -544,15 +566,16 @@ public class SyncService extends IntentService {
 
 
             ContentValues contentValues = new ContentValues();
-            contentValues.put(TASK_ID, Task.getProperty(0).toString());
-            contentValues.put(TASK_Title, Task.getProperty(1).toString().trim());
-            contentValues.put(Task_Description, Task.getProperty(2).toString().trim());
-            contentValues.put(TASK_DueDate, Task.getProperty(3).toString());
-            contentValues.put(TASK_Creator, Task.getProperty(4).toString());
-            contentValues.put(TASK_Status, Task.getProperty(5).toString());
-            contentValues.put(TASK_Editable, Boolean.valueOf(Task.getProperty(6).toString()));
-            contentValues.put(TASK_ReplyAble, Boolean.valueOf(Task.getProperty(6).toString()));
+            contentValues.put(TASK_ID, TaskID);
+            contentValues.put(TASK_Title, TaskTitle);
+            contentValues.put(Task_Description, TaskDescription);
+            contentValues.put(TASK_DueDate, TaskDueDate);
+            contentValues.put(TASK_Creator, TaskCreator);
+            contentValues.put(TASK_Status, TaskStatus);
+            contentValues.put(TASK_Editable, TEditable);
+            contentValues.put(TASK_ReplyAble, TReplyAble);
             contentValues.put(isSeen, false);
+            contentValues.put("SendDelivered", false);
 
             getContentResolver().insert(CONTENT_URI3, contentValues);
 

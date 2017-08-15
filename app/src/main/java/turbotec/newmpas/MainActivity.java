@@ -42,16 +42,17 @@ public class MainActivity extends AppCompatActivity {
     static boolean NFlag = true;
     static boolean TFlag = true;
     static boolean Gone = false;
+    //    List<Boolean> CList = new ArrayList<>(); //Critical
+//    List<Boolean> SSList = new ArrayList<>(); //SendSeen
+    //    boolean isSelected = false;
+//    private Menu mMenu;
+    static int setTab = 0;
     //    List<String> Mlist = new ArrayList<>(); //Messages List
 //    List<String> Tlist = new ArrayList<>(); //Title List
 //    List<Boolean> SList = new ArrayList<>(); //is Seen
     List<Integer> IList = new ArrayList<>(); //Message ID
     List<String> IDList = new ArrayList<>();
     private SharedPreferenceHandler share = SharedPreferenceHandler.getInstance(this);
-    //    List<Boolean> CList = new ArrayList<>(); //Critical
-//    List<Boolean> SSList = new ArrayList<>(); //SendSeen
-    //    boolean isSelected = false;
-//    private Menu mMenu;
     private boolean first = true;
     private ViewPager mPager;
     private ScreenSlidePagerAdapter mPagerAdapter;
@@ -107,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
         Intent in = getIntent();
 
         if (savedInstanceState == null) {
@@ -158,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                setTab = tab.getPosition();
                 //do stuff here
 //                switch (tab.getPosition()) {
 //                    case 0: {
@@ -242,18 +245,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        mPager.setCurrentItem(setTab);
+
         NFlag = true;
         TFlag = true;
         if (Gone) {
             ListView lvno = (ListView) findViewById(R.id.list_notification);
             ListView lvta = (ListView) findViewById(R.id.list_task);
-            if (tabLayout.getSelectedTabPosition() == 0) {
+            if ((tabLayout.getSelectedTabPosition() == 0) & (lvno != null)) {
                 NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
                 lvno.setAdapter(ad);
                 ad.notifyDataSetChanged();
                 lvno.setSelection(Scroll_Position);
 
-            } else if (tabLayout.getSelectedTabPosition() == 1) {
+            } else if ((tabLayout.getSelectedTabPosition() == 1) & (lvta != null)) {
 
                 TasksAdapter ad = TasksAdapter.getInstance(this);
                 lvta.setAdapter(ad);

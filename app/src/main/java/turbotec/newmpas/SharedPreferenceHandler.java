@@ -36,6 +36,16 @@ public class SharedPreferenceHandler {
     }
 
 
+    public void SaveError(String message) {
+
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(context.getString(R.string.ErrorMessage), message);
+        editor.apply();
+
+    }
+
+
 //    public void SavePublickey(String pubkey) {
 //
 //        SharedPreferences sharedPref = main_menu.getSharedPreferences(main_menu.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
@@ -59,7 +69,7 @@ public class SharedPreferenceHandler {
 
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(context.getString(R.string.Chnage), Change);
+        editor.putBoolean(context.getString(R.string.Change), Change);
         editor.apply();
 
     }
@@ -160,7 +170,7 @@ public class SharedPreferenceHandler {
     public boolean GetChange() {
 
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
-        return sharedPref.getBoolean(context.getString(R.string.Chnage), false);
+        return sharedPref.getBoolean(context.getString(R.string.Change), false);
 
     }
 
@@ -178,6 +188,14 @@ public class SharedPreferenceHandler {
 
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
         return sharedPref.getString(context.getString(R.string.Status), context.getString(R.string.defaultValue));
+
+    }
+
+
+    public String GetError() {
+
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
+        return sharedPref.getString(context.getString(R.string.ErrorMessage), context.getString(R.string.defaultValue));
 
     }
 

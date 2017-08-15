@@ -102,66 +102,66 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 //        NotiCheckedState[0] = false;
 
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancelAll();
+        try {
+
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancelAll();
 
 
+            Intent in = getIntent();
 
+            if (savedInstanceState == null) {
+                if (in != null) {
+                    Bundle b = in.getExtras();
+                    if (b != null) {
 
-        Intent in = getIntent();
+                        Intent showActivity = new Intent(MainActivity.this, Message_Detail_Activity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString(getString(R.string.Title), b.getString(getString(R.string.Title)));
+                        bundle.putString(getString(R.string.Body), b.getString(getString(R.string.Body)));
+                        bundle.putInt(getString(R.string.ID), b.getInt(getString(R.string.ID)));
+                        bundle.putBoolean(getString(R.string.Seen), b.getBoolean(getString(R.string.Seen)));
+                        bundle.putBoolean(getString(R.string.Critical), b.getBoolean(getString(R.string.Critical)));
+                        bundle.putBoolean(getString(R.string.SendSeen), b.getBoolean(getString(R.string.SendSeen)));
 
-        if (savedInstanceState == null) {
-            if (in != null) {
-                Bundle b = in.getExtras();
-                if (b != null) {
-
-                    Intent showActivity = new Intent(MainActivity.this, Message_Detail_Activity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putString(getString(R.string.Title), b.getString(getString(R.string.Title)));
-                    bundle.putString(getString(R.string.Body), b.getString(getString(R.string.Body)));
-                    bundle.putInt(getString(R.string.ID), b.getInt(getString(R.string.ID)));
-                    bundle.putBoolean(getString(R.string.Seen), b.getBoolean(getString(R.string.Seen)));
-                    bundle.putBoolean(getString(R.string.Critical), b.getBoolean(getString(R.string.Critical)));
-                    bundle.putBoolean(getString(R.string.SendSeen), b.getBoolean(getString(R.string.SendSeen)));
-
-                    String s = b.getString(getString(R.string.Title));
-                    if (s != null)
-                        if (!s.isEmpty()) {
-                            showActivity.putExtras(bundle);
+                        String s = b.getString(getString(R.string.Title));
+                        if (s != null)
+                            if (!s.isEmpty()) {
+                                showActivity.putExtras(bundle);
 //            showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                            startActivity(showActivity);
-                        }
+                                startActivity(showActivity);
+                            }
+                    }
                 }
             }
-        }
 
-        registerReceiver(broadcastReceiver, new IntentFilter("Alarm fire"));
+            registerReceiver(broadcastReceiver, new IntentFilter("Alarm fire"));
 
-        NotificationsAdapter.set(this);
-        TasksAdapter.set(this);
+            NotificationsAdapter.set(this);
+            TasksAdapter.set(this);
 
 
-        List<Fragment> fragments = new Vector<>();
-        fragments.add(Fragment.instantiate(this, NotificationFragment.class.getName()));
-        fragments.add(Fragment.instantiate(this, TaskFragment.class.getName()));
+            List<Fragment> fragments = new Vector<>();
+            fragments.add(Fragment.instantiate(this, NotificationFragment.class.getName()));
+            fragments.add(Fragment.instantiate(this, TaskFragment.class.getName()));
 
-        this.mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), fragments);
-        mPager = (ViewPager) findViewById(R.id.pager);
+            this.mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), fragments);
+            mPager = (ViewPager) findViewById(R.id.pager);
 
-        mPager.setAdapter(mPagerAdapter);
+            mPager.setAdapter(mPagerAdapter);
 
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mPager);
+            tabLayout = (TabLayout) findViewById(R.id.tabs);
+            tabLayout.setupWithViewPager(mPager);
 
-        mPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                setTab = tab.getPosition();
-                //do stuff here
+            mPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    setTab = tab.getPosition();
+                    //do stuff here
 //                switch (tab.getPosition()) {
 //                    case 0: {
 //                        ListView lvno = (ListView) findViewById(R.id.list_notification);
@@ -172,59 +172,63 @@ public class MainActivity extends AppCompatActivity {
 //                        lvta.setSelection(Scroll_Position);
 //                    }
 //                }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-                final TabLayout.Tab tb = tab;
-                int sumN = 0;
-                for (int i = 0; i < NotiCheckedState.length; i++) {
-                    sumN += NotiCheckedState[i] ? 1 : 0;
-                    NotiCheckedState[i] = false;
-                }
-                int sumT = 0;
-                for (int i = 0; i < TaskCheckedState.length; i++) {
-                    sumT += TaskCheckedState[i] ? 1 : 0;
-                    TaskCheckedState[i] = false;
                 }
 
-                switch (tb.getPosition()) {
-                    case 0: {
-                        if (sumN > 0) {
-                            new Handler().postDelayed(new Runnable() {
-                                public void run() {
-                                    NotificationsAdapter NAda = NotificationsAdapter.getInstance();
-                                    NAda.notifyDataSetChanged();
-                                }
-                            }, 300);
-                        }
-                        break;
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+
+                    final TabLayout.Tab tb = tab;
+                    int sumN = 0;
+                    for (int i = 0; i < NotiCheckedState.length; i++) {
+                        sumN += NotiCheckedState[i] ? 1 : 0;
+                        NotiCheckedState[i] = false;
                     }
-                    case 1: {
-                        if (sumT > 0) {
-                            new Handler().postDelayed(new Runnable() {
-                                public void run() {
-
-                                    TasksAdapter TAda = TasksAdapter.getInstance();
-                                    TAda.notifyDataSetChanged();
-                                }
-                            }, 300);
-                        }
-                        break;
+                    int sumT = 0;
+                    for (int i = 0; i < TaskCheckedState.length; i++) {
+                        sumT += TaskCheckedState[i] ? 1 : 0;
+                        TaskCheckedState[i] = false;
                     }
+
+                    switch (tb.getPosition()) {
+                        case 0: {
+                            if (sumN > 0) {
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+                                        NotificationsAdapter NAda = NotificationsAdapter.getInstance();
+                                        NAda.notifyDataSetChanged();
+                                    }
+                                }, 300);
+                            }
+                            break;
+                        }
+                        case 1: {
+                            if (sumT > 0) {
+                                new Handler().postDelayed(new Runnable() {
+                                    public void run() {
+
+                                        TasksAdapter TAda = TasksAdapter.getInstance();
+                                        TAda.notifyDataSetChanged();
+                                    }
+                                }, 300);
+                            }
+                            break;
+                        }
+                    }
+
+                    invalidateOptionsMenu();
                 }
 
-                invalidateOptionsMenu();
-            }
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
 
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
+                }
+            });
 
-            }
-        });
-
-
+        } catch (Exception e) {
+            share.SaveError(e.getMessage());
+            Intent SE = new Intent(this, SendError.class);
+            startService(SE);
+        }
     }
 
     @Override
@@ -246,27 +250,29 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        mPager.setCurrentItem(setTab);
+        try {
 
-        NFlag = true;
-        TFlag = true;
-        if (Gone) {
-            ListView lvno = (ListView) findViewById(R.id.list_notification);
-            ListView lvta = (ListView) findViewById(R.id.list_task);
-            if ((tabLayout.getSelectedTabPosition() == 0) & (lvno != null)) {
-                NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
-                lvno.setAdapter(ad);
-                ad.notifyDataSetChanged();
-                lvno.setSelection(Scroll_Position);
+            mPager.setCurrentItem(setTab);
 
-            } else if ((tabLayout.getSelectedTabPosition() == 1) & (lvta != null)) {
+            NFlag = true;
+            TFlag = true;
+            if (Gone) {
+                ListView lvno = (ListView) findViewById(R.id.list_notification);
+                ListView lvta = (ListView) findViewById(R.id.list_task);
+                if ((tabLayout.getSelectedTabPosition() == 0) & (lvno != null)) {
+                    NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
+                    lvno.setAdapter(ad);
+                    ad.notifyDataSetChanged();
+                    lvno.setSelection(Scroll_Position);
 
-                TasksAdapter ad = TasksAdapter.getInstance(this);
-                lvta.setAdapter(ad);
-                ad.notifyDataSetChanged();
+                } else if ((tabLayout.getSelectedTabPosition() == 1) & (lvta != null)) {
+
+                    TasksAdapter ad = TasksAdapter.getInstance(this);
+                    lvta.setAdapter(ad);
+                    ad.notifyDataSetChanged();
+                }
+                Gone = false;
             }
-            Gone = false;
-        }
 
 //        ListView lv = (ListView) findViewById(R.id.list_notification);
 //        if ((tabLayout.getSelectedTabPosition() == 0)&(lv != null)) {
@@ -278,6 +284,12 @@ public class MainActivity extends AppCompatActivity {
 //                }
 //            });
 //        }
+
+        } catch (Exception e) {
+            share.SaveError(e.getMessage());
+            Intent SE = new Intent(this, SendError.class);
+            startService(SE);
+        }
 
     }
 

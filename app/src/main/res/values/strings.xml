@@ -5,10 +5,11 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="PREFERENCE_FILE">turbotec.mpas.PREFERENCE_FILE</string>
     <string name="DeviceID">Device Unique ID</string>
-    <string name="Chnage">Change</string>
+    <string name="Change">Change</string>
     <string name="Token">Token</string>
     <string name="FileVersion">FileVersion</string>
     <string name="defaultValue">Not_Saved</string>
+    <string name="ErrorMessage">ErrorMessage</string>
     <string name="Username">Username</string>
     <string name="Activation">Activation</string>
     <string name="Password">Password</string>

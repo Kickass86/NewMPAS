@@ -188,7 +188,7 @@ public class VersionUpdate extends Service {
             // Normally we would do some work here, like download a file.
             // For our sample, we just sleep for 5 seconds.
             try {
-                Thread.sleep(5000);
+//                Thread.sleep(5000);
 
 
                 IntentFilter filter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
@@ -372,7 +372,7 @@ public class VersionUpdate extends Service {
                 }
 
 
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 // Restore interrupt status.
                 Thread.currentThread().interrupt();
             }

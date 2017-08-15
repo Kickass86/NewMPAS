@@ -42,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-
+            Log.i("is this ", "BroadcastReceiver");
             String action = intent.getAction();
 
             setTitle(getString(R.string.app_name));
@@ -54,6 +54,7 @@ public class LoginActivity extends AppCompatActivity {
                     intent = new Intent(context, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+                    finish();
 
                     Log.i("is this ", "BroadcastReceiver");
                 }
@@ -131,110 +132,125 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        try {
+
 
 //        NotificationsAdapter.getInstance(this);
-        share = SharedPreferenceHandler.getInstance(this);
-        first = true;
-        mCheckedState = new boolean[0];
+            share = SharedPreferenceHandler.getInstance(this);
+            first = true;
+            mCheckedState = new boolean[0];
 
-        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
-        alarmIntent.setAction("Alarm");
-        pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
-
-
-        if(share.GetStatus().equals(getString(R.string.defaultValue)))
-        {
-            setTitle(getString(R.string.app_name));
-        }
-        else {
-            setTitle(getString(R.string.Waiting_for_Network));
-        }
+            Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+            alarmIntent.setAction("Alarm");
+            pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
 
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancelAll();
-
-
-
-
-
-
-
-
-        String state = share.GetStatus();
-
-        State st = State.valueOf(state);
-
-        switch (st) {
-            case OK: {
-
-                setContentView(R.layout.notification_tab);
-
-                alarmIntent = new Intent(this, AlarmReceiver.class);
-                alarmIntent.setAction("Alarm");
-                pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
-
-                AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-                manager.cancel(pendingIntent);
-
-                manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
-                Log.i("Alarm", "Set");
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-
-
-                break;
+            if (share.GetStatus().equals(getString(R.string.defaultValue))) {
+                setTitle(getString(R.string.app_name));
+            } else {
+                setTitle(getString(R.string.Waiting_for_Network));
             }
-            case Wait: {
-                setContentView(R.layout.wait_for_activation_layout);
-                alarmIntent = new Intent(this, AlarmReceiver.class);
-                alarmIntent.setAction("Alarm");
-                pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
-                AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-                manager.cancel(pendingIntent);
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancelAll();
 
-                manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
 
-                Log.i("Alarm", "Set");
+            String state = share.GetStatus();
 
-                break;
-            }
-            case Invalid:
-            case Not_Saved:
-            default: {
+            State st = State.valueOf(state);
+
+            switch (st) {
+                case OK: {
+
+                    setContentView(R.layout.notification_tab);
+
+                    alarmIntent = new Intent(this, AlarmReceiver.class);
+                    alarmIntent.setAction("Alarm");
+                    pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+
+                    AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+                    manager.cancel(pendingIntent);
+
+                    manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
+                    Log.i("Alarm", "Set");
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+
+
+                    break;
+                }
+                case Wait: {
+                    setContentView(R.layout.wait_for_activation_layout);
+                    alarmIntent = new Intent(this, AlarmReceiver.class);
+                    alarmIntent.setAction("Alarm");
+                    pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+
+                    AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+                    manager.cancel(pendingIntent);
+
+                    manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
+
+                    Log.i("Alarm", "Set");
+
+                    break;
+                }
+                case Invalid:
+                case Not_Saved:
+                default: {
 //                if (!first) {
 //                    setContentView(R.layout.waiting_layout);
 //                } else {
-                setContentView(R.layout.login_layout);
-                registerReceiver(broadcastReceiver, new IntentFilter("Alarm fire"));
-                flag = true;
+                    setContentView(R.layout.login_layout);
+                    registerReceiver(broadcastReceiver, new IntentFilter("Alarm fire"));
+                    flag = true;
 
 
 //            new Thread(new Runnable() {
 //                @Override
 //                public void run() {
 
-                UsernameView = (EditText) findViewById(R.id.editText2);
-                PasswordView = (EditText) findViewById(R.id.editText);
-                Button registerButton = (Button) findViewById(R.id.button);
+                    UsernameView = (EditText) findViewById(R.id.editText2);
+                    PasswordView = (EditText) findViewById(R.id.editText);
+                    Button registerButton = (Button) findViewById(R.id.button);
 
-                UsernameView.requestFocus();
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
+                    UsernameView.requestFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
 
-                PasswordView.setOnKeyListener(new View.OnKeyListener() {
+                    PasswordView.setOnKeyListener(new View.OnKeyListener() {
 
-                    @Override
-                    public boolean onKey(View v, int keyCode, KeyEvent event) {
-                        if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+                        @Override
+                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+                            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+
+                                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
+                                String Username = UsernameView.getText().toString();
+                                String Password = PasswordView.getText().toString();
+                                String DeviceID = getUniquePsuedoID();
+                                share.SaveLoginDetails(Username, Password);
+                                share.SaveDeviceID(DeviceID);
+
+                                attemptLogin(Username, Password, DeviceID);
+                            }
+                            return false;
+                        }
+                    });
+
+
+                    registerButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
 
                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
 
                             String Username = UsernameView.getText().toString();
                             String Password = PasswordView.getText().toString();
@@ -243,36 +259,19 @@ public class LoginActivity extends AppCompatActivity {
                             share.SaveDeviceID(DeviceID);
 
                             attemptLogin(Username, Password, DeviceID);
-                        }
-                        return false;
-                    }
-                });
-
-
-                registerButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-
-
-                        String Username = UsernameView.getText().toString();
-                        String Password = PasswordView.getText().toString();
-                        String DeviceID = getUniquePsuedoID();
-                        share.SaveLoginDetails(Username, Password);
-                        share.SaveDeviceID(DeviceID);
-
-                        attemptLogin(Username, Password, DeviceID);
 //                Log.i("Successful Login ", "Welcome " + Name);
-                    }
-                });
+                        }
+                    });
 //                }
 
+                }
             }
+
+        } catch (Exception e) {
+            share.SaveError(e.getMessage());
+            Intent SE = new Intent(this, SendError.class);
+            startService(SE);
         }
-
-
     }
 
     @Override

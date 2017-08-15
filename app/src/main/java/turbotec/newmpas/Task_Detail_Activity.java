@@ -3,6 +3,7 @@ package turbotec.newmpas;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -22,6 +23,7 @@ public class Task_Detail_Activity extends AppCompatActivity {
     static final String URL1 = "content://" + PROVIDER_NAME + "/tasks/";
     //    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
+    private SharedPreferenceHandler share;
     //    static final Uri CONTENT_URI2 = Uri.parse(URL2);
 //    private static DatabaseHandler db;
     //    private final Context main_menu;
@@ -34,124 +36,131 @@ public class Task_Detail_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.task_detail_layout);
 
+        try {
+            share = SharedPreferenceHandler.getInstance(this);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
-        Bundle b = getIntent().getExtras();
-        String Subject;
-        String Creator;
-        String DueDate;
-        String TStatus;
-        String TDescription;
-        boolean TEditable;
-        boolean TReply;
-
-        if (b != null) {
-            Subject = b.getString(getString(R.string.Subject));
-            Creator = b.getString(getString(R.string.TCreator));
-            DueDate = b.getString(getString(R.string.DueDate));
-            TStatus = b.getString(getString(R.string.TStatus));
-            TDescription = b.getString(getString(R.string.TDescription));
-            TEditable = b.getBoolean(getString(R.string.TEditable));
-            TReply = b.getBoolean(getString(R.string.TReplyAble));
-            TID = b.getString(getString(R.string.TID));
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-            TextView t1 = (TextView) findViewById(R.id.Subject);
-            TextView t2 = (TextView) findViewById(R.id.TCreator);
-            TextView t3 = (TextView) findViewById(R.id.DueDate);
-            TextView t4 = (TextView) findViewById(R.id.TStatus);
-            TextView t5 = (TextView) findViewById(R.id.TDescription);
+            Bundle b = getIntent().getExtras();
+            String Subject;
+            String Creator;
+            String DueDate;
+            String TStatus;
+            String TDescription;
+            boolean TEditable;
+            boolean TReply;
 
-            Button b1 = (Button) findViewById(R.id.ButtonEdit);
-            Button b2 = (Button) findViewById(R.id.ButtonReply);
+            if (b != null) {
+                Subject = b.getString(getString(R.string.Subject));
+                Creator = b.getString(getString(R.string.TCreator));
+                DueDate = b.getString(getString(R.string.DueDate));
+                TStatus = b.getString(getString(R.string.TStatus));
+                TDescription = b.getString(getString(R.string.TDescription));
+                TEditable = b.getBoolean(getString(R.string.TEditable));
+                TReply = b.getBoolean(getString(R.string.TReplyAble));
+                TID = b.getString(getString(R.string.TID));
 
-            t1.setText(Subject);
-            t2.setText(Creator);
-            t3.setText(DueDate);
-            t4.setText(TStatus);
-            t5.setText(TDescription);
 
-            if (TEditable) {
-                b1.setEnabled(true);
-            }
-            if (TReply) {
-                b2.setEnabled(true);
-            }
+                TextView t1 = (TextView) findViewById(R.id.Subject);
+                TextView t2 = (TextView) findViewById(R.id.TCreator);
+                TextView t3 = (TextView) findViewById(R.id.DueDate);
+                TextView t4 = (TextView) findViewById(R.id.TStatus);
+                TextView t5 = (TextView) findViewById(R.id.TDescription);
+
+                Button b1 = (Button) findViewById(R.id.ButtonEdit);
+                Button b2 = (Button) findViewById(R.id.ButtonReply);
+
+                t1.setText(Subject);
+                t2.setText(Creator);
+                t3.setText(DueDate);
+                t4.setText(TStatus);
+                t5.setText(TDescription);
+
+                if (TEditable) {
+                    b1.setEnabled(true);
+                }
+                if (TReply) {
+                    b2.setEnabled(true);
+                }
 
 //                Intent in = new Intent(this, SaveState.class);
 //                startService(in);
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
 
 //                        SQLiteDatabase database = db.getWritableDatabase();
 
-                    ContentValues values = new ContentValues();
-                    values.put("isSeen", true);
+                        ContentValues values = new ContentValues();
+                        values.put("isSeen", true);
 
-                    getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{String.valueOf(TID)});
-
-
-                }
+                        getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{String.valueOf(TID)});
 
 
-            }).start();
+                    }
+
+
+                }).start();
 
 
 //            }
-        }
+            }
 
 
 //        if (!TDescription) {
-        int z = 3;
-        String[] data = new String[]{z + "", "1", String.valueOf(TID)};
+            int z = 3;
+            String[] data = new String[]{z + "", "1", String.valueOf(TID)};
 
-        SendStatusAsyncTask taskstate = new SendStatusAsyncTask(this);
+            SendStatusAsyncTask taskstate = new SendStatusAsyncTask(this);
 
-        taskstate.execute(data);
+            taskstate.execute(data);
 //        }
-        DelBut = (Button) findViewById(R.id.ButtonDelete);
+            DelBut = (Button) findViewById(R.id.ButtonDelete);
 
-        DelBut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            DelBut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
 
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Task_Detail_Activity.this);
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Task_Detail_Activity.this);
 
-                alertDialogBuilder.setPositiveButton("Yes",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                    alertDialogBuilder.setPositiveButton("Yes",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
 
 
 //                                SQLiteDatabase database = db.getWritableDatabase();
 //                                database.delete("Messages", "MessageID  = ?", new String[]{String.valueOf(TID)});
-                                getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{String.valueOf(TID)});
+                                    getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{String.valueOf(TID)});
 //                                database.close();
-                                finish();
+                                    finish();
 
-                            }
-                        })
-                        .setNegativeButton("No",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
+                                }
+                            })
+                            .setNegativeButton("No",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
 
-                                        dialog.cancel();
+                                            dialog.cancel();
 
-                                    }
-                                })
-                        .setMessage(R.string.dialog_message)
-                        .setTitle(R.string.Delete_Button);
-                AlertDialog adialog = alertDialogBuilder.create();
-                adialog.show();
+                                        }
+                                    })
+                            .setMessage(R.string.dialog_message)
+                            .setTitle(R.string.Delete_Button);
+                    AlertDialog adialog = alertDialogBuilder.create();
+                    adialog.show();
 
 
-            }
-        });
+                }
+            });
 
+        } catch (Exception e) {
+            share.SaveError(e.getMessage());
+            Intent SE = new Intent(this, SendError.class);
+            startService(SE);
+        }
 
     }
 

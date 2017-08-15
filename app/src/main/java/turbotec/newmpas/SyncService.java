@@ -324,6 +324,9 @@ public class SyncService extends IntentService {
 
 
         share.SaveChange(FlagChange);
+        share.SaveStatus(Change);
+
+        MyContext.sendBroadcast(new Intent("Alarm fire"));
 
 //        if (FlagChange)
 //        {

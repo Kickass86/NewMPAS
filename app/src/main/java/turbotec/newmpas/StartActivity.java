@@ -54,6 +54,7 @@ public class StartActivity extends AppCompatActivity {
                 InstallIntent.putExtras(bundle);
                 startActivity(InstallIntent);
                 finish();
+                return;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -76,6 +77,9 @@ public class StartActivity extends AppCompatActivity {
                 pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
                 AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+                manager.cancel(pendingIntent);
+
                 manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
 
 
@@ -83,16 +87,19 @@ public class StartActivity extends AppCompatActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
-                break;
+                return;
             }
             case Wait: {
 
                 setContentView(R.layout.wait_for_activation_layout);
+
                 Intent alarmIntent = new Intent(this, AlarmReceiver.class);
                 alarmIntent.setAction("Alarm");
                 pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
-
                 AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+                manager.cancel(pendingIntent);
+
                 manager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent);
             }
             case Invalid:
@@ -102,6 +109,7 @@ public class StartActivity extends AppCompatActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(intent);
                 finish();
+                return;
             }
 
         }

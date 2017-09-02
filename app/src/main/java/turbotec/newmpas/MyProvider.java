@@ -55,14 +55,16 @@ public class MyProvider extends ContentProvider {
     private static final String TASK_Creator = "TaskCreator";
     private static final String TASK_Status = "TaskStatus";
     private static final String isSeen = "isSeen";
+    private static final String Report = "Report";
     private static final String Editable = "isEditable";
     private static final String ReplyAble = "ReplyAble";
     static final String CREATE_TASKS_TABLE =
             "CREATE TABLE " + TABLE_TASKS + "(" +
                     TASK_ID + " TEXT PRIMARY KEY," +
                     TASK_Title + " TEXT," + Task_Description + " TEXT," + TASK_DueDate +
-                    " TEXT," + TASK_Creator + " TEXT," + TASK_Status + " TEXT," + isSeen + " Boolean,"
-                    + SendDelivered + " Boolean," + Editable + " Boolean," + ReplyAble + " Boolean)";
+                    " TEXT," + TASK_Creator + " TEXT," + TASK_Status + " TEXT," + Report + " TEXT,"
+                    + isSeen + " Boolean," + SendDelivered + " Boolean," + Editable + " Boolean,"
+                    + ReplyAble + " Boolean)";
 
     private static final String DATABASE_NAME = "MPAS";
 //    private static HashMap<String, String> MESSAGES_PROJECTION_MAP;
@@ -179,7 +181,7 @@ public class MyProvider extends ContentProvider {
         String id = null;
 //        if(uriMatcher.match(uri) == Message_ID) {
 
-            id = uri.getPathSegments().get(1);
+//            id = uri.getPathSegments().get(1);
 //        }
 //        if(uriMatcher.match(uri) == Tasks) {
 //
@@ -223,7 +225,7 @@ public class MyProvider extends ContentProvider {
     class DatabaseHandler extends SQLiteOpenHelper {
 
 
-        private static final int DATABASE_VERSION = 1;
+        private static final int DATABASE_VERSION = 2;
 
 
         private DatabaseHandler(Context context) {

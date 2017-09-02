@@ -188,7 +188,7 @@ public class SendError extends Service {
                 Log.v("Intent Service", "Check Request");
                 int responseMessage;
                 String value = "Val1=" + share.GetDeviceID() + ",Val2=" + share.GetToken() + ",Val3=" + share.GetError();
-                requestString = requestString + new String(Base64.encode(value.getBytes(), Base64.DEFAULT));
+                requestString = requestString + new String(Base64.encode(value.getBytes("UTF-8"), Base64.DEFAULT));
 //        downloadString = downloadString + new String(Base64.encode(value.getBytes(), Base64.DEFAULT));
                 requestString = requestString.replaceAll("\n", "");
 //        downloadString = downloadString.replaceAll("\n", "");

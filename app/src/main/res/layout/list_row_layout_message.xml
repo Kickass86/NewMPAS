@@ -9,9 +9,7 @@
     <CheckBox
         android:id="@+id/checkbox1"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="5dip"
-        android:layout_marginTop="5dip"
+        android:layout_height="wrap_content"
         android:checked="false"
         android:visibility="gone" />
 
@@ -19,16 +17,18 @@
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
         android:layout_marginBottom="5dip"
         android:layout_marginLeft="10dip"
         android:layout_marginStart="10dip"
         android:layout_marginTop="5dip"
         android:layout_weight="20"
         android:ellipsize="end"
+        android:gravity="center_vertical"
         android:maxLines="1"
+        android:textAlignment="gravity"
 
 
-        android:textAlignment="center"
         android:textColor="#000000"
 
         android:textSize="16sp"
@@ -63,7 +63,7 @@
     <ImageView
         android:id="@+id/Critical"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="5dip"
         android:layout_marginTop="5dip"
         android:layout_weight="10"
@@ -72,7 +72,7 @@
     <ImageView
         android:id="@+id/state"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="5dip"
         android:layout_marginTop="5dip"
         android:layout_weight="10"

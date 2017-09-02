@@ -93,10 +93,18 @@ static List<Boolean> CList = new ArrayList<>();
                 } while (cursor.moveToNext());
             }
         }
+        int count = cursor.getCount();
         cursor.close();
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         c = (CheckBox) activity.findViewById(R.id.checkbox1);
         if (MainActivity.NFlag) {
+            MainActivity.NotiCheckedState = new boolean[activity.IList.size()];
+            for (int i = 0; i < activity.IList.size(); i++) {
+                MainActivity.NotiCheckedState[i] = false;
+            }
+            MainActivity.NFlag = false;
+        }
+        if (count != MainActivity.NotiCheckedState.length) {
             MainActivity.NotiCheckedState = new boolean[activity.IList.size()];
             for (int i = 0; i < activity.IList.size(); i++) {
                 MainActivity.NotiCheckedState[i] = false;

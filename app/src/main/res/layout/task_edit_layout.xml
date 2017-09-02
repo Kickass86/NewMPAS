@@ -3,25 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--<android.support.v7.widget.Toolbar-->
-    <!--android:id="@+id/toolbar"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_weight="1"-->
-    <!--android:background="?attr/colorPrimary"-->
-    <!--android:minHeight="?attr/actionBarSize"-->
-    <!--android:theme="?attr/actionBarTheme" />-->
-
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/Subject"
+        <EditText
+            android:id="@+id/SubjectEdit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dip"
             android:layout_marginTop="10dip"
             android:textAlignment="center"
             android:textColor="#000000"
@@ -29,16 +21,14 @@
             android:textStyle="bold" />
 
 
-
-
         <LinearLayout
-            android:id="@+id/Row2"
+            android:id="@id/Row2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/Subject">
+            android:layout_below="@id/SubjectEdit">
 
             <TextView
-                android:id="@+id/TCreator"
+                android:id="@+id/TCreatorEdit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
@@ -49,12 +39,11 @@
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:textColor="#000000"
                 android:textSize="16sp" />
 
 
-            <TextView
-                android:id="@+id/DueDate"
+            <EditText
+                android:id="@+id/DueDateEdit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
@@ -62,12 +51,15 @@
                 android:layout_marginRight="8dip"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="false"
                 android:gravity="center"
+                android:inputType="date"
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/TStatus"
+                android:id="@+id/TStatusEdit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
@@ -75,26 +67,21 @@
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:textColor="#000000"
                 android:textSize="16sp" />
 
 
         </LinearLayout>
 
-
         <LinearLayout
-            android:id="@+id/Row6"
+            android:id="@+id/Row3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/Row2"
-            android:layout_marginTop="5dp"
-            android:gravity="center">
+            android:layout_below="@id/Row2">
 
-            <TextView
-                android:id="@+id/TDescription"
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/TDescriptionEdit"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/Row2"
                 android:layout_marginBottom="5dp"
                 android:layout_marginEnd="15dip"
                 android:layout_marginLeft="15dp"
@@ -102,7 +89,6 @@
                 android:layout_marginStart="15dip"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
-
                 android:gravity="start"
                 android:textColor="#000000"
                 android:textSize="16sp" />
@@ -111,18 +97,15 @@
 
 
         <LinearLayout
-            android:id="@+id/Row7"
+            android:id="@+id/Row10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/Row6"
-            android:layout_marginTop="5dp"
-            android:gravity="center">
+            android:layout_below="@id/Row3">
 
-            <TextView
+            <EditText
                 android:id="@+id/TReply"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/Row6"
                 android:layout_marginBottom="5dp"
                 android:layout_marginEnd="15dip"
                 android:layout_marginLeft="15dp"
@@ -130,7 +113,6 @@
                 android:layout_marginStart="15dip"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
-
                 android:gravity="start"
                 android:textColor="#000000"
                 android:textSize="16sp" />
@@ -141,25 +123,15 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/Row7"
-            android:layout_marginTop="5dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/Row10"
             android:gravity="center">
 
 
             <Button
-                android:id="@+id/ButtonDelete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginStart="15dip"
-                android:layout_marginTop="5dp"
-                android:enabled="false"
-                android:text="@string/Delete_Button"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/ButtonEdit"
+                android:id="@+id/ButtonEditDone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
@@ -167,22 +139,10 @@
                 android:layout_marginLeft="15dp"
                 android:layout_marginStart="15dip"
                 android:layout_marginTop="5dp"
-                android:enabled="false"
-                android:text="@string/Edit_Button"
+                android:text="@string/Edit_Done_Button"
                 android:textAllCaps="false" />
 
 
-            <Button
-                android:id="@+id/ButtonReply"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginStart="15dip"
-                android:layout_marginTop="5dp"
-                android:enabled="false"
-                android:text="@string/Reply_Button"
-                android:textAllCaps="false" />
         </LinearLayout>
 
 

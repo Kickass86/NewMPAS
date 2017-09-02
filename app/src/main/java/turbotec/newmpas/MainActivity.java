@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
 //    List<Boolean> SList = new ArrayList<>(); //is Seen
     List<Integer> IList = new ArrayList<>(); //Message ID
     List<String> IDList = new ArrayList<>();
+    private MainActivity Myactivity;
     private SharedPreferenceHandler share = SharedPreferenceHandler.getInstance(this);
     private boolean first = true;
     private ViewPager mPager;
@@ -102,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 //        NotiCheckedState[0] = false;
 
+        Myactivity = this;
+
         try {
 
             NotificationManager mNotificationManager =
@@ -131,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                                 showActivity.putExtras(bundle);
 //            showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
+                                Gone = true;
                                 startActivity(showActivity);
                             }
                     }
@@ -194,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                             if (sumN > 0) {
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
-                                        NotificationsAdapter NAda = NotificationsAdapter.getInstance();
+                                        NotificationsAdapter NAda = NotificationsAdapter.getInstance(Myactivity);
                                         NAda.notifyDataSetChanged();
                                     }
                                 }, 300);
@@ -206,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
 
-                                        TasksAdapter TAda = TasksAdapter.getInstance();
+                                        TasksAdapter TAda = TasksAdapter.getInstance(Myactivity);
                                         TAda.notifyDataSetChanged();
                                     }
                                 }, 300);
@@ -270,6 +273,7 @@ public class MainActivity extends AppCompatActivity {
                     TasksAdapter ad = TasksAdapter.getInstance(this);
                     lvta.setAdapter(ad);
                     ad.notifyDataSetChanged();
+                    lvta.setSelection(Scroll_Position);
                 }
                 Gone = false;
             }
@@ -379,7 +383,7 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < total; i++) {
                 TaskCheckedState[i] = opposite;
             }
-            TasksAdapter ad = TasksAdapter.getInstance();
+            TasksAdapter ad = TasksAdapter.getInstance(this);
             ad.notifyDataSetChanged();
         }
 
@@ -390,6 +394,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void MarkDelete() {
 
+//        new Thread(new Runnable() {
+//            public void run() {
+
+        ListView lvno = (ListView) findViewById(R.id.list_notification);
+        ListView lvta = (ListView) findViewById(R.id.list_task);
 
         if (tabLayout.getSelectedTabPosition() == 0) {
             for (int i = 0; i < NotiCheckedState.length; i++) {
@@ -398,13 +407,13 @@ public class MainActivity extends AppCompatActivity {
                     Integer ID;
                     ID = IList.get(i);
                     getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{String.valueOf(ID)});
+                    NotiCheckedState[i] = false;
                 }
             }
 
-            for (int i = 0; i < NotiCheckedState.length; i++) {
-                NotiCheckedState[i] = false;
-            }
-            NotificationsAdapter ad = NotificationsAdapter.getInstance();
+
+            NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
+            lvno.setAdapter(ad);
             ad.notifyDataSetChanged();
 
         } else if (tabLayout.getSelectedTabPosition() == 1) {
@@ -414,21 +423,31 @@ public class MainActivity extends AppCompatActivity {
                     String ID;
                     ID = IDList.get(i);
                     getContentResolver().delete(CONTENT_URI2, "_id  = ?", new String[]{String.valueOf(ID)});
+                    TaskCheckedState[i] = false;
                 }
             }
-            for (int i = 0; i < TaskCheckedState.length; i++) {
-                TaskCheckedState[i] = false;
-            }
-            TasksAdapter ad = TasksAdapter.getInstance();
+
+
+            TasksAdapter ad = TasksAdapter.getInstance(this);
+            lvta.setAdapter(ad);
             ad.notifyDataSetChanged();
-        }
+                }
 
         invalidateOptionsMenu();
+//            }
+//        }).start();
 
 
     }
 
     private void MarkRead() {
+
+
+//        new Thread(new Runnable() {
+//            public void run() {
+
+        ListView lvno = (ListView) findViewById(R.id.list_notification);
+        ListView lvta = (ListView) findViewById(R.id.list_task);
 
         if (tabLayout.getSelectedTabPosition() == 0) {
             for (int i = 0; i < NotiCheckedState.length; i++) {
@@ -444,6 +463,10 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < NotiCheckedState.length; i++) {
                 NotiCheckedState[i] = false;
             }
+
+            NotificationsAdapter ad = NotificationsAdapter.getInstance(getApplication());
+            lvno.setAdapter(ad);
+            ad.notifyDataSetChanged();
         } else if (tabLayout.getSelectedTabPosition() == 1) {
             for (int i = 0; i < TaskCheckedState.length; i++) {
 
@@ -458,9 +481,14 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < TaskCheckedState.length; i++) {
                 TaskCheckedState[i] = false;
             }
-        }
+            TasksAdapter ad = TasksAdapter.getInstance(getApplication());
+            lvta.setAdapter(ad);
+            ad.notifyDataSetChanged();
+                }
 
         invalidateOptionsMenu();
+//            }
+//        }).start();
 
 
     }
@@ -516,35 +544,48 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         boolean fl = false;
-//        boolean i;
-        for (boolean i : NotiCheckedState) {
-            if (i) {
-                fl = true;
-                break;
-            }
-        }
 
-        if (fl) {
-            for (int i = 0; i < NotiCheckedState.length; i++) {
-                NotiCheckedState[i] = false;
+
+        ListView lvno = (ListView) findViewById(R.id.list_notification);
+        ListView lvta = (ListView) findViewById(R.id.list_task);
+
+        if (tabLayout.getSelectedTabPosition() == 0) {
+            for (boolean i : NotiCheckedState) {
+                if (i) {
+                    fl = true;
+                    break;
+                }
             }
-            for (int i = 0; i < TaskCheckedState.length; i++) {
-                TaskCheckedState[i] = false;
-            }
-            ListView lvno = (ListView) findViewById(R.id.list_notification);
-            ListView lvta = (ListView) findViewById(R.id.list_task);
-            if (lvno != null) {
-                NotificationsAdapter ad = NotificationsAdapter.getInstance(getBaseContext());
+            if (fl) {
+                for (int i = 0; i < NotiCheckedState.length; i++) {
+                    NotiCheckedState[i] = false;
+                }
+
+                NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
                 lvno.setAdapter(ad);
                 ad.notifyDataSetChanged();
-            } else if (lvta != null) {
-                TasksAdapter ad = TasksAdapter.getInstance(getBaseContext());
+            }
+        } else if (tabLayout.getSelectedTabPosition() == 1) {
+            for (boolean i : TaskCheckedState) {
+                if (i) {
+                    fl = true;
+                    break;
+                }
+            }
+            if (fl) {
+                for (int i = 0; i < TaskCheckedState.length; i++) {
+                    TaskCheckedState[i] = false;
+                }
+                TasksAdapter ad = TasksAdapter.getInstance(this);
                 lvta.setAdapter(ad);
                 ad.notifyDataSetChanged();
             }
-        } else {
+        }
+        if (!fl) {
             super.onBackPressed();
         }
+
+        invalidateOptionsMenu();
     }
 
 

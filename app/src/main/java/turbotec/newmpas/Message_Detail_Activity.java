@@ -37,6 +37,8 @@ public class Message_Detail_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.message_detail_layout);
 
+        MainActivity.setTab = 0;
+
         try {
             share = SharedPreferenceHandler.getInstance(this);
 
@@ -74,9 +76,9 @@ public class Message_Detail_Activity extends AppCompatActivity {
 //                Intent in = new Intent(this, SaveState.class);
 //                startService(in);
 
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
 
 //                        SQLiteDatabase database = db.getWritableDatabase();
 
@@ -86,10 +88,10 @@ public class Message_Detail_Activity extends AppCompatActivity {
                             getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{String.valueOf(ID)});
 
 
-                        }
+//                        }
 
 
-                    }).start();
+//                    }).start();
 
 
                 }

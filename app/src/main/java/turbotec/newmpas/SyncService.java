@@ -61,6 +61,7 @@ public class SyncService extends IntentService {
     private static final String TASK_Editable = "isEditable";
     private static final String TASK_ReplyAble = "ReplyAble";
     private static final String isSeen = "isSeen";
+    private static final String Report = "Report";
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
 //    private static final String ACTION_FOO = "turbotec.newmpas.action.FOO";
@@ -89,7 +90,7 @@ public class SyncService extends IntentService {
     private String InsertDate;
     private boolean Critical;
     private boolean Seen;
-    private boolean SendDelivered;
+    private String SendDelivered = "SendDelivered";
     private boolean SendSeen;
     private String TaskID;
     private String TaskTitle;
@@ -97,6 +98,7 @@ public class SyncService extends IntentService {
     private String TaskDueDate;
     private String TaskCreator;
     private String TaskStatus;
+    private String TReport = "";
     private boolean TEditable;
     private boolean TReplyAble;
     private String OPERATION_NAME_CHECK;
@@ -235,7 +237,7 @@ public class SyncService extends IntentService {
             }
 
 
-            plaintext = new String(Base64.encode(plaintext.getBytes(), Base64.DEFAULT));
+            plaintext = new String(Base64.encode(plaintext.getBytes("UTF-8"), Base64.DEFAULT));
 
             plaintext = plaintext.replaceAll("\n", "");
             SoapObject request = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_CHECK);
@@ -399,9 +401,12 @@ public class SyncService extends IntentService {
                     + ",value3=" + Status + ",value4=" + TIDs;
 
 
-            plaintxt = new String(Base64.encode(plaintxt.getBytes(), Base64.DEFAULT));
-            plaintxt = plaintxt.replaceAll("\n", "");
-
+            try {
+                plaintxt = new String(Base64.encode(plaintxt.getBytes("UTF-8"), Base64.DEFAULT));
+                plaintxt = plaintxt.replaceAll("\n", "");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             SoapObject requestDel = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_DELIVERED);
             PropertyInfo Pinf = new PropertyInfo();
             Pinf.setName("Value");
@@ -434,7 +439,7 @@ public class SyncService extends IntentService {
             if (response.toString().contains(MyContext.getString(R.string.Delivered))) {
 
                 ContentValues values = new ContentValues();
-                values.put("SendDelivered", true);
+                values.put(SendDelivered, true);
                 String[] MIDs = IDs.split(";");
                 for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
@@ -450,7 +455,7 @@ public class SyncService extends IntentService {
 
                 ContentValues values = new ContentValues();
 //            values.put("SendSeen", true);
-                values.put("SendDelivered", true);
+                values.put(SendDelivered, true);
                 String[] MIDs = IDs.split(";");
                 for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
@@ -488,6 +493,7 @@ public class SyncService extends IntentService {
             TaskStatus = Task.getProperty(5).toString();
             TReplyAble = Boolean.valueOf("1".equals(Task.getProperty(6).toString()));
             TEditable = Boolean.valueOf("1".equals(Task.getProperty(7).toString()));
+            TReport = Task.getProperty(8).toString();
 
             Cursor c = getContentResolver().query(CONTENT_URI3, new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(TaskID)}, null);
             if (c != null) {
@@ -505,7 +511,8 @@ public class SyncService extends IntentService {
                         values.put(TASK_Status, TaskStatus);
                         values.put(TASK_Editable, TEditable);
                         values.put(TASK_ReplyAble, TReplyAble);
-                        values.put("SendDelivered", false);
+                        values.put(SendDelivered, false);
+                        values.put(Report, TReport);
                         values.put(isSeen, false);
 
                         getContentResolver().update(CONTENT_URI3, values, "_id  = ?", new String[]{String.valueOf(TaskID)});
@@ -536,7 +543,7 @@ public class SyncService extends IntentService {
             if (!isAppForeground(MyContext)) {
 
                 Log.i("Notify", "is running");
-                Intent nid = new Intent(MyContext, Task_Detail_Activity.class);
+                Intent nid = new Intent(MyContext, MainActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString(MyContext.getString(R.string.TID), TaskID);
                 bundle.putString(MyContext.getString(R.string.Subject), TaskTitle);
@@ -575,10 +582,11 @@ public class SyncService extends IntentService {
             contentValues.put(TASK_DueDate, TaskDueDate);
             contentValues.put(TASK_Creator, TaskCreator);
             contentValues.put(TASK_Status, TaskStatus);
+            contentValues.put(Report, Report);
             contentValues.put(TASK_Editable, TEditable);
             contentValues.put(TASK_ReplyAble, TReplyAble);
             contentValues.put(isSeen, false);
-            contentValues.put("SendDelivered", false);
+            contentValues.put(SendDelivered, false);
 
             getContentResolver().insert(CONTENT_URI3, contentValues);
 
@@ -607,7 +615,7 @@ public class SyncService extends IntentService {
             InsertDate = Message.getProperty(3).toString();
             Critical = Boolean.valueOf(Message.getProperty(4).toString());
             Seen = false;
-            SendDelivered = false;
+//            SendDelivered = false;
             SendSeen = false;
 
             Cursor c = getContentResolver().query(CONTENT_URI1, new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(MessageID)}, null);
@@ -684,7 +692,7 @@ public class SyncService extends IntentService {
             contentValues.put("InsertDate", Message.getProperty(3).toString());
             contentValues.put("Critical", Boolean.valueOf(Message.getProperty(4).toString()));
             contentValues.put("Seen", false);
-            contentValues.put("SendDelivered", false);
+            contentValues.put(SendDelivered, false);
             contentValues.put("SendSeen", false);
             getContentResolver().insert(CONTENT_URI1, contentValues);
 

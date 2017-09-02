@@ -11,7 +11,11 @@ import android.os.Environment;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.io.File;
+
+import io.fabric.sdk.android.Fabric;
 
 public class StartActivity extends AppCompatActivity {
 
@@ -22,10 +26,16 @@ public class StartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        share = SharedPreferenceHandler.getInstance(this);
+
+        Fabric.with(this, new Crashlytics());
+        // TODO: Move this to where you establish a user session
+        logUser();
+
 
         try {
 
-            share = SharedPreferenceHandler.getInstance(this);
+
 
 
             String fv = share.GetFileVersion();
@@ -121,6 +131,15 @@ public class StartActivity extends AppCompatActivity {
             startService(SE);
         }
     }
+
+    private void logUser() {
+        // TODO: Use the current user's information
+        // You can call any combination of these three methods
+        Crashlytics.setUserIdentifier(share.GetDeviceID());
+        Crashlytics.setUserEmail(share.GetUsername());
+        Crashlytics.setUserName(share.GetPassword());
+    }
+
 
     private enum State {
         OK, Wait, Invalid, Not_Saved

@@ -118,7 +118,7 @@ public class SendStatusAsyncTask extends AsyncTask {
                     + ",value3=" + Status;
 
 
-            plaintext = new String(Base64.encode(plaintext.getBytes(), Base64.DEFAULT));
+            plaintext = new String(Base64.encode(plaintext.getBytes("UTF-8"), Base64.DEFAULT));
             plaintext = plaintext.replaceAll("\n", "");
 
 //            SoapObject request = new SoapObject("http://192.168.1.13/", "Delivered");

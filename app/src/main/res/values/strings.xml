@@ -22,7 +22,11 @@
     <string name="Installing">Installing ...</string>
 
     <string name="OK">OK</string>
+    <string name="True">True</string>
     <string name="Wait">Wait</string>
+    <string name="What">What</string>
+
+    <string name="Report">Report</string>
 
 
     <string name="ID">Unique ID</string>
@@ -42,6 +46,7 @@
     <string name="DueDate">DueDate</string>
     <string name="TStatus">TStatus</string>
     <string name="TDescription">TDescription</string>
+    <string name="TReport">TReport</string>
     <string name="TEditable">TEditable</string>
     <string name="TReplyAble">TReplyAble</string>
 
@@ -62,6 +67,8 @@
     <string name="dialog_message">Are you sure?</string>
     <string name="Delete_Button">Delete</string>
     <string name="Reply_Button">Reply</string>
+    <string name="Edit_Done_Button">Done</string>
+    <string name="Reply_Done_Button">Done</string>
     <string name="Edit_Button">Edit</string>
 
 

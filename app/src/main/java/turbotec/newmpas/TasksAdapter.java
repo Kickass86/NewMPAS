@@ -38,7 +38,7 @@ public class TasksAdapter extends BaseAdapter {
     static List<String> ReList = new ArrayList<>();
     //    static List<String> IDList = new ArrayList<>();
     static List<String> CrList = new ArrayList<>();
-    static List<String> StList = new ArrayList<>();
+    static List<Integer> StList = new ArrayList<>();
     static List<String> DateList = new ArrayList<>();
     private static TasksAdapter instance;
     private static LayoutInflater inflater = null;
@@ -64,10 +64,10 @@ public class TasksAdapter extends BaseAdapter {
         return instance;
     }
 
-    public static TasksAdapter getInstance() {
-//        Initialize();
-        return instance;
-    }
+//    public static TasksAdapter getInstance() {
+////        Initialize();
+//        return instance;
+//    }
 
     static void Initialize() {
 
@@ -94,7 +94,7 @@ public class TasksAdapter extends BaseAdapter {
                     DesList.add(cursor.getString(2));
                     DateList.add(cursor.getString(3));
                     CrList.add(cursor.getString(4));
-                    StList.add(cursor.getString(5));
+                    StList.add(cursor.getInt(5));
                     ReList.add(cursor.getString(6));
                     isSeen.add("1".equals(cursor.getString(7)));
                     EList.add("1".equals(cursor.getString(9)));
@@ -152,7 +152,7 @@ public class TasksAdapter extends BaseAdapter {
         rowView = inflater.inflate(R.layout.list_row_layout_task, parent, false);
 
         holder.tv1 = (TextView) rowView.findViewById(R.id.ttitle);
-        holder.tv2 = (TextView) rowView.findViewById(R.id.tdes);
+//        holder.tv2 = (TextView) rowView.findViewById(R.id.tdes);
         holder.tv3 = (TextView) rowView.findViewById(R.id.tdate);
         holder.cb = (CheckBox) rowView.findViewById(R.id.tcheckbox);
         holder.i1 = (ImageView) rowView.findViewById(R.id.tstate);
@@ -167,7 +167,7 @@ public class TasksAdapter extends BaseAdapter {
 
 
         holder.tv1.setText(Tlist.get(position));
-        holder.tv2.setText(DesList.get(position));
+//        holder.tv2.setText(DesList.get(position));
         holder.tv3.setText(DateList.get(position));
 
         if (isSeen.get(position))
@@ -252,7 +252,7 @@ public class TasksAdapter extends BaseAdapter {
                     bundle.putString(activity.getString(R.string.Subject), Tlist.get(position));
                     bundle.putString(activity.getString(R.string.TCreator), CrList.get(position));
                     bundle.putString(activity.getString(R.string.DueDate), DateList.get(position));
-                    bundle.putString(activity.getString(R.string.TStatus), StList.get(position));
+                    bundle.putInt(activity.getString(R.string.TStatus), StList.get(position));
                     bundle.putString(activity.getString(R.string.TDescription), DesList.get(position));
                     bundle.putBoolean(activity.getString(R.string.TEditable), EList.get(position));
                     bundle.putBoolean(activity.getString(R.string.TReplyAble), RList.get(position));
@@ -335,7 +335,7 @@ public class TasksAdapter extends BaseAdapter {
 
     private class Holder {
         TextView tv1;
-        TextView tv2;
+        //        TextView tv2;
         TextView tv3;
         ImageView i1;
         CheckBox cb;

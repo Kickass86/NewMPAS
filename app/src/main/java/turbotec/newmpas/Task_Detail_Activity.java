@@ -26,11 +26,13 @@ public class Task_Detail_Activity extends AppCompatActivity {
     String Subject;
     String Creator;
     String DueDate;
-    String TStatus;
+    int TStatus;
     String TDescription;
     String Report = "";
+
     boolean TEditable;
     boolean TReplyable;
+    boolean TDeletable;
     private SharedPreferenceHandler share;
     //    static final Uri CONTENT_URI2 = Uri.parse(URL2);
 //    private static DatabaseHandler db;
@@ -41,6 +43,11 @@ public class Task_Detail_Activity extends AppCompatActivity {
     private Button ReplyBut;
     private String TID;
     private Task_Detail_Activity activity;
+
+
+//    private enum Status {
+//        Not_Assigned, In_Progress, Finished, Closed
+//    }
 
     public Task_Detail_Activity() {
         activity = this;
@@ -66,10 +73,11 @@ public class Task_Detail_Activity extends AppCompatActivity {
                 Subject = b.getString(getString(R.string.Subject));
                 Creator = b.getString(getString(R.string.TCreator));
                 DueDate = b.getString(getString(R.string.DueDate));
-                TStatus = b.getString(getString(R.string.TStatus));
+                TStatus = b.getInt(getString(R.string.TStatus));
                 TDescription = b.getString(getString(R.string.TDescription));
                 TEditable = b.getBoolean(getString(R.string.TEditable));
                 TReplyable = b.getBoolean(getString(R.string.TReplyAble));
+                TDeletable = b.getBoolean(getString(R.string.TDeletable));
                 TID = b.getString(getString(R.string.TID));
                 Report = b.getString(getString(R.string.TReport));
 
@@ -79,17 +87,36 @@ public class Task_Detail_Activity extends AppCompatActivity {
                 TextView t3 = (TextView) findViewById(R.id.DueDate);
                 TextView t4 = (TextView) findViewById(R.id.TStatus);
                 TextView t5 = (TextView) findViewById(R.id.TDescription);
-                TextView t6 = (TextView) findViewById(R.id.TReply);
+                TextView t6 = (TextView) findViewById(R.id.THReply);
 
                 Button b1 = (Button) findViewById(R.id.ButtonEdit);
                 Button b2 = (Button) findViewById(R.id.ButtonReply);
+                Button b3 = (Button) findViewById(R.id.ButtonDelete);
 
                 t1.setText(Subject);
                 t2.setText(Creator);
                 t3.setText(DueDate);
-                t4.setText(TStatus);
+
                 t5.setText(TDescription);
                 t6.setText(Report);
+
+
+                switch (TStatus) {
+                    case 1:
+                        t4.setText("Not Assigned");
+                        break;
+                    case 2:
+                        t4.setText("In Progress");
+                        break;
+                    case 3:
+                        t4.setText("Finished");
+                        break;
+                    case 1002:
+                    default:
+                        t4.setText("Closed");
+                        break;
+
+                }
 
                 if (TEditable) {
                     b1.setEnabled(true);
@@ -98,28 +125,20 @@ public class Task_Detail_Activity extends AppCompatActivity {
                     b2.setEnabled(true);
                 }
 
-//                Intent in = new Intent(this, SaveState.class);
-//                startService(in);
-
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-
-//                        SQLiteDatabase database = db.getWritableDatabase();
-
-                        ContentValues values = new ContentValues();
-                        values.put("isSeen", true);
-
-                        getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{String.valueOf(TID)});
+                if (TDeletable) {
+                    b3.setEnabled(true);
+                }
 
 
-//                    }
+                ContentValues values = new ContentValues();
+                values.put("isSeen", true);
+
+                getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{String.valueOf(TID)});
 
 
-//                }).start();
 
 
-//            }
+
             }
 
 
@@ -145,11 +164,17 @@ public class Task_Detail_Activity extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int id) {
 
 
-//                                SQLiteDatabase database = db.getWritableDatabase();
-//                                database.delete("Messages", "MessageID  = ?", new String[]{String.valueOf(TID)});
-                                    getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{String.valueOf(TID)});
-//                                database.close();
-                                    finish();
+                                    setContentView(R.layout.waiting_layout);
+
+                                    String[] Taskdata = {TID, Subject, TDescription, DueDate, Report, "0"};
+
+                                    SendEdit se = new SendEdit(getBaseContext());
+
+                                    se.execute(Taskdata);
+
+//                                    getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{String.valueOf(TID)});
+
+//                                    finish();
 
                                 }
                             })
@@ -186,11 +211,12 @@ public class Task_Detail_Activity extends AppCompatActivity {
                     bundle.putString(activity.getString(R.string.Subject), Subject);
                     bundle.putString(activity.getString(R.string.TCreator), Creator);
                     bundle.putString(activity.getString(R.string.DueDate), DueDate);
-                    bundle.putString(activity.getString(R.string.TStatus), TStatus);
+                    bundle.putInt(activity.getString(R.string.TStatus), TStatus);
                     bundle.putString(activity.getString(R.string.TDescription), TDescription);
                     bundle.putString(activity.getString(R.string.TReport), Report);
                     bundle.putBoolean(activity.getString(R.string.TEditable), TEditable);
                     bundle.putBoolean(activity.getString(R.string.TReplyAble), TReplyable);
+                    bundle.putBoolean(activity.getString(R.string.TDeletable), TDeletable);
 
 
                     EditActivity.putExtras(bundle);
@@ -220,11 +246,12 @@ public class Task_Detail_Activity extends AppCompatActivity {
                     bundle.putString(activity.getString(R.string.Subject), Subject);
                     bundle.putString(activity.getString(R.string.TCreator), Creator);
                     bundle.putString(activity.getString(R.string.DueDate), DueDate);
-                    bundle.putString(activity.getString(R.string.TStatus), TStatus);
+                    bundle.putInt(activity.getString(R.string.TStatus), TStatus);
                     bundle.putString(activity.getString(R.string.TDescription), TDescription);
                     bundle.putString(activity.getString(R.string.TReport), Report);
                     bundle.putBoolean(activity.getString(R.string.TEditable), TEditable);
                     bundle.putBoolean(activity.getString(R.string.TReplyAble), TReplyable);
+                    bundle.putBoolean(activity.getString(R.string.TDeletable), TDeletable);
 
 
                     EditActivity.putExtras(bundle);

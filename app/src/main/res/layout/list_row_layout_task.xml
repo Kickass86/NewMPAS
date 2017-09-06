@@ -23,9 +23,9 @@
         android:layout_marginLeft="10dip"
         android:layout_marginStart="10dip"
         android:layout_marginTop="5dip"
-        android:layout_weight="20"
+        android:layout_weight="40"
         android:ellipsize="end"
-        android:gravity="start"
+        android:gravity="center"
 
 
         android:maxLines="1"
@@ -33,41 +33,30 @@
 
         android:textSize="16sp"
         android:textStyle="bold" />
-    <!--android:scrollHorizontally="true"-->
-    <!--android:layout_alignParentLeft="true"-->
-    <!--android:layout_alignParentStart="true"-->
 
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="5" />
 
-    <TextView
-        android:id="@+id/tdes"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_vertical"
-        android:layout_marginBottom="5dip"
-        android:layout_marginEnd="8dip"
-        android:layout_marginRight="8dip"
-        android:layout_marginTop="5dip"
-        android:layout_weight="35"
-        android:ellipsize="end"
-        android:gravity="start"
-        android:maxLines="1"
-        android:textAlignment="gravity"
-        android:textColor="#000000"
-        android:textSize="16sp" />
-    <!--android:layout_alignParentRight="true"-->
-
-    <!--<ImageView-->
-    <!--android:id="@+id/Critical"-->
+    <!--<Space-->
     <!--android:layout_width="0dp"-->
-    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_weight="5" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/tdes"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_gravity="center_vertical"-->
     <!--android:layout_marginBottom="5dip"-->
+    <!--android:layout_marginEnd="8dip"-->
+    <!--android:layout_marginRight="8dip"-->
     <!--android:layout_marginTop="5dip"-->
-    <!--android:layout_weight="10"-->
+    <!--android:layout_weight="35"-->
+    <!--android:ellipsize="end"-->
+    <!--android:gravity="start"-->
+    <!--android:maxLines="1"-->
+    <!--android:textAlignment="gravity"-->
+    <!--android:textColor="#000000"-->
     <!--android:textSize="16sp" />-->
+
 
     <Space
         android:layout_width="0dp"
@@ -80,8 +69,8 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="5dip"
         android:layout_marginTop="5dip"
-        android:layout_weight="28"
-        android:gravity="start"
+        android:layout_weight="35"
+        android:gravity="center"
         android:maxLines="1"
         android:textColor="#000000"
         android:textSize="16sp" />
@@ -92,7 +81,7 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="5dip"
         android:layout_marginTop="5dip"
-        android:layout_weight="10"
+        android:layout_weight="15"
         android:textSize="16sp" />
 
 

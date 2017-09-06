@@ -8,64 +8,55 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/SubjectEdit"
+        <TextView
+            android:id="@+id/SubjectR"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="10dip"
             android:layout_marginTop="10dip"
             android:textAlignment="center"
-            android:textColor="#000000"
             android:textSize="16sp"
             android:textStyle="bold" />
 
 
         <LinearLayout
-            android:id="@id/Row2"
+            android:id="@+id/Row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/SubjectEdit">
+            android:layout_below="@id/SubjectR">
 
             <TextView
-                android:id="@+id/TCreatorEdit"
+                android:id="@+id/TCreatorR"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_below="@id/Subject"
+                android:layout_below="@id/SubjectR"
                 android:layout_marginBottom="5dp"
-                android:layout_marginLeft="8dip"
                 android:layout_marginStart="8dip"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:textSize="16sp" />
 
-
-            <EditText
-                android:id="@+id/DueDateEdit"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginEnd="8dip"
-                android:layout_marginStart="8dip"
-                android:layout_marginTop="5dp"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:focusable="false"
-                android:gravity="center"
-                android:inputType="date"
-                android:textColor="#000000"
-                android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/TStatusEdit"
+                android:id="@+id/DueDateR"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:layout_marginEnd="8dip"
-                android:layout_marginRight="8dip"
+                android:layout_marginStart="8dip"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="16sp" />
+
+            <Spinner
+                android:id="@+id/TStatusR"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginEnd="8dip"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
                 android:gravity="center"
@@ -74,35 +65,35 @@
 
         </LinearLayout>
 
+
         <LinearLayout
-            android:id="@+id/Row3"
+            android:id="@+id/Row15"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/Row2">
+            android:layout_below="@id/Row">
 
-            <EditText
-                android:id="@+id/TDescriptionEdit"
+            <TextView
+                android:id="@+id/TDescriptionR"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
+
                 android:layout_marginEnd="15dip"
-                android:layout_marginLeft="15dip"
-                android:layout_marginRight="15dip"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
                 android:gravity="start"
-                android:textColor="#000000"
-                android:textSize="16sp" />
 
+                android:textSize="16sp" />
         </LinearLayout>
 
 
         <LinearLayout
-            android:id="@+id/Row10"
+            android:id="@+id/Row4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/Row3">
+            android:layout_below="@id/Row15">
+
 
             <TextView
                 android:id="@+id/THReply"
@@ -110,12 +101,34 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:layout_marginEnd="15dip"
-                android:layout_marginLeft="15dip"
-                android:layout_marginRight="15dip"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
                 android:gravity="start"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/Row35"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/Row4">
+
+
+            <EditText
+                android:id="@+id/TReply"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginEnd="15dip"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:textColor="#000000"
                 android:textSize="16sp" />
 
         </LinearLayout>
@@ -124,25 +137,21 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/Row10"
+            android:layout_below="@id/Row35"
+            android:layout_marginTop="5dp"
             android:gravity="center">
 
 
             <Button
-                android:id="@+id/ButtonEditDone"
+                android:id="@+id/ButtonReplyDone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="15dp"
+                android:layout_below="@id/Row4"
+                android:layout_marginBottom="20dp"
                 android:layout_marginStart="15dp"
-                android:layout_marginTop="5dp"
-                android:text="@string/Edit_Done_Button"
+                android:layout_marginTop="20dp"
+                android:text="@string/Reply_Done_Button"
                 android:textAllCaps="false" />
-
 
         </LinearLayout>
 

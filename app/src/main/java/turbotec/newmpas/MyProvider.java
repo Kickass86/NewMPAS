@@ -58,13 +58,14 @@ public class MyProvider extends ContentProvider {
     private static final String Report = "Report";
     private static final String Editable = "isEditable";
     private static final String ReplyAble = "ReplyAble";
+    private static final String Deletable = "Deletable";
     static final String CREATE_TASKS_TABLE =
             "CREATE TABLE " + TABLE_TASKS + "(" +
                     TASK_ID + " TEXT PRIMARY KEY," +
                     TASK_Title + " TEXT," + Task_Description + " TEXT," + TASK_DueDate +
-                    " TEXT," + TASK_Creator + " TEXT," + TASK_Status + " TEXT," + Report + " TEXT,"
+                    " TEXT," + TASK_Creator + " TEXT," + TASK_Status + " INTEGER," + Report + " TEXT,"
                     + isSeen + " Boolean," + SendDelivered + " Boolean," + Editable + " Boolean,"
-                    + ReplyAble + " Boolean)";
+                    + ReplyAble + " Boolean," + Deletable + " Boolean)";
 
     private static final String DATABASE_NAME = "MPAS";
 //    private static HashMap<String, String> MESSAGES_PROJECTION_MAP;
@@ -225,7 +226,7 @@ public class MyProvider extends ContentProvider {
     class DatabaseHandler extends SQLiteOpenHelper {
 
 
-        private static final int DATABASE_VERSION = 2;
+        private static final int DATABASE_VERSION = 3;
 
 
         private DatabaseHandler(Context context) {

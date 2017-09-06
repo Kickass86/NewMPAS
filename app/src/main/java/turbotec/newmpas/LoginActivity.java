@@ -42,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            Log.i("is this ", "BroadcastReceiver");
+//            Log.i("is this ", "BroadcastReceiver");
             String action = intent.getAction();
 
             setTitle(getString(R.string.app_name));
@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
 
-                    Log.i("is this ", "BroadcastReceiver");
+//                    Log.i("is this ", "BroadcastReceiver");
                 }
                 else{
                     startActivity(new Intent(context, LoginActivity.class));

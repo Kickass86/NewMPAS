@@ -4,27 +4,16 @@ import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -46,8 +35,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
     private static final String SendDelivered = "SendDelivered";
     private static final String isSeen = "isSeen";
     private static final String Task_Report = "Report";
-    private final String ip = "192.168.1.13";
-    private final int port = 80;
+
     Calendar myCalendar = Calendar.getInstance();
     DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 
@@ -68,6 +56,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
     EditText DE;
     TextView StE;
     EditText RE;
+    TextView RH;
     TextView ST;
     TextView DeT;
     TextView CT;
@@ -76,10 +65,11 @@ public class Task_Edit_Activity extends AppCompatActivity {
     String Subject;
     String Creator;
     String DueDate;
-    String TStatus;
+    int TStatus;
     String TReport;
     String TDescription;
     String Report = "";
+    boolean TDeletable;
     boolean TEditable;
     boolean TReply;
     private SharedPreferenceHandler share;
@@ -113,10 +103,11 @@ public class Task_Edit_Activity extends AppCompatActivity {
             Subject = b.getString(getString(R.string.Subject));
             Creator = b.getString(getString(R.string.TCreator));
             DueDate = b.getString(getString(R.string.DueDate));
-            TStatus = b.getString(getString(R.string.TStatus));
+            TStatus = b.getInt(getString(R.string.TStatus));
             TDescription = b.getString(getString(R.string.TDescription));
             TEditable = b.getBoolean(getString(R.string.TEditable));
             TReply = b.getBoolean(getString(R.string.TReplyAble));
+            TDeletable = b.getBoolean(getString(R.string.TDeletable));
             TID = b.getString(getString(R.string.TID));
             Report = b.getString(getString(R.string.TReport));
 
@@ -128,7 +119,8 @@ public class Task_Edit_Activity extends AppCompatActivity {
                 DeE = (EditText) findViewById(R.id.TDescriptionEdit);
                 CE = (TextView) findViewById(R.id.TCreatorEdit);
                 DE = (EditText) findViewById(R.id.DueDateEdit);
-                StE = (TextView) findViewById(R.id.TStatusEdit);
+//                StE = (TextView) findViewById(R.id.TStatusEdit);
+                RH = (TextView) findViewById(R.id.THReply);
                 RE = (EditText) findViewById(R.id.TReply);
 
 
@@ -136,8 +128,8 @@ public class Task_Edit_Activity extends AppCompatActivity {
                 DeE.setText(TDescription);
                 CE.setText(Creator);
                 DE.setText(DueDate);
-                StE.setText(TStatus);
-                RE.setText(TReport);
+//                StE.setText(TStatus);
+                RH.setText(TReport);
 
 
                 EditText edittext = (EditText) findViewById(R.id.DueDateEdit);
@@ -161,16 +153,12 @@ public class Task_Edit_Activity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
-                        Subject = SE.getText().toString();
-                        TDescription = DeE.getText().toString();
-                        Creator = CE.getText().toString();
-                        DueDate = DE.getText().toString();
-                        TStatus = StE.getText().toString();
-                        Report = RE.getText().toString();
+
+                        String[] Taskdata = {TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus)};
 
                         SendEdit se = new SendEdit(getBaseContext());
 
-                        se.execute(MyContext);
+                        se.execute(Taskdata);
 
                         finish();
 
@@ -180,14 +168,24 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
                 setContentView(R.layout.task_reply_layout);
 
-                RE = (EditText) findViewById(R.id.TReply);
+
+                Spinner dropdown = (Spinner) findViewById(R.id.TStatusR);
+                String[] items = new String[]{"Not Assigned", "In Progress", "Finished", "Closed"};
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
+
+                dropdown.setAdapter(adapter);
+
+                dropdown.setSelection(TStatus);
+
 
 
                 ST = (TextView) findViewById(R.id.SubjectR);
                 DeT = (TextView) findViewById(R.id.TDescriptionR);
                 CT = (TextView) findViewById(R.id.TCreatorR);
                 DT = (TextView) findViewById(R.id.DueDateR);
-                StT = (TextView) findViewById(R.id.TStatusR);
+//                StT = (Spinner) findViewById(R.id.TStatusR);
+                RH = (TextView) findViewById(R.id.THReply);
                 RE = (EditText) findViewById(R.id.TReply);
 
 
@@ -195,7 +193,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
                 DeT.setText(TDescription);
                 CT.setText(Creator);
                 DT.setText(DueDate);
-                StT.setText(TStatus);
+//                StT.setText(TStatus);
                 RE.setText(Report);
 
 
@@ -207,10 +205,29 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
                         Report = RE.getText().toString();
 
+                        Spinner dropdown = (Spinner) findViewById(R.id.TStatusR);
+                        TStatus = dropdown.getSelectedItemPosition();
+
+
+                        ContentValues values = new ContentValues();
+                        values.put(TASK_Title, Subject);
+                        values.put(Task_Description, TDescription);
+                        values.put(TASK_DueDate, DueDate);
+                        values.put(TASK_Creator, Creator);
+                        values.put(TASK_Status, TStatus);
+                        values.put(SendDelivered, false);
+                        values.put(isSeen, true);
+                        values.put(TASK_Editable, TEditable);
+                        values.put(TASK_ReplyAble, TReply);
+                        values.put(Task_Report, Report);
+
+                        getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{TID});
+
+                        String[] Taskdata = {TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus)};
 
                         SendEdit se = new SendEdit(getBaseContext());
 
-                        se.execute(MyContext);
+                        se.execute(Taskdata);
 
                         finish();
 
@@ -224,134 +241,8 @@ public class Task_Edit_Activity extends AppCompatActivity {
     }
 
 
-    public class SendEdit extends AsyncTask {
 
-
-        private final Context MyContext;
-        private final String OPERATION_NAME_DELIVERED = "EditTask";
-        private String SOAP_ACTION_EditTask = "EditTask";
-        private String WSDL_TARGET_NAMESPACE;
-        private String SOAP_ADDRESS;
-
-
-        public SendEdit(Context myContext) {
-            MyContext = myContext;
-            share = SharedPreferenceHandler.getInstance(MyContext);
-//        db = DatabaseHandler.getInstance(MyContext);
-//        database = db.getWritableDatabase();
-        }
-
-
-        private boolean isLocalReachable() {
-
-            boolean exists = false;
-
-            try {
-                SocketAddress sockaddr = new InetSocketAddress(ip, port);
-                // Create an unbound socket
-                Socket sock = new Socket();
-
-                // This method will block no more than timeoutMs.
-                // If the timeout occurs, SocketTimeoutException is thrown.
-                int timeoutMs = 1000;   // 200 milliseconds
-                sock.connect(sockaddr, timeoutMs);
-                exists = true;
-
-                sock.close();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return exists;
-        }
-
-
-        @Override
-        protected String doInBackground(Object[] params) {
-
-
-            Object response = "";
-
-            ContentValues values = new ContentValues();
-            values.put(TASK_Title, Subject);
-            values.put(Task_Description, TDescription);
-            values.put(TASK_DueDate, DueDate);
-            values.put(TASK_Creator, Creator);
-            values.put(TASK_Status, TStatus);
-            values.put(SendDelivered, false);
-            values.put(isSeen, true);
-            values.put(TASK_Editable, TEditable);
-            values.put(TASK_ReplyAble, TReply);
-            values.put(Task_Report, Report);
-
-            getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{TID});
-
-
-            if (isLocalReachable()) {
-                SOAP_ACTION_EditTask = "http://192.168.1.13/EditTask";
-                WSDL_TARGET_NAMESPACE = "http://192.168.1.13/";
-                SOAP_ADDRESS = "http://192.168.1.13/Andr/WSLocal.asmx";
-            } else {
-                SOAP_ACTION_EditTask = "https://mpas.migtco.com:3000/EditTask";
-                WSDL_TARGET_NAMESPACE = "https://mpas.migtco.com:3000/";
-                SOAP_ADDRESS = "https://mpas.migtco.com:3000/Andr/WS.asmx";
-            }
-
-
-            try {
-
-                // requests!
-
-                String plaintext = "value1=" + share.GetDeviceID() + ",value2=" + share.GetToken()
-                        + ",value3=" + TID + ",value4=" + Subject + ",value5=" + TDescription
-                        + ",value6=" + DueDate + ",value7=" + Report;
-
-
-                plaintext = new String(Base64.encode(plaintext.getBytes("UTF-8"), Base64.DEFAULT));
-                plaintext = plaintext.replaceAll("\n", "");
-
-
-                SoapObject request = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_DELIVERED);
-                PropertyInfo pi = new PropertyInfo();
-                pi.setName("Value");
-                pi.setValue(plaintext);
-                pi.setType(String.class);
-                request.addProperty(pi);
-
-
-                SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                        SoapEnvelope.VER11);
-                envelope.dotNet = true;
-
-                envelope.setOutputSoapObject(request);
-
-
-                HttpTransportSE httpTransport = new HttpTransportSE(SOAP_ADDRESS);
-
-
-                httpTransport.call(SOAP_ACTION_EditTask, envelope);
-                response = envelope.getResponse();
-
-
-                if (response.toString().contains(MyContext.getString(R.string.Seen)) || (response.toString().contains(MyContext.getString(R.string.Delivered)))
-                        || (response.toString().contains(MyContext.getString(R.string.True)))) {
-
-
-                    values.put("SendDelivered", true);
-
-                    MyContext.getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{TID});
-                }
-
-
-            } catch (XmlPullParserException | IOException soapFault) {
-                soapFault.printStackTrace();
-            }
-
-
-            return response.toString();
-        }
-    }
 
 
 }
+

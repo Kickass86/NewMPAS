@@ -120,10 +120,8 @@ public class Message_Detail_Activity extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int id) {
 
 
-//                                SQLiteDatabase database = db.getWritableDatabase();
-//                                database.delete("Messages", "MessageID  = ?", new String[]{String.valueOf(ID)});
                                     getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{String.valueOf(ID)});
-//                                database.close();
+
                                     finish();
 
                                 }

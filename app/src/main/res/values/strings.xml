@@ -35,6 +35,7 @@
     <string name="Critical">Critical</string>
     <string name="Delivered">Delivered</string>
     <string name="Seen">Seen</string>
+    <string name="Deleted">Deleted</string>
     <string name="SendSeen">SendSeen</string>
     <string name="error_invalid_password">Error! Password is empty.</string>
     <string name="error_field_required">Error! Username is empty.</string>
@@ -49,6 +50,7 @@
     <string name="TReport">TReport</string>
     <string name="TEditable">TEditable</string>
     <string name="TReplyAble">TReplyAble</string>
+    <string name="TDeletable">TDeletable</string>
 
 
     <string name="WaitForActivation">Please wait for activation</string>

@@ -60,6 +60,7 @@ public class SyncService extends IntentService {
     private static final String TASK_Status = "TaskStatus";
     private static final String TASK_Editable = "isEditable";
     private static final String TASK_ReplyAble = "ReplyAble";
+    private static final String TASK_Deletable = "Deletable";
     private static final String isSeen = "isSeen";
     private static final String Report = "Report";
     // TODO: Rename actions, choose action names that describe tasks that this
@@ -97,10 +98,11 @@ public class SyncService extends IntentService {
     private String TaskDescription;
     private String TaskDueDate;
     private String TaskCreator;
-    private String TaskStatus;
+    private int TaskStatus;
     private String TReport = "";
     private boolean TEditable;
     private boolean TReplyAble;
+    private boolean TDeletable;
     private String OPERATION_NAME_CHECK;
     private String OPERATION_NAME_DELIVERED;
     private String SOAP_ACTION_CHECK;
@@ -108,6 +110,8 @@ public class SyncService extends IntentService {
     private String WSDL_TARGET_NAMESPACE;
     private String SOAP_ADDRESS;
     private Context MyContext;
+
+    private int TAB;
 
     public SyncService() {
         super("SyncService");
@@ -223,6 +227,7 @@ public class SyncService extends IntentService {
         String Token = share.GetToken();
 
         Change = share.GetStatus();
+        FlagChange = false;
 
 
 
@@ -327,8 +332,10 @@ public class SyncService extends IntentService {
 
         share.SaveChange(FlagChange);
         share.SaveStatus(Change);
+        Intent in = new Intent("Alarm fire");
+        in.putExtra("Type", TAB);
 
-        MyContext.sendBroadcast(new Intent("Alarm fire"));
+        MyContext.sendBroadcast(in);
 
 //        if (FlagChange)
 //        {
@@ -490,15 +497,16 @@ public class SyncService extends IntentService {
             TaskDescription = Task.getProperty(2).toString();
             TaskDueDate = Task.getProperty(3).toString();
             TaskCreator = Task.getProperty(4).toString();
-            TaskStatus = Task.getProperty(5).toString();
+            TaskStatus = Integer.valueOf(Task.getProperty(5).toString().trim());
             TReplyAble = Boolean.valueOf("1".equals(Task.getProperty(6).toString()));
             TEditable = Boolean.valueOf("1".equals(Task.getProperty(7).toString()));
             TReport = Task.getProperty(8).toString();
+            TDeletable = Boolean.valueOf("1".equals(Task.getProperty(9).toString()));
 
             Cursor c = getContentResolver().query(CONTENT_URI3, new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(TaskID)}, null);
             if (c != null) {
-                if (c.getCount() > 0) {
-                    if (c.getString(5).equals(TaskStatus)) {
+                if ((c.getCount() > 0) & (c.moveToFirst())) {
+                    if (c.getInt(5) == TaskStatus) {
                         index++;
                         continue;
                     } else {
@@ -511,6 +519,7 @@ public class SyncService extends IntentService {
                         values.put(TASK_Status, TaskStatus);
                         values.put(TASK_Editable, TEditable);
                         values.put(TASK_ReplyAble, TReplyAble);
+                        values.put(TASK_Deletable, TDeletable);
                         values.put(SendDelivered, false);
                         values.put(Report, TReport);
                         values.put(isSeen, false);
@@ -526,9 +535,9 @@ public class SyncService extends IntentService {
             }
             c.close();
 
-            long[] pattern = {1000, 1000, 1000, 1000, 1000};
-            Vibrator vibrator = (Vibrator) MyContext.getSystemService(Context.VIBRATOR_SERVICE);
-            vibrator.vibrate(pattern, -1);
+//            long[] pattern = {1000, 1000, 1000, 1000, 1000};
+//            Vibrator vibrator = (Vibrator) MyContext.getSystemService(Context.VIBRATOR_SERVICE);
+//            vibrator.vibrate(pattern, -1);
             try {
                 Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 Ringtone r = RingtoneManager.getRingtone(MyContext, notification);
@@ -550,20 +559,25 @@ public class SyncService extends IntentService {
                 bundle.putString(MyContext.getString(R.string.TDescription), TaskDescription);
                 bundle.putString(MyContext.getString(R.string.DueDate), TaskDueDate);
                 bundle.putString(MyContext.getString(R.string.TCreator), TaskCreator);
-                bundle.putString(MyContext.getString(R.string.TStatus), TaskStatus);
+                bundle.putInt(MyContext.getString(R.string.TStatus), TaskStatus);
                 bundle.putBoolean(MyContext.getString(R.string.TEditable), TEditable);
                 bundle.putBoolean(MyContext.getString(R.string.TReplyAble), TReplyAble);
+                bundle.putBoolean(MyContext.getString(R.string.TDeletable), TDeletable);
+                bundle.putString(MyContext.getString(R.string.TReport), TReport);
+                bundle.putBoolean("Type", false);
                 nid.putExtras(bundle);
-                nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 Random i = new Random();
                 PendingIntent ci = PendingIntent.getActivity(MyContext, i.nextInt(), nid, 0);
 
                 mBuilder =
                         new android.support.v4.app.NotificationCompat.Builder(MyContext)
                                 .setSmallIcon(R.mipmap.ic_assignment_black_24dp)
+//                                .setLargeIcon(R.mipmap.ic_assignment_black_24dp_new)
                                 .setContentTitle(MessageTitle)
                                 .setContentIntent(ci)
                                 .setAutoCancel(true)
+                                .setColor(0x00FFFF)
                                 .setContentText(MessageBody);
                 if (!isDuplicate) {
                     mBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
@@ -572,6 +586,8 @@ public class SyncService extends IntentService {
 
                 mNotificationManager.notify(MessageID, mBuilder.build());
                 isDuplicate = true;
+            } else {
+                TAB = 1;
             }
 
 
@@ -582,9 +598,10 @@ public class SyncService extends IntentService {
             contentValues.put(TASK_DueDate, TaskDueDate);
             contentValues.put(TASK_Creator, TaskCreator);
             contentValues.put(TASK_Status, TaskStatus);
-            contentValues.put(Report, Report);
+            contentValues.put(Report, TReport);
             contentValues.put(TASK_Editable, TEditable);
             contentValues.put(TASK_ReplyAble, TReplyAble);
+            contentValues.put(TASK_Deletable, TDeletable);
             contentValues.put(isSeen, false);
             contentValues.put(SendDelivered, false);
 
@@ -605,6 +622,7 @@ public class SyncService extends IntentService {
 //            FLag = "OK";
             Change = "OK";
             FlagChange = true;
+
 
             SoapObject Message = (SoapObject) message.getProperty(index);
 
@@ -663,6 +681,7 @@ public class SyncService extends IntentService {
                     bundle.putBoolean(MyContext.getString(R.string.SendSeen), SendSeen);
                     bundle.putInt(MyContext.getString(R.string.ID), MessageID);
                     bundle.putBoolean(MyContext.getString(R.string.Seen), Seen);
+                    bundle.putBoolean("Type", true);
                     nid.putExtras(bundle);
                     nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     PendingIntent ci = PendingIntent.getActivity(MyContext, MessageID, nid, 0);
@@ -673,6 +692,7 @@ public class SyncService extends IntentService {
                                     .setSmallIcon(R.mipmap.ic_message_black_24dp)
                                     .setContentTitle(MessageTitle)
                                     .setContentIntent(ci)
+                                    .setColor(0x00FFFF)
                                     .setAutoCancel(true)
                                     .setContentText(MessageBody);
                     if (!isDuplicate) {
@@ -682,6 +702,8 @@ public class SyncService extends IntentService {
 
                     mNotificationManager.notify(MessageID, mBuilder.build());
                     isDuplicate = true;
+                } else {
+                    TAB = 0;
                 }
             }
 

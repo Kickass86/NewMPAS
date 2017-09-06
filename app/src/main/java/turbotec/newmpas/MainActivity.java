@@ -54,12 +54,6 @@ public class MainActivity extends AppCompatActivity {
     List<String> IDList = new ArrayList<>();
     private MainActivity Myactivity;
     private SharedPreferenceHandler share = SharedPreferenceHandler.getInstance(this);
-    private boolean first = true;
-    private ViewPager mPager;
-    private ScreenSlidePagerAdapter mPagerAdapter;
-    private TabLayout tabLayout;
-
-
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -72,29 +66,39 @@ public class MainActivity extends AppCompatActivity {
 
                 boolean stat = share.GetChange();
                 if (stat) {
+                    int i = intent.getIntExtra("Type", 0);
 
                     ListView lvno = (ListView) findViewById(R.id.list_notification);
                     ListView lvta = (ListView) findViewById(R.id.list_task);
-                    if (tabLayout.getSelectedTabPosition() == 0) {
+
+                    TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+                    TabLayout.Tab tab = tabLayout.getTabAt(i);
+                    tab.select();
+
+                    if (i == 0) {
 
                         NotificationsAdapter ad = NotificationsAdapter.getInstance(context);
                         lvno.setAdapter(ad);
                         ad.notifyDataSetChanged();
 
-                    } else if (tabLayout.getSelectedTabPosition() == 1) {
+                    } else {
 
                         TasksAdapter ad = TasksAdapter.getInstance(context);
                         lvta.setAdapter(ad);
                         ad.notifyDataSetChanged();
                     }
                     Log.i("is this ", "BroadcastReceiver");
+                    share.SaveChange(false);
                 }
 
 
             }
         }
     };
-
+    private boolean first = true;
+    private ViewPager mPager;
+    private ScreenSlidePagerAdapter mPagerAdapter;
+    private TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,24 +123,47 @@ public class MainActivity extends AppCompatActivity {
                     Bundle b = in.getExtras();
                     if (b != null) {
 
-                        Intent showActivity = new Intent(MainActivity.this, Message_Detail_Activity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putString(getString(R.string.Title), b.getString(getString(R.string.Title)));
-                        bundle.putString(getString(R.string.Body), b.getString(getString(R.string.Body)));
-                        bundle.putInt(getString(R.string.ID), b.getInt(getString(R.string.ID)));
-                        bundle.putBoolean(getString(R.string.Seen), b.getBoolean(getString(R.string.Seen)));
-                        bundle.putBoolean(getString(R.string.Critical), b.getBoolean(getString(R.string.Critical)));
-                        bundle.putBoolean(getString(R.string.SendSeen), b.getBoolean(getString(R.string.SendSeen)));
+                        if (b.getBoolean("Type")) {
+                            Intent showActivity = new Intent(MainActivity.this, Message_Detail_Activity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putString(getString(R.string.Title), b.getString(getString(R.string.Title)));
+                            bundle.putString(getString(R.string.Body), b.getString(getString(R.string.Body)));
+                            bundle.putInt(getString(R.string.ID), b.getInt(getString(R.string.ID)));
+                            bundle.putBoolean(getString(R.string.Seen), b.getBoolean(getString(R.string.Seen)));
+                            bundle.putBoolean(getString(R.string.Critical), b.getBoolean(getString(R.string.Critical)));
+                            bundle.putBoolean(getString(R.string.SendSeen), b.getBoolean(getString(R.string.SendSeen)));
 
-                        String s = b.getString(getString(R.string.Title));
-                        if (s != null)
-                            if (!s.isEmpty()) {
-                                showActivity.putExtras(bundle);
+                            String s = b.getString(getString(R.string.Title));
+                            if (s != null)
+                                if (!s.isEmpty()) {
+                                    showActivity.putExtras(bundle);
 //            showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                Gone = true;
-                                startActivity(showActivity);
-                            }
+                                    showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    Gone = true;
+                                    setTab = 0;
+                                    startActivity(showActivity);
+                                }
+                        } else {
+                            Intent showActivity = new Intent(MainActivity.this, Task_Detail_Activity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putString(getString(R.string.Subject), b.getString(getString(R.string.Subject)));
+                            bundle.putString(getString(R.string.TCreator), b.getString(getString(R.string.TCreator)));
+                            bundle.putString(getString(R.string.DueDate), b.getString(getString(R.string.DueDate)));
+                            bundle.putInt(getString(R.string.TStatus), b.getInt(getString(R.string.TStatus)));
+                            bundle.putString(getString(R.string.TDescription), b.getString(getString(R.string.TDescription)));
+                            bundle.putBoolean(getString(R.string.TEditable), b.getBoolean(getString(R.string.TEditable)));
+                            bundle.putBoolean(getString(R.string.TReplyAble), b.getBoolean(getString(R.string.TReplyAble)));
+                            bundle.putBoolean(getString(R.string.TDeletable), b.getBoolean(getString(R.string.TDeletable)));
+                            bundle.putString(getString(R.string.TID), b.getString(getString(R.string.TID)));
+                            bundle.putString(getString(R.string.TReport), b.getString(getString(R.string.TReport)));
+                            showActivity.putExtras(bundle);
+                            Gone = true;
+                            setTab = 1;
+                            showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            Log.i("Task Detail", Tlist.get(position));
+//                    finish();
+                            startActivity(showActivity);
+                        }
                     }
                 }
             }
@@ -163,18 +190,28 @@ public class MainActivity extends AppCompatActivity {
             tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
-                    setTab = tab.getPosition();
+//                    setTab = tab.getPosition();
                     //do stuff here
-//                switch (tab.getPosition()) {
-//                    case 0: {
-//                        ListView lvno = (ListView) findViewById(R.id.list_notification);
-//                        lvno.setSelection(Scroll_Position);
-//                    }
-//                    case 1: {
-//                        ListView lvta = (ListView) findViewById(R.id.list_task);
-//                        lvta.setSelection(Scroll_Position);
-//                    }
-//                }
+                    switch (tab.getPosition()) {
+                        case 0: {
+                            ListView lvno = (ListView) findViewById(R.id.list_notification);
+                            lvno.setSelection(Scroll_Position);
+                            if (Gone) {
+                                NotificationsAdapter ad = NotificationsAdapter.getInstance(getBaseContext());
+                                lvno.setAdapter(ad);
+                                ad.notifyDataSetChanged();
+                            }
+                        }
+                        case 1: {
+                            ListView lvta = (ListView) findViewById(R.id.list_task);
+                            lvta.setSelection(Scroll_Position);
+                            if (Gone) {
+                                TasksAdapter ad = TasksAdapter.getInstance(getBaseContext());
+                                lvta.setAdapter(ad);
+                                ad.notifyDataSetChanged();
+                            }
+                        }
+                    }
                 }
 
                 @Override
@@ -267,6 +304,7 @@ public class MainActivity extends AppCompatActivity {
                     lvno.setAdapter(ad);
                     ad.notifyDataSetChanged();
                     lvno.setSelection(Scroll_Position);
+                    Gone = false;
 
                 } else if ((tabLayout.getSelectedTabPosition() == 1) & (lvta != null)) {
 
@@ -274,8 +312,9 @@ public class MainActivity extends AppCompatActivity {
                     lvta.setAdapter(ad);
                     ad.notifyDataSetChanged();
                     lvta.setSelection(Scroll_Position);
+                    Gone = false;
                 }
-                Gone = false;
+
             }
 
 //        ListView lv = (ListView) findViewById(R.id.list_notification);

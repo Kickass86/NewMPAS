@@ -61,6 +61,11 @@ public class SyncService extends IntentService {
     private static final String TASK_Editable = "isEditable";
     private static final String TASK_ReplyAble = "ReplyAble";
     private static final String TASK_Deletable = "Deletable";
+
+    private static final String TASK_isCreator = "isCreator";
+    private static final String TASK_isResponsible = "isResponsible";
+    private static final String TASK_NameResponsible = "NameResponsible";
+
     private static final String isSeen = "isSeen";
     private static final String Report = "Report";
     // TODO: Rename actions, choose action names that describe tasks that this
@@ -103,6 +108,9 @@ public class SyncService extends IntentService {
     private boolean TEditable;
     private boolean TReplyAble;
     private boolean TDeletable;
+    private boolean TisCreator;
+    private boolean TisResponsible;
+    private String TNameResponsible;
     private String OPERATION_NAME_CHECK;
     private String OPERATION_NAME_DELIVERED;
     private String SOAP_ACTION_CHECK;
@@ -501,14 +509,21 @@ public class SyncService extends IntentService {
             TReplyAble = Boolean.valueOf("1".equals(Task.getProperty(6).toString()));
             TEditable = Boolean.valueOf("1".equals(Task.getProperty(7).toString()));
             TReport = Task.getProperty(8).toString();
+            TReport = TReport.replaceAll("&#x0D;", "");
+            TReport = TReport.replaceAll("-@-", "\n");
             TDeletable = Boolean.valueOf("1".equals(Task.getProperty(9).toString()));
+            TisCreator = Boolean.valueOf("1".equals(Task.getProperty(10).toString()));
+            TisResponsible = Boolean.valueOf("1".equals(Task.getProperty(11).toString()));
+            TNameResponsible = Task.getProperty(12).toString();
 
             Cursor c = getContentResolver().query(CONTENT_URI3, new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(TaskID)}, null);
             if (c != null) {
                 if ((c.getCount() > 0) & (c.moveToFirst())) {
-                    if (c.getInt(5) == TaskStatus) {
-                        index++;
+                    if (TaskStatus == 0) {
+
+                        getContentResolver().delete(CONTENT_URI3, "_id  = ?", new String[]{String.valueOf(TaskID)});
                         continue;
+
                     } else {
                         ContentValues values = new ContentValues();
                         values.put(TASK_ID, TaskID);
@@ -520,9 +535,13 @@ public class SyncService extends IntentService {
                         values.put(TASK_Editable, TEditable);
                         values.put(TASK_ReplyAble, TReplyAble);
                         values.put(TASK_Deletable, TDeletable);
+                        values.put(TASK_isCreator, TisCreator);
+                        values.put(TASK_isResponsible, TisResponsible);
+                        values.put(TASK_NameResponsible, TNameResponsible);
                         values.put(SendDelivered, false);
                         values.put(Report, TReport);
                         values.put(isSeen, false);
+
 
                         getContentResolver().update(CONTENT_URI3, values, "_id  = ?", new String[]{String.valueOf(TaskID)});
 
@@ -564,6 +583,9 @@ public class SyncService extends IntentService {
                 bundle.putBoolean(MyContext.getString(R.string.TReplyAble), TReplyAble);
                 bundle.putBoolean(MyContext.getString(R.string.TDeletable), TDeletable);
                 bundle.putString(MyContext.getString(R.string.TReport), TReport);
+                bundle.putBoolean(MyContext.getString(R.string.TisCreator), TisCreator);
+                bundle.putBoolean(MyContext.getString(R.string.TisResponsible), TisResponsible);
+                bundle.putString(MyContext.getString(R.string.TNameResponsible), TNameResponsible);
                 bundle.putBoolean("Type", false);
                 nid.putExtras(bundle);
                 nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -602,6 +624,9 @@ public class SyncService extends IntentService {
             contentValues.put(TASK_Editable, TEditable);
             contentValues.put(TASK_ReplyAble, TReplyAble);
             contentValues.put(TASK_Deletable, TDeletable);
+            contentValues.put(TASK_isCreator, TisCreator);
+            contentValues.put(TASK_isResponsible, TisResponsible);
+            contentValues.put(TASK_NameResponsible, TNameResponsible);
             contentValues.put(isSeen, false);
             contentValues.put(SendDelivered, false);
 

@@ -24,7 +24,20 @@ public class SendEdit extends AsyncTask {
     static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
     static final String URL1 = "content://" + PROVIDER_NAME + "/tasks/";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
-
+    private static final String TASK_ID = "_id";
+    private static final String TASK_Title = "TaskTitle";
+    private static final String Task_Description = "TaskDescription";
+    private static final String TASK_DueDate = "DueDate";
+    private static final String TASK_Creator = "TaskCreator";
+    private static final String TASK_Status = "TaskStatus";
+    private static final String TASK_Editable = "isEditable";
+    private static final String TASK_ReplyAble = "ReplyAble";
+    private static final String TASK_Deletable = "Deletable";
+    private static final String SendDelivered = "SendDelivered";
+    private static final String isSeen = "isSeen";
+    private static final String TASK_isCreator = "isCreator";
+    private static final String TASK_isResponsible = "isResponsible";
+    private static final String TASK_NameResponsible = "NameResponsible";
     private final String OPERATION_NAME_DELIVERED = "EditTask";
     private final String ip = "192.168.1.13";
     private final int port = 80;
@@ -33,6 +46,7 @@ public class SendEdit extends AsyncTask {
     String DueDate;
     int TStatus;
     String TDescription;
+    String TNameResponsible;
     String Report = "";
     private String SOAP_ACTION_EditTask = "EditTask";
     private String WSDL_TARGET_NAMESPACE;
@@ -54,7 +68,9 @@ public class SendEdit extends AsyncTask {
         super.onPostExecute(o);
 
         if (TStatus == 0) {
-            MyContext.startActivity(new Intent(MyContext.getApplicationContext(), MainActivity.class));
+            Intent intent = new Intent(MyContext.getApplicationContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            MyContext.startActivity(intent);
         }
     }
 
@@ -108,15 +124,15 @@ public class SendEdit extends AsyncTask {
             // requests!
 
             TID = (String) params[0];
-            Subject = (String) params[0];
-            TDescription = (String) params[0];
-            DueDate = (String) params[0];
-            Report = (String) params[0];
-            TStatus = (int) params[0];
+            Subject = (String) params[1];
+            TDescription = (String) params[2];
+            DueDate = (String) params[3];
+            Report = (String) params[4];
+            TStatus = Integer.valueOf((String) params[5]);
 
-            String plaintext = "value1=" + share.GetDeviceID() + ",value2=" + share.GetToken()
-                    + ",value3=" + TID + ",value4=" + Subject + ",value5=" + TDescription
-                    + ",value6=" + DueDate + ",value7=" + Report + ",value8=" + TStatus;
+            String plaintext = "value1=" + share.GetDeviceID() + "!!*!!value2=" + share.GetToken()
+                    + "!!*!!value3=" + TID + "!!*!!value4=" + Subject + "!!*!!value5=" + TDescription
+                    + "!!*!!value6=" + DueDate + "!!*!!value7=" + Report + "!!*!!value8=" + TStatus;
 
 
             plaintext = new String(Base64.encode(plaintext.getBytes("UTF-8"), Base64.DEFAULT));
@@ -147,20 +163,56 @@ public class SendEdit extends AsyncTask {
             if (response.toString().contains(MyContext.getString(R.string.Deleted))) {
 
                 MyContext.getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{TID});
+                share.SaveChange(true);
+                Intent in = new Intent("Alarm fire");
+                in.putExtra("Type", 1);
+                MyContext.sendBroadcast(in);
+
             }
 
 
             if (response.toString().contains(MyContext.getString(R.string.Seen)) || (response.toString().contains(MyContext.getString(R.string.Delivered)))
                     || (response.toString().contains(MyContext.getString(R.string.True)))) {
 
+                TNameResponsible = (String) params[6];
 
-                values.put("SendDelivered", true);
+                values.put(SendDelivered, true);
+                if (!TNameResponsible.isEmpty()) {
+                    values.put(TASK_NameResponsible, TNameResponsible);
+                }
+
+
 
                 MyContext.getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{TID});
+
+            }
+            if (response.toString().contains(MyContext.getString(R.string.Inserted))) {
+
+                TNameResponsible = (String) params[6];
+
+                values.put(TASK_ID, TID);
+                values.put(TASK_Title, Subject);
+                values.put(Task_Description, TDescription);
+                values.put(TASK_DueDate, DueDate);
+                values.put(TASK_Creator, "اینجانب");
+                values.put(TASK_Status, TStatus);
+                values.put(TASK_Editable, true);
+                values.put(TASK_ReplyAble, false);
+                values.put(TASK_Deletable, true);
+                values.put(TASK_isCreator, true);
+                values.put(TASK_isResponsible, false);
+                values.put(TASK_NameResponsible, TNameResponsible);
+                values.put(SendDelivered, false);
+                values.put(Report, Report);
+                values.put(isSeen, true);
+
+
+                MyContext.getContentResolver().insert(CONTENT_URI1, values);
+
             } else {
 
 
-                values.put("SendDelivered", false);
+                values.put(SendDelivered, false);
 
                 MyContext.getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{TID});
             }

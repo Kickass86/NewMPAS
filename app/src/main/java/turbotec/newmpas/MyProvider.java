@@ -54,18 +54,21 @@ public class MyProvider extends ContentProvider {
     private static final String TASK_DueDate = "DueDate";
     private static final String TASK_Creator = "TaskCreator";
     private static final String TASK_Status = "TaskStatus";
+    private static final String TASK_isCreator = "isCreator";
+    private static final String TASK_isResponsible = "isResponsible";
+    private static final String TASK_NameResponsible = "NameResponsible";
     private static final String isSeen = "isSeen";
     private static final String Report = "Report";
     private static final String Editable = "isEditable";
     private static final String ReplyAble = "ReplyAble";
     private static final String Deletable = "Deletable";
     static final String CREATE_TASKS_TABLE =
-            "CREATE TABLE " + TABLE_TASKS + "(" +
-                    TASK_ID + " TEXT PRIMARY KEY," +
-                    TASK_Title + " TEXT," + Task_Description + " TEXT," + TASK_DueDate +
-                    " TEXT," + TASK_Creator + " TEXT," + TASK_Status + " INTEGER," + Report + " TEXT,"
+            "CREATE TABLE " + TABLE_TASKS + "(" + TASK_ID + " TEXT PRIMARY KEY,"
+                    + TASK_Title + " TEXT," + Task_Description + " TEXT," + TASK_DueDate + " TEXT,"
+                    + TASK_Creator + " TEXT," + TASK_Status + " INTEGER," + Report + " TEXT,"
                     + isSeen + " Boolean," + SendDelivered + " Boolean," + Editable + " Boolean,"
-                    + ReplyAble + " Boolean," + Deletable + " Boolean)";
+                    + ReplyAble + " Boolean," + Deletable + " Boolean," + TASK_isCreator + " Boolean,"
+                    + TASK_isResponsible + " Boolean," + TASK_NameResponsible + " TEXT)";
 
     private static final String DATABASE_NAME = "MPAS";
 //    private static HashMap<String, String> MESSAGES_PROJECTION_MAP;
@@ -226,7 +229,7 @@ public class MyProvider extends ContentProvider {
     class DatabaseHandler extends SQLiteOpenHelper {
 
 
-        private static final int DATABASE_VERSION = 3;
+        private static final int DATABASE_VERSION = 4;
 
 
         private DatabaseHandler(Context context) {

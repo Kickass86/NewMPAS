@@ -6,6 +6,9 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -14,6 +17,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -35,7 +46,8 @@ public class Task_Edit_Activity extends AppCompatActivity {
     private static final String SendDelivered = "SendDelivered";
     private static final String isSeen = "isSeen";
     private static final String Task_Report = "Report";
-
+    private final String ip = "192.168.1.13";
+    private final int port = 80;
     Calendar myCalendar = Calendar.getInstance();
     DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 
@@ -52,6 +64,8 @@ public class Task_Edit_Activity extends AppCompatActivity {
     };
     EditText SE;
     EditText DeE;
+    TextView ResE1;
+    EditText ResE2;
     TextView CE;
     EditText DE;
     TextView StE;
@@ -68,10 +82,13 @@ public class Task_Edit_Activity extends AppCompatActivity {
     int TStatus;
     String TReport;
     String TDescription;
+    String TResponsible;
     String Report = "";
     boolean TDeletable;
     boolean TEditable;
     boolean TReply;
+    private String UserListURL;
+    private URL url;
     private SharedPreferenceHandler share;
     private Context MyContext;
     private String TID;
@@ -83,6 +100,31 @@ public class Task_Edit_Activity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
 
         edittext.setText(sdf.format(myCalendar.getTime()));
+    }
+
+
+    private boolean isLocalReachable() {
+
+        boolean exists = false;
+
+        try {
+            SocketAddress sockaddr = new InetSocketAddress(ip, port);
+            // Create an unbound socket
+            Socket sock = new Socket();
+
+            // This method will block no more than timeoutMs.
+            // If the timeout occurs, SocketTimeoutException is thrown.
+            int timeoutMs = 5000;   // 800 milliseconds
+            sock.connect(sockaddr, timeoutMs);
+            exists = true;
+
+            sock.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return exists;
     }
 
 
@@ -114,7 +156,85 @@ public class Task_Edit_Activity extends AppCompatActivity {
             if (W.equals("Edit")) {
                 setContentView(R.layout.task_edit_layout);
 
+                ResE1 = (TextView) findViewById(R.id.TResponsibleEdit1);
+                ResE2 = (EditText) findViewById(R.id.TResponsibleEdit2);
+                if (TStatus == 1) {
+                    ResE1.setVisibility(View.GONE);
+                    ResE2.setVisibility(View.VISIBLE);
 
+                    if (isLocalReachable()) {
+                        UserListURL = "http://192.168.1.13/Andr/Download.ashx";
+                    } else {
+                        UserListURL = "https://mpas.migtco.com:3000/Andr/Download.ashx";
+                    }
+
+
+                    String[] responseMessage;
+
+                    try {
+
+
+                        String value = "Val1=" + share.GetDeviceID() + ",Val2=" + share.GetToken();
+                        UserListURL = UserListURL + new String(Base64.encode(value.getBytes("UTF-8"), Base64.DEFAULT));
+                        UserListURL = UserListURL.replaceAll("\n", "");
+
+
+                        url = new URL(UserListURL);
+                        HttpURLConnection c = (HttpURLConnection) url.openConnection();
+                        c.setRequestMethod("GET");
+                        c.connect();
+
+
+                        int code = c.getResponseCode();
+                        String s = "";
+                        if (code == 200) {
+
+
+                            final InputStream is = c.getInputStream();
+
+                            if (is != null) {
+                                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+                                String line;
+
+                                while ((line = bufferedReader.readLine()) != null)
+                                    s += line;
+                                is.close();
+                            }
+
+                        }
+                        c.disconnect();
+                        if (!(s.contains("Invalid") | s.contains("Error") | s.contains("Unable") | (s.contains("unexpected")))) {
+                            s = s.replace(";", " ");
+                            responseMessage = s.split("-@-");
+                        } else {
+                            responseMessage = new String[]{""};
+                        }
+                    } catch (Exception e) {
+                        Log.w("HTTP:", e);
+                        responseMessage = new String[]{""};
+                    }
+
+
+                    final String[] finalResponseMessage = responseMessage;
+                    ResE2.setOnKeyListener(new View.OnKeyListener() {
+                        @Override
+                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+                            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+
+                                String search = ResE2.getText().toString();
+                                for (String st : finalResponseMessage) {
+                                    if (st.contains(search)) {
+                                        search = st;
+                                    }
+                                }
+                                ResE2.setText(search);
+                            }
+                            return false;
+                        }
+                    });
+
+
+                }
                 SE = (EditText) findViewById(R.id.SubjectEdit);
                 DeE = (EditText) findViewById(R.id.TDescriptionEdit);
                 CE = (TextView) findViewById(R.id.TCreatorEdit);
@@ -153,8 +273,14 @@ public class Task_Edit_Activity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
+                        TResponsible = ResE2.getText().toString();
+                        String[] Taskdata;
+                        if (!TResponsible.isEmpty()) {
+                            Taskdata = new String[]{TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus), TResponsible};
+                        } else {
+                            Taskdata = new String[]{TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus)};
+                        }
 
-                        String[] Taskdata = {TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus)};
 
                         SendEdit se = new SendEdit(getBaseContext());
 

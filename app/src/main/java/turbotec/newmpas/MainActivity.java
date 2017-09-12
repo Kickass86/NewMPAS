@@ -154,6 +154,9 @@ public class MainActivity extends AppCompatActivity {
                             bundle.putBoolean(getString(R.string.TEditable), b.getBoolean(getString(R.string.TEditable)));
                             bundle.putBoolean(getString(R.string.TReplyAble), b.getBoolean(getString(R.string.TReplyAble)));
                             bundle.putBoolean(getString(R.string.TDeletable), b.getBoolean(getString(R.string.TDeletable)));
+                            bundle.putBoolean(getString(R.string.TisCreator), b.getBoolean(getString(R.string.TisCreator)));
+                            bundle.putBoolean(getString(R.string.TisResponsible), b.getBoolean(getString(R.string.TisResponsible)));
+                            bundle.putString(getString(R.string.TNameResponsible), b.getString(getString(R.string.TNameResponsible)));
                             bundle.putString(getString(R.string.TID), b.getString(getString(R.string.TID)));
                             bundle.putString(getString(R.string.TReport), b.getString(getString(R.string.TReport)));
                             showActivity.putExtras(bundle);

@@ -18,10 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".MainActivity">
-        </activity>
-
+        <activity android:name=".MainActivity"></activity>
         <activity
             android:name=".Message_Detail_Activity"
             android:exported="false"
@@ -30,7 +27,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
         <activity
             android:name=".Task_Detail_Activity"
             android:exported="false"
@@ -39,7 +35,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
         <activity android:name=".StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,10 +42,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".LoginActivity" />
-
         <activity android:name=".InstallActivity" />
+        <activity android:name=".Task_Edit_Activity" />
+        <activity android:name=".AddActivity" />
 
         <receiver
             android:name=".AlarmReceiver"
@@ -65,24 +60,19 @@
             android:name=".MyProvider"
             android:authorities="turbotec.newmpas.MyProvider"
             android:enabled="true"
-            android:exported="false">
-        </provider>
+            android:exported="false"></provider>
 
         <service
             android:name=".SyncService"
-            android:exported="false">
-        </service>
-
+            android:exported="false"></service>
         <service
             android:name=".VersionUpdate"
-            android:exported="false">
-        </service>
+            android:exported="false"></service>
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="3a60a9645533d6ea649932c66a882b196fb54d75" />
 
-        <activity android:name=".Task_Edit_Activity"></activity>
 
     </application>
 

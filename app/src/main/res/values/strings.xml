@@ -23,6 +23,7 @@
 
     <string name="OK">OK</string>
     <string name="True">True</string>
+    <string name="Inserted">Inserted</string>
     <string name="Wait">Wait</string>
     <string name="What">What</string>
 
@@ -51,6 +52,9 @@
     <string name="TEditable">TEditable</string>
     <string name="TReplyAble">TReplyAble</string>
     <string name="TDeletable">TDeletable</string>
+    <string name="TisCreator">isCreator</string>
+    <string name="TisResponsible">isResponsible</string>
+    <string name="TNameResponsible">NameResponsible</string>
 
 
     <string name="WaitForActivation">Please wait for activation</string>
@@ -70,6 +74,7 @@
     <string name="Delete_Button">Delete</string>
     <string name="Reply_Button">Reply</string>
     <string name="Edit_Done_Button">Done</string>
+    <string name="Add_Done_Button">Done</string>
     <string name="Reply_Done_Button">Done</string>
     <string name="Edit_Button">Edit</string>
 

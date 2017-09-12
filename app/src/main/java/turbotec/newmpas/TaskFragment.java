@@ -1,8 +1,10 @@
 package turbotec.newmpas;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,9 @@ import android.widget.TextView;
  * A simple {@link Fragment} subclass.
  */
 public class TaskFragment extends Fragment {
+
+    FloatingActionButton b;
+
 
 
     public TaskFragment() {
@@ -47,8 +52,71 @@ public class TaskFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        b = (FloatingActionButton) view.findViewById(R.id.fab);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(getContext(), AddActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+
+
+            }
+        });
+//        DisplayMetrics metrics = getResources().getDisplayMetrics();
+//        final int windowWidth = metrics.widthPixels;
+//        final int windowHeight = metrics.heightPixels;
+//        b.setOnTouchListener(new View.OnTouchListener() {
+//
+//            float x, y;
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//
+//                final int x = (int) event.getRawX();
+//                final int y = (int) event.getRawY();
+//
+//                float newX, newY;
+//                int lastAction = 0;
+//
+//                switch (event.getActionMasked()) {
+//                    case MotionEvent.ACTION_DOWN:
+//
+//                        dX = x - b.getX();
+//                        dY = y - b.getY();
+//                        lastAction = MotionEvent.ACTION_DOWN;
+//                        break;
+//
+//                    case MotionEvent.ACTION_MOVE:
+//
+//                        newX = event.getRawX() + dX;
+//                        newY = event.getRawY() + dY;
+//
+//                        if ( (newX <= 0 || newX >= windowWidth) ||
+//                                (newY <= 0 || newY >= windowHeight) )
+//                            break;
+//
+//                        b.setX(newX);
+//                        b.setY(newY);
+//
+//                        lastAction = MotionEvent.ACTION_MOVE;
+//
+//                        break;
+//
+//                    case MotionEvent.ACTION_UP:
+//                        if (lastAction == MotionEvent.ACTION_DOWN)
+////                            Toast.makeText(DraggableView.this, "Clicked!", Toast.LENGTH_SHORT).show();
+//                        break;
+//
+//                    default:
+//                        return false;
+//                }
+//                return true;
+//            }
+//        });
 
 //        ListView list = (ListView) view.findViewById(R.id.list_task);
 //

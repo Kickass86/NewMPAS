@@ -35,8 +35,11 @@ public class TasksAdapter extends BaseAdapter {
     static List<Boolean> isSeen = new ArrayList<>();
     static List<Boolean> EList = new ArrayList<>();
     static List<Boolean> RList = new ArrayList<>();
+    static List<Boolean> DelList = new ArrayList<>();
     static List<String> ReList = new ArrayList<>();
-    //    static List<String> IDList = new ArrayList<>();
+    static List<Boolean> iCList = new ArrayList<>();
+    static List<Boolean> iRList = new ArrayList<>();
+    static List<String> NRList = new ArrayList<>();
     static List<String> CrList = new ArrayList<>();
     static List<Integer> StList = new ArrayList<>();
     static List<String> DateList = new ArrayList<>();
@@ -78,7 +81,11 @@ public class TasksAdapter extends BaseAdapter {
         isSeen = new ArrayList<>();
         EList = new ArrayList<>();
         RList = new ArrayList<>();
+        DelList = new ArrayList<>();
         ReList = new ArrayList<>();
+        iCList = new ArrayList<>();
+        iRList = new ArrayList<>();
+        NRList = new ArrayList<>();
         activity.IDList = new ArrayList<>();
         CrList = new ArrayList<>();
         StList = new ArrayList<>();
@@ -99,6 +106,12 @@ public class TasksAdapter extends BaseAdapter {
                     isSeen.add("1".equals(cursor.getString(7)));
                     EList.add("1".equals(cursor.getString(9)));
                     RList.add("1".equals(cursor.getString(10)));
+                    DelList.add("1".equals(cursor.getString(11)));
+                    iCList.add("1".equals(cursor.getString(12)));
+                    iRList.add("1".equals(cursor.getString(13)));
+                    NRList.add(cursor.getString(14));
+
+
 //                        }
 //                    activity.TaskCheckedState = new boolean[activity.IList.size()];
 //                    activity.num_selected = 0;
@@ -256,8 +269,12 @@ public class TasksAdapter extends BaseAdapter {
                     bundle.putString(activity.getString(R.string.TDescription), DesList.get(position));
                     bundle.putBoolean(activity.getString(R.string.TEditable), EList.get(position));
                     bundle.putBoolean(activity.getString(R.string.TReplyAble), RList.get(position));
+                    bundle.putBoolean(activity.getString(R.string.TDeletable), DelList.get(position));
                     bundle.putString(activity.getString(R.string.TID), activity.IDList.get(position));
                     bundle.putString(activity.getString(R.string.TReport), ReList.get(position));
+                    bundle.putString(activity.getString(R.string.TNameResponsible), NRList.get(position));
+                    bundle.putBoolean(activity.getString(R.string.TisCreator), iCList.get(position));
+                    bundle.putBoolean(activity.getString(R.string.TisResponsible), iRList.get(position));
                     showActivity.putExtras(bundle);
                     MainActivity.Scroll_Position = position;
                     MainActivity.Gone = true;

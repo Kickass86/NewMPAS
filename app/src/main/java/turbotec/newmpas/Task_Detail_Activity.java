@@ -28,10 +28,13 @@ public class Task_Detail_Activity extends AppCompatActivity {
     String DueDate;
     int TStatus;
     String TDescription;
+    String TNameResponsible;
     String Report = "";
 
     boolean TEditable;
     boolean TReplyable;
+    boolean TisCreator;
+    boolean TisResposible;
     boolean TDeletable;
     private SharedPreferenceHandler share;
     //    static final Uri CONTENT_URI2 = Uri.parse(URL2);
@@ -78,6 +81,9 @@ public class Task_Detail_Activity extends AppCompatActivity {
                 TEditable = b.getBoolean(getString(R.string.TEditable));
                 TReplyable = b.getBoolean(getString(R.string.TReplyAble));
                 TDeletable = b.getBoolean(getString(R.string.TDeletable));
+                TisCreator = b.getBoolean(getString(R.string.TisCreator));
+                TisResposible = b.getBoolean(getString(R.string.TisResponsible));
+                TNameResponsible = b.getString(getString(R.string.TNameResponsible));
                 TID = b.getString(getString(R.string.TID));
                 Report = b.getString(getString(R.string.TReport));
 

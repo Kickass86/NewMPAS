@@ -27,20 +27,35 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/SubjectEdit">
 
-            <TextView
-                android:id="@+id/TCreatorEdit"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@id/Subject"
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="8dip"
-                android:layout_marginStart="8dip"
-                android:layout_marginTop="5dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:textSize="16sp" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/TCreatorEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+
+                    android:layout_weight="1"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/TResponsibleEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+
+                    android:layout_weight="1"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+            </LinearLayout>
 
 
             <EditText

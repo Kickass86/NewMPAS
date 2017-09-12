@@ -9,7 +9,7 @@
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/SubjectEdit"
+            android:id="@+id/SubjectAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -22,51 +22,30 @@
 
 
         <LinearLayout
-
-            android:id="@id/Row2"
+            android:id="@+id/Ro2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/SubjectEdit">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/TCreatorEdit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-
-
-                    android:layout_weight="1"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/TResponsibleEdit1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
-
-                <EditText
-                    android:id="@+id/TResponsibleEdit2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="#000000"
-                    android:textSize="16sp"
-                    android:visibility="gone" />
-            </LinearLayout>
+            android:layout_below="@id/SubjectAdd">
 
 
             <EditText
-                android:id="@+id/DueDateEdit"
+                android:id="@+id/TResponsibleAdd"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginEnd="8dip"
+                android:layout_marginStart="8dip"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="false"
+                android:gravity="center"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+
+
+            <EditText
+                android:id="@+id/DueDateAdd"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
@@ -81,32 +60,23 @@
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/TStatusEdit"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginEnd="8dip"
-                android:layout_marginTop="5dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textSize="16sp" />
-
 
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/Row3"
+            android:id="@+id/Ro3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/Row2">
+            android:layout_below="@id/Ro2">
 
             <EditText
-                android:id="@+id/TDescriptionEdit"
+                android:id="@+id/TDescriptionAdd"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:layout_marginEnd="15dip"
+                android:layout_marginLeft="15dip"
+                android:layout_marginRight="15dip"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
@@ -118,44 +88,25 @@
 
 
         <LinearLayout
-            android:id="@+id/Row10"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/Row3">
-
-            <TextView
-                android:id="@+id/THReply"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginEnd="15dip"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="5dp"
-                android:layout_weight="1"
-                android:gravity="start"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-
-        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@id/Row10"
+            android:layout_below="@id/Ro3"
             android:gravity="center">
 
 
             <Button
-                android:id="@+id/ButtonEditDone"
+                android:id="@+id/ButtonAddDone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
                 android:layout_marginBottom="5dp"
+                android:layout_marginLeft="15dp"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="5dp"
-                android:text="@string/Edit_Done_Button"
+                android:text="@string/Add_Done_Button"
                 android:textAllCaps="false" />
 
 

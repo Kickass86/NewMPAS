@@ -29,6 +29,7 @@
             android:textStyle="bold" />
 
 
+
         <LinearLayout
             android:id="@+id/Row2"
             android:layout_width="match_parent"
@@ -40,21 +41,37 @@
             <LinearLayout
 
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_below="@id/Subject">
 
-                <TextView
-                    android:id="@+id/TCreator"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@id/Subject"
-                    android:layout_marginBottom="15dp"
+                    android:layout_gravity="center"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="15dp"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/TCreator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+
+                        android:layout_weight="1"
+                        android:textColor="#000000"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/TResponsible"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+
+                        android:layout_weight="1"
+                        android:textColor="#000000"
+                        android:textSize="16sp" />
+                </LinearLayout>
 
 
                 <TextView

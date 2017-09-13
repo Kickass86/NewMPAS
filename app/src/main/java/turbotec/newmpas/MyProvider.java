@@ -28,12 +28,19 @@ public class MyProvider extends ContentProvider {
     static final int UnsentM = 2;
     static final int Tasks = 3;
     static final int TasksT = 4;
+    static final int User = 5;
     //    static final int MID = 5;
 //    static final int TID = 6;
     static final UriMatcher uriMatcher;
     // Table Name
+    static final String TABLE_USER = "USERS";
     static final String TABLE_MESSAGES = "MESSAGES";
     static final String TABLE_TASKS = "TASKS";
+    private static final String USER_ID = "_id";
+    private static final String USER_NAME = "Name";
+    static final String CREATE_USER_TABLE =
+            "CREATE TABLE " + TABLE_USER + "(" + USER_ID + " TEXT PRIMARY KEY,"
+                    + USER_NAME + " TEXT)";
     private static final String MESSAGE_ID = "_id";
     private static final String MESSAGE_Title = "MessageTitle";
     private static final String MESSAGE_BODY = "MessageBody";
@@ -58,6 +65,7 @@ public class MyProvider extends ContentProvider {
     private static final String TASK_isResponsible = "isResponsible";
     private static final String TASK_NameResponsible = "NameResponsible";
     private static final String isSeen = "isSeen";
+    private static final String SendInsert = "SendInsert";
     private static final String Report = "Report";
     private static final String Editable = "isEditable";
     private static final String ReplyAble = "ReplyAble";
@@ -68,7 +76,8 @@ public class MyProvider extends ContentProvider {
                     + TASK_Creator + " TEXT," + TASK_Status + " INTEGER," + Report + " TEXT,"
                     + isSeen + " Boolean," + SendDelivered + " Boolean," + Editable + " Boolean,"
                     + ReplyAble + " Boolean," + Deletable + " Boolean," + TASK_isCreator + " Boolean,"
-                    + TASK_isResponsible + " Boolean," + TASK_NameResponsible + " TEXT)";
+                    + TASK_isResponsible + " Boolean," + SendInsert + " Boolean,"
+                    + TASK_NameResponsible + " TEXT)";
 
     private static final String DATABASE_NAME = "MPAS";
 //    private static HashMap<String, String> MESSAGES_PROJECTION_MAP;
@@ -79,6 +88,7 @@ public class MyProvider extends ContentProvider {
         uriMatcher.addURI(PROVIDER_NAME, "/messages/unsent/", UnsentM);
         uriMatcher.addURI(PROVIDER_NAME, "/tasks/", Tasks);
         uriMatcher.addURI(PROVIDER_NAME, "/tasks/unsent/", TasksT);
+        uriMatcher.addURI(PROVIDER_NAME, "/users", User);
 
 //        uriMatcher.addURI(PROVIDER_NAME, "/messages/#", MID);
 //        uriMatcher.addURI(PROVIDER_NAME, "/tasks/*", TID);
@@ -123,6 +133,8 @@ public class MyProvider extends ContentProvider {
 //            cursor = dbHelper.getTasks("", projection, selection, selectionArgs, sortOrder);
         } else if (uriMatcher.match(uri) == TasksT) {
             cursor = dbHelper.getUnsendTask(projection, selection, selectionArgs, sortOrder);
+        } else if (uriMatcher.match(uri) == User) {
+            cursor = dbHelper.getUser(projection, selection, selectionArgs, sortOrder);
         }
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
 //        getContext().getContentResolver().notifyChange(uri, null);
@@ -161,21 +173,36 @@ public class MyProvider extends ContentProvider {
 
             long rowID = dbHelper.addNewMessage(values);
             if (rowID > 0) {
-//            Uri _uri = ContentUris.withAppendedId(CONTENT_URI1, rowID);
-//            getContext().getContentResolver().notifyChange(_uri, null);
                 return uri;
             }
         }
         if (uriMatcher.match(uri) == Tasks) {
             long rowID = dbHelper.addNewTask(values);
             if (rowID > 0) {
-//            Uri _uri = ContentUris.withAppendedId(CONTENT_URI1, rowID);
-//            getContext().getContentResolver().notifyChange(_uri, null);
                 return uri;
             }
         }
+        if (uriMatcher.match(uri) == User) {
+            long rowID = dbHelper.addNewUser(values);
+            if (rowID > 0) {
+                return uri;
+            }
+        }
+
         throw new SQLException("Failed to add a record into " + uri);
 
+    }
+
+    @Override
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
+
+        for (ContentValues value : values) {
+
+            insert(uri, value);
+
+        }
+
+        return super.bulkInsert(uri, values);
     }
 
     @Override
@@ -229,7 +256,7 @@ public class MyProvider extends ContentProvider {
     class DatabaseHandler extends SQLiteOpenHelper {
 
 
-        private static final int DATABASE_VERSION = 4;
+        private static final int DATABASE_VERSION = 5;
 
 
         private DatabaseHandler(Context context) {
@@ -246,6 +273,7 @@ public class MyProvider extends ContentProvider {
         public void onCreate(SQLiteDatabase db) {
             db.execSQL(CREATE_TASKS_TABLE);
             db.execSQL(CREATE_MESSAGES_TABLE);
+            db.execSQL(CREATE_USER_TABLE);
         }
 
         @Override
@@ -254,6 +282,7 @@ public class MyProvider extends ContentProvider {
             // Drop older table if existed
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASKS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
 
             // Create tables again
             onCreate(db);
@@ -332,6 +361,24 @@ public class MyProvider extends ContentProvider {
         }
 
 
+        public Cursor getUser(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+
+            SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
+            sqliteQueryBuilder.setTables(TABLE_USER);
+
+
+            Cursor cursor = sqliteQueryBuilder.query(getReadableDatabase(),
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    sortOrder);
+            return cursor;
+
+        }
+
+
 
         public long addNewMessage(ContentValues values) throws SQLException {
             long id = getWritableDatabase().insert(TABLE_MESSAGES, "", values);
@@ -351,6 +398,16 @@ public class MyProvider extends ContentProvider {
 
             return id;
         }
+
+        public long addNewUser(ContentValues values) throws SQLException {
+            long id = getWritableDatabase().insert(TABLE_USER, "", values);
+            if (id <= 0) {
+                throw new SQLException("Failed to add an image");
+            }
+
+            return id;
+        }
+
 
         public int deleteMessage(String id, String selection, String[] selectionArg) {
             if(id == null) {

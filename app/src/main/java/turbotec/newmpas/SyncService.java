@@ -41,6 +41,8 @@ import java.util.Random;
  * helper methods.
  */
 public class SyncService extends IntentService {
+
+
     static final String PROVIDER_NAME = "turbotec.newmpas.MyProvider";
     static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
     static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
@@ -51,7 +53,16 @@ public class SyncService extends IntentService {
     static final Uri CONTENT_URI3 = Uri.parse(URL3);
     static final Uri CONTENT_URI4 = Uri.parse(URL4);
     //    static final Uri CONTENT_URI3 = Uri.parse(URL3);
-    private static final int Timeout = 70000;
+//    private static final int Timeout = 70000;
+    private static final String MESSAGE_ID = "_id";
+    private static final String MESSAGE_Title = "MessageTitle";
+    private static final String MESSAGE_BODY = "MessageBody";
+    private static final String INSERT_DATE = "InsertDate";
+    private static final String Critical = "Critical";
+    //    private static final String isSeen = "Seen";
+    private static final String SSeen = "SendSeen";
+
+
     private static final String TASK_ID = "_id";
     private static final String TASK_Title = "TaskTitle";
     private static final String Task_Description = "TaskDescription";
@@ -61,11 +72,10 @@ public class SyncService extends IntentService {
     private static final String TASK_Editable = "isEditable";
     private static final String TASK_ReplyAble = "ReplyAble";
     private static final String TASK_Deletable = "Deletable";
-
+    private static final String SendInsert = "SendInsert";
     private static final String TASK_isCreator = "isCreator";
     private static final String TASK_isResponsible = "isResponsible";
     private static final String TASK_NameResponsible = "NameResponsible";
-
     private static final String isSeen = "isSeen";
     private static final String Report = "Report";
     // TODO: Rename actions, choose action names that describe tasks that this
@@ -77,6 +87,7 @@ public class SyncService extends IntentService {
 //    private static final String EXTRA_PARAM2 = "turbotec.newmpas.extra.PARAM2";
     private final String ip = "192.168.1.13";
     private final int port = 80;
+    private String SendDelivered = "SendDelivered";
     private SharedPreferenceHandler share;
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mBuilder;
@@ -94,9 +105,9 @@ public class SyncService extends IntentService {
     private String MessageTitle;
     private String MessageBody;
     private String InsertDate;
-    private boolean Critical;
+    //    private boolean Critical;
     private boolean Seen;
-    private String SendDelivered = "SendDelivered";
+
     private boolean SendSeen;
     private String TaskID;
     private String TaskTitle;
@@ -114,6 +125,7 @@ public class SyncService extends IntentService {
     private String OPERATION_NAME_CHECK;
     private String OPERATION_NAME_DELIVERED;
     private String SOAP_ACTION_CHECK;
+    private String SOAP_ACTION_EditTask;
     private String SOAP_ACTION_DELIVERED;
     private String WSDL_TARGET_NAMESPACE;
     private String SOAP_ADDRESS;
@@ -165,6 +177,7 @@ public class SyncService extends IntentService {
             SOAP_ACTION_DELIVERED = b?"http://192.168.1.13/Delivered":"https://mpas.migtco.com:3000/Delivered";
             WSDL_TARGET_NAMESPACE = b?"http://192.168.1.13/":"https://mpas.migtco.com:3000/";
             SOAP_ADDRESS          = b?"http://192.168.1.13/Andr/WSLocal.asmx":"https://mpas.migtco.com:3000/Andr/WS.asmx";
+            SOAP_ACTION_EditTask = b ? "http://192.168.1.13/EditTask" : "https://mpas.migtco.com:3000/EditTask";
             OPERATION_NAME_CHECK = "CheckUser";
             OPERATION_NAME_DELIVERED = "Delivered";
 
@@ -326,7 +339,10 @@ public class SyncService extends IntentService {
 
             isDuplicate = false;
 
+            HandleUnsendInsert();
+
             HandleUnsendDelivery();
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -368,6 +384,112 @@ public class SyncService extends IntentService {
 //        }
 
 
+
+    }
+
+    private void HandleUnsendInsert() {
+        int num = 0;
+
+        Cursor cursor = getContentResolver().query(CONTENT_URI4, null, "SendInsert = ?", new String[]{"0"}, null);
+        TIDs = "";
+        try {
+            if (cursor != null) {
+
+
+                if (cursor.moveToFirst()) {
+                    do {
+
+
+                        Object response = "";
+
+                        ContentValues values = new ContentValues();
+
+
+                        if (isLocalReachable()) {
+                            SOAP_ACTION_EditTask = "http://192.168.1.13/EditTask";
+                            WSDL_TARGET_NAMESPACE = "http://192.168.1.13/";
+                            SOAP_ADDRESS = "http://192.168.1.13/Andr/WSLocal.asmx";
+                        } else {
+                            SOAP_ACTION_EditTask = "https://mpas.migtco.com:3000/EditTask";
+                            WSDL_TARGET_NAMESPACE = "https://mpas.migtco.com:3000/";
+                            SOAP_ADDRESS = "https://mpas.migtco.com:3000/Andr/WS.asmx";
+                        }
+
+
+                        try {
+
+                            // requests!
+
+                            TID = cursor.getString(0);
+                            TaskTitle = cursor.getString(1);
+                            TaskDescription = cursor.getString(2);
+                            TaskDueDate = cursor.getString(3);
+                            TaskStatus = Integer.valueOf(cursor.getString(5));
+                            TNameResponsible = cursor.getString(15);
+
+                            String plaintext = "value1=" + share.GetDeviceID() + "!!*!!value2=" + share.GetToken()
+                                    + "!!*!!value3=" + TID + "!!*!!value4=" + TaskTitle + "!!*!!value5=" + TaskDescription
+                                    + "!!*!!value6=" + TaskDueDate + "!!*!!value7=" + "" + "!!*!!value8=" + TaskStatus
+                                    + "!!*!!value9=" + TNameResponsible;
+
+
+                            plaintext = new String(Base64.encode(plaintext.getBytes("UTF-8"), Base64.DEFAULT));
+                            plaintext = plaintext.replaceAll("\n", "");
+
+
+                            SoapObject request = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_DELIVERED);
+                            PropertyInfo pi = new PropertyInfo();
+                            pi.setName("Value");
+                            pi.setValue(plaintext);
+                            pi.setType(String.class);
+                            request.addProperty(pi);
+
+
+                            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                                    SoapEnvelope.VER11);
+                            envelope.dotNet = true;
+
+                            envelope.setOutputSoapObject(request);
+
+
+                            HttpTransportSE httpTransport = new HttpTransportSE(SOAP_ADDRESS);
+
+
+                            httpTransport.call(SOAP_ACTION_EditTask, envelope);
+                            response = envelope.getResponse();
+
+
+                            if (response.toString().contains(MyContext.getString(R.string.Inserted))) {
+
+
+                                values.put(SendDelivered, true);
+                                values.put(SendInsert, true);
+
+
+                                MyContext.getContentResolver().insert(CONTENT_URI1, values);
+
+                            } else {
+
+
+                                values.put(SendDelivered, false);
+
+                                MyContext.getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{TID});
+                            }
+
+
+                        } catch (XmlPullParserException | IOException soapFault) {
+                            soapFault.printStackTrace();
+                        }
+                    } while (cursor.moveToNext());
+
+                }
+
+                cursor.close();
+            }
+
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
 
     }
 
@@ -538,6 +660,7 @@ public class SyncService extends IntentService {
                         values.put(TASK_isCreator, TisCreator);
                         values.put(TASK_isResponsible, TisResponsible);
                         values.put(TASK_NameResponsible, TNameResponsible);
+                        values.put(SendInsert, false);
                         values.put(SendDelivered, false);
                         values.put(Report, TReport);
                         values.put(isSeen, false);
@@ -627,6 +750,7 @@ public class SyncService extends IntentService {
             contentValues.put(TASK_isCreator, TisCreator);
             contentValues.put(TASK_isResponsible, TisResponsible);
             contentValues.put(TASK_NameResponsible, TNameResponsible);
+            contentValues.put(SendInsert, false);
             contentValues.put(isSeen, false);
             contentValues.put(SendDelivered, false);
 
@@ -656,7 +780,7 @@ public class SyncService extends IntentService {
             MessageTitle = Message.getProperty(1).toString().trim();
             MessageBody = Message.getProperty(2).toString().trim();
             InsertDate = Message.getProperty(3).toString();
-            Critical = Boolean.valueOf(Message.getProperty(4).toString());
+            isCritical = Boolean.valueOf(Message.getProperty(4).toString());
             Seen = false;
 //            SendDelivered = false;
             SendSeen = false;
@@ -702,7 +826,7 @@ public class SyncService extends IntentService {
                     Bundle bundle = new Bundle();
                     bundle.putString(MyContext.getString(R.string.Title), MessageTitle);
                     bundle.putString(MyContext.getString(R.string.Body), MessageBody);
-                    bundle.putBoolean(MyContext.getString(R.string.Critical), Critical);
+                    bundle.putBoolean(MyContext.getString(R.string.Critical), isCritical);
                     bundle.putBoolean(MyContext.getString(R.string.SendSeen), SendSeen);
                     bundle.putInt(MyContext.getString(R.string.ID), MessageID);
                     bundle.putBoolean(MyContext.getString(R.string.Seen), Seen);
@@ -733,14 +857,14 @@ public class SyncService extends IntentService {
             }
 
             ContentValues contentValues = new ContentValues();
-            contentValues.put("_id", Integer.valueOf(Message.getProperty(0).toString()));
-            contentValues.put("MessageTitle", Message.getProperty(1).toString().trim());
-            contentValues.put("MessageBody", Message.getProperty(2).toString().trim());
-            contentValues.put("InsertDate", Message.getProperty(3).toString());
-            contentValues.put("Critical", Boolean.valueOf(Message.getProperty(4).toString()));
-            contentValues.put("Seen", false);
+            contentValues.put(MESSAGE_ID, Integer.valueOf(Message.getProperty(0).toString()));
+            contentValues.put(MESSAGE_Title, Message.getProperty(1).toString().trim());
+            contentValues.put(MESSAGE_BODY, Message.getProperty(2).toString().trim());
+            contentValues.put(INSERT_DATE, Message.getProperty(3).toString());
+            contentValues.put(Critical, Boolean.valueOf(Message.getProperty(4).toString()));
+            contentValues.put(isSeen, false);
             contentValues.put(SendDelivered, false);
-            contentValues.put("SendSeen", false);
+            contentValues.put(SSeen, false);
             getContentResolver().insert(CONTENT_URI1, contentValues);
 
             index++;

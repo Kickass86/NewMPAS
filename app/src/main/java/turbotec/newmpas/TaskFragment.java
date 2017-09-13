@@ -60,8 +60,11 @@ public class TaskFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
+                GetUserList userList = new GetUserList(getContext());
+                userList.execute();
+
                 Intent intent = new Intent(getContext(), AddActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
 
 

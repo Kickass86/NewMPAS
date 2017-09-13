@@ -2,13 +2,9 @@ package turbotec.newmpas;
 
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -17,14 +13,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -68,14 +56,14 @@ public class Task_Edit_Activity extends AppCompatActivity {
     EditText ResE2;
     TextView CE;
     EditText DE;
-    TextView StE;
+    //    TextView StE;
     EditText RE;
     TextView RH;
     TextView ST;
     TextView DeT;
     TextView CT;
     TextView DT;
-    TextView StT;
+    //    TextView StT;
     String Subject;
     String Creator;
     String DueDate;
@@ -87,11 +75,13 @@ public class Task_Edit_Activity extends AppCompatActivity {
     boolean TDeletable;
     boolean TEditable;
     boolean TReply;
-    private String UserListURL;
-    private URL url;
-    private SharedPreferenceHandler share;
-    private Context MyContext;
+    //    private String UserListURL;
+//    private URL url;
+//    private SharedPreferenceHandler share;
+//    private Context MyContext;
     private String TID;
+
+//    String[] responseMessage;
 
     private void updateLabel() {
 
@@ -103,29 +93,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
     }
 
 
-    private boolean isLocalReachable() {
 
-        boolean exists = false;
-
-        try {
-            SocketAddress sockaddr = new InetSocketAddress(ip, port);
-            // Create an unbound socket
-            Socket sock = new Socket();
-
-            // This method will block no more than timeoutMs.
-            // If the timeout occurs, SocketTimeoutException is thrown.
-            int timeoutMs = 5000;   // 800 milliseconds
-            sock.connect(sockaddr, timeoutMs);
-            exists = true;
-
-            sock.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return exists;
-    }
 
 
     @Override
@@ -135,8 +103,8 @@ public class Task_Edit_Activity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         String W;
 
-        share = SharedPreferenceHandler.getInstance(this);
-        MyContext = getBaseContext();
+//        share = SharedPreferenceHandler.getInstance(this);
+//        MyContext = getBaseContext();
 
 
         if (b != null) {
@@ -157,84 +125,34 @@ public class Task_Edit_Activity extends AppCompatActivity {
                 setContentView(R.layout.task_edit_layout);
 
                 ResE1 = (TextView) findViewById(R.id.TResponsibleEdit1);
-                ResE2 = (EditText) findViewById(R.id.TResponsibleEdit2);
-                if (TStatus == 1) {
-                    ResE1.setVisibility(View.GONE);
-                    ResE2.setVisibility(View.VISIBLE);
+//                ResE2 = (EditText) findViewById(R.id.TResponsibleEdit2);
+//                if (TStatus == 1) {
+//                    ResE1.setVisibility(View.GONE);
+//                    ResE2.setVisibility(View.VISIBLE);
 
-                    if (isLocalReachable()) {
-                        UserListURL = "http://192.168.1.13/Andr/Download.ashx";
-                    } else {
-                        UserListURL = "https://mpas.migtco.com:3000/Andr/Download.ashx";
-                    }
+//                    GetUserList userList = new GetUserList(getBaseContext());
 
 
-                    String[] responseMessage;
-
-                    try {
-
-
-                        String value = "Val1=" + share.GetDeviceID() + ",Val2=" + share.GetToken();
-                        UserListURL = UserListURL + new String(Base64.encode(value.getBytes("UTF-8"), Base64.DEFAULT));
-                        UserListURL = UserListURL.replaceAll("\n", "");
-
-
-                        url = new URL(UserListURL);
-                        HttpURLConnection c = (HttpURLConnection) url.openConnection();
-                        c.setRequestMethod("GET");
-                        c.connect();
-
-
-                        int code = c.getResponseCode();
-                        String s = "";
-                        if (code == 200) {
+//                    final String[] finalResponseMessage = responseMessage;
+//                    ResE2.setOnKeyListener(new View.OnKeyListener() {
+//                        @Override
+//                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+//
+//                                String search = ResE2.getText().toString();
+//                                for (String st : finalResponseMessage) {
+//                                    if (st.contains(search)) {
+//                                        search = st;
+//                                    }
+//                                }
+//                                ResE2.setText(search);
+//                            }
+//                            return false;
+//                        }
+//                    });
 
 
-                            final InputStream is = c.getInputStream();
-
-                            if (is != null) {
-                                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
-                                String line;
-
-                                while ((line = bufferedReader.readLine()) != null)
-                                    s += line;
-                                is.close();
-                            }
-
-                        }
-                        c.disconnect();
-                        if (!(s.contains("Invalid") | s.contains("Error") | s.contains("Unable") | (s.contains("unexpected")))) {
-                            s = s.replace(";", " ");
-                            responseMessage = s.split("-@-");
-                        } else {
-                            responseMessage = new String[]{""};
-                        }
-                    } catch (Exception e) {
-                        Log.w("HTTP:", e);
-                        responseMessage = new String[]{""};
-                    }
-
-
-                    final String[] finalResponseMessage = responseMessage;
-                    ResE2.setOnKeyListener(new View.OnKeyListener() {
-                        @Override
-                        public boolean onKey(View v, int keyCode, KeyEvent event) {
-                            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-
-                                String search = ResE2.getText().toString();
-                                for (String st : finalResponseMessage) {
-                                    if (st.contains(search)) {
-                                        search = st;
-                                    }
-                                }
-                                ResE2.setText(search);
-                            }
-                            return false;
-                        }
-                    });
-
-
-                }
+//                }
                 SE = (EditText) findViewById(R.id.SubjectEdit);
                 DeE = (EditText) findViewById(R.id.TDescriptionEdit);
                 CE = (TextView) findViewById(R.id.TCreatorEdit);
@@ -349,11 +267,11 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
                         getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{TID});
 
-                        String[] Taskdata = {TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus)};
+                        String[] TaskData = {TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus)};
 
                         SendEdit se = new SendEdit(getBaseContext());
 
-                        se.execute(Taskdata);
+                        se.execute(TaskData);
 
                         finish();
 

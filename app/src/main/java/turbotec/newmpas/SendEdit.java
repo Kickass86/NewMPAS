@@ -47,6 +47,7 @@ public class SendEdit extends AsyncTask {
     int TStatus;
     String TDescription;
     String TNameResponsible;
+    String TIDResponsible;
     String Report = "";
     private String SOAP_ACTION_EditTask = "EditTask";
     private String WSDL_TARGET_NAMESPACE;
@@ -129,11 +130,16 @@ public class SendEdit extends AsyncTask {
             DueDate = (String) params[3];
             Report = (String) params[4];
             TStatus = Integer.valueOf((String) params[5]);
+            TIDResponsible = (String) params[6];
+            TNameResponsible = (String) params[7];
 
             String plaintext = "value1=" + share.GetDeviceID() + "!!*!!value2=" + share.GetToken()
                     + "!!*!!value3=" + TID + "!!*!!value4=" + Subject + "!!*!!value5=" + TDescription
-                    + "!!*!!value6=" + DueDate + "!!*!!value7=" + Report + "!!*!!value8=" + TStatus;
+                    + "!!*!!value6=" + DueDate + "!!*!!value7=" + Report + "!!*!!value8=" + TStatus + "!!*!!value9=";
 
+            if (TIDResponsible != null) {
+                plaintext = plaintext + TIDResponsible;
+            }
 
             plaintext = new String(Base64.encode(plaintext.getBytes("UTF-8"), Base64.DEFAULT));
             plaintext = plaintext.replaceAll("\n", "");
@@ -174,7 +180,7 @@ public class SendEdit extends AsyncTask {
             if (response.toString().contains(MyContext.getString(R.string.Seen)) || (response.toString().contains(MyContext.getString(R.string.Delivered)))
                     || (response.toString().contains(MyContext.getString(R.string.True)))) {
 
-                TNameResponsible = (String) params[6];
+
 
                 values.put(SendDelivered, true);
                 if (!TNameResponsible.isEmpty()) {
@@ -188,7 +194,7 @@ public class SendEdit extends AsyncTask {
             }
             if (response.toString().contains(MyContext.getString(R.string.Inserted))) {
 
-                TNameResponsible = (String) params[6];
+                TNameResponsible = (String) params[7];
 
                 values.put(TASK_ID, TID);
                 values.put(TASK_Title, Subject);
@@ -202,12 +208,18 @@ public class SendEdit extends AsyncTask {
                 values.put(TASK_isCreator, true);
                 values.put(TASK_isResponsible, false);
                 values.put(TASK_NameResponsible, TNameResponsible);
-                values.put(SendDelivered, false);
-                values.put(Report, Report);
+                values.put(SendDelivered, true);
+                values.put("Report", Report);
                 values.put(isSeen, true);
 
 
                 MyContext.getContentResolver().insert(CONTENT_URI1, values);
+
+                share.SaveChange(true);
+                Intent in = new Intent("Alarm fire");
+                in.putExtra("Type", 1);
+                MyContext.sendBroadcast(in);
+
 
             } else {
 

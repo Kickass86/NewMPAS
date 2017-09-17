@@ -109,7 +109,7 @@ public class GetUserList extends AsyncTask {
             }
             c.disconnect();
             if (!(s.contains("Invalid") | s.contains("Error") | s.contains("Unable") | (s.contains("unexpected")))) {
-                s = s.replace(";", " ");
+//                s = s.replace(";", " ");
 //                responseMessage = s.split("-@-");
             } else {
                 responseMessage = new String[]{""};
@@ -119,19 +119,33 @@ public class GetUserList extends AsyncTask {
             responseMessage = new String[]{""};
         }
 
-        responseMessage = s.split("-@-");
-        ContentValues[] values = new ContentValues[responseMessage.length];
+        int num;
 
-        int index = 0;
-        for (String w : responseMessage) {
-            String[] all = w.split(";");
-            values[index].put("_id", all[0]);
-            values[index].put("Name", all[1]);
-            index++;
+        if (!s.isEmpty()) {
+            responseMessage = s.split("-@-");
+            ContentValues[] values = new ContentValues[responseMessage.length];
+//            ContentValues value = new ContentValues();
+//            for(int i = 0; i < responseMessage.length; i++){
+//                values[i] = new ContentValues();
+//
+//            }
 
+            int index = 0;
+            for (String w : responseMessage) {
+                String[] all = w.split(";");
+//                value.put("_id", all[0]);
+//                value.put("Name", all[1]);
+                values[index] = new ContentValues();
+                values[index].put("_id", all[0]);
+                values[index].put("Name", all[1]);
+                index++;
+
+            }
+
+            num = MyContext.getContentResolver().bulkInsert(CONTENT_URI, values);
+        } else {
+            num = 0;
         }
-
-        int num = MyContext.getContentResolver().bulkInsert(CONTENT_URI, values);
 
         return num;
     }

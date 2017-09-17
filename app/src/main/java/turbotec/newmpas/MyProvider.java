@@ -183,6 +183,7 @@ public class MyProvider extends ContentProvider {
             }
         }
         if (uriMatcher.match(uri) == User) {
+//            dbHelper.deleteUsers();
             long rowID = dbHelper.addNewUser(values);
             if (rowID > 0) {
                 return uri;
@@ -196,13 +197,17 @@ public class MyProvider extends ContentProvider {
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
 
+        dbHelper.deleteUsers();
+        long i = 0;
         for (ContentValues value : values) {
 
-            insert(uri, value);
+//            insert(uri, value);
+            i = dbHelper.addNewUser(value);
 
         }
 
-        return super.bulkInsert(uri, values);
+//        return super.bulkInsert(uri, values);
+        return (int) i;
     }
 
     @Override
@@ -256,7 +261,7 @@ public class MyProvider extends ContentProvider {
     class DatabaseHandler extends SQLiteOpenHelper {
 
 
-        private static final int DATABASE_VERSION = 5;
+        private static final int DATABASE_VERSION = 6;
 
 
         private DatabaseHandler(Context context) {
@@ -383,7 +388,7 @@ public class MyProvider extends ContentProvider {
         public long addNewMessage(ContentValues values) throws SQLException {
             long id = getWritableDatabase().insert(TABLE_MESSAGES, "", values);
             if(id <=0 ) {
-                throw new SQLException("Failed to add an image");
+                throw new SQLException("Failed to add a Message");
             }
 
             return id;
@@ -445,6 +450,9 @@ public class MyProvider extends ContentProvider {
         }
 
 
+        public int deleteUsers() {
+            return getWritableDatabase().delete(TABLE_USER, null, null);
+        }
     }
 
 

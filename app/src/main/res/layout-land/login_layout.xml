@@ -74,7 +74,7 @@
             android:layout_marginRight="32dp"
             android:layout_marginStart="32dp"
             android:layout_marginTop="24dp"
-            android:inputType="textPassword"
+            android:inputType="textNoSuggestions|textPassword"
             android:maxLines="1"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintLeft_toLeftOf="parent"

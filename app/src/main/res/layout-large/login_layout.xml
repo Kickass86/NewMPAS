@@ -68,7 +68,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="24dp"
-        android:inputType="textPassword"
+        android:inputType="textNoSuggestions|textPassword"
         android:maxLines="1"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="@+id/guideliner"

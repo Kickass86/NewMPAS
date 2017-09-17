@@ -1,12 +1,15 @@
 package turbotec.newmpas;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -37,15 +40,17 @@ public class AddActivity extends AppCompatActivity {
         }
 
     };
+    String my_var;
     //    private String UserListURL;
-    private String Responsibe;
+    private String IDResponsible;
+    private String NameResponsible;
+    private String[] Responsible;
     //    private URL url;
     private EditText DateAdd;
     private EditText SubjectAdd;
     private EditText DescAdd;
-    private EditText RespAdd;
+    private AutoCompleteTextView RespAdd;
     private Button Done;
-
     private SharedPreferenceHandler share;
 
 
@@ -70,7 +75,7 @@ public class AddActivity extends AppCompatActivity {
         DateAdd = (EditText) findViewById(R.id.DueDateAdd);
         SubjectAdd = (EditText) findViewById(R.id.SubjectAdd);
         DescAdd = (EditText) findViewById(R.id.TDescriptionAdd);
-        RespAdd = (EditText) findViewById(R.id.TResponsibleAdd);
+        RespAdd = (AutoCompleteTextView) findViewById(R.id.TResponsibleAdd);
         Done = (Button) findViewById(R.id.ButtonAddDone);
 
 
@@ -87,23 +92,109 @@ public class AddActivity extends AppCompatActivity {
 
 
 //        final String[] finalResponseMessage = responseMessage;
-        RespAdd.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+        Cursor c = getContentResolver().query(CONTENT_URI, null, null, null, null);
+        final String[] Names = new String[c.getCount()];
+        Responsible = new String[c.getCount()];
+        int index = 0;
+        if (c.moveToFirst()) {
+            do {
+                Names[index] = c.getString(1);
+                Responsible[index] = c.getString(0);
+                index++;
+            } while (c.moveToNext());
+        }
+        c.close();
 
-                    String search = RespAdd.getText().toString();
-                    Cursor c = getContentResolver().query(CONTENT_URI, null, "USER_NAME like ?", new String[]{search}, null);
-                    if (c.moveToFirst()) {
-                        search = c.getString(1);
-                        Responsibe = c.getString(0);
+
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, Names);
+//        AutoCompleteTextView textView = (AutoCompleteTextView) findViewById(R.id.TResponsibleAdd);
+        RespAdd.setAdapter(adapter);
+        RespAdd.setThreshold(1);
+        adapter.notifyDataSetChanged();
+
+        RespAdd.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                IDResponsible = Responsible[position];
+                String selection = (String) parent.getItemAtPosition(position);
+//                int pos = -1;
+
+                for (int i = 0; i < Names.length; i++) {
+                    if (Names[i].equals(selection)) {
+                        IDResponsible = Responsible[i];
+                        break;
                     }
-                    c.close();
-                    RespAdd.setText(search);
                 }
-                return false;
             }
         });
+
+//        RespAdd.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View view, boolean hasFocus) {
+//                if (!hasFocus) {
+//                    String val = RespAdd.getText() + "";
+//                    String code = RespAdd.get(val);
+//                    Log.v("TruitonAutoCompleteTextViewActivity",
+//                            "Selected City Code: " + code);
+//                    if (code == null) {
+//                        RespAdd.setError("Invalid City");
+//                    }
+//                }
+//            }
+//        });
+
+
+//        textView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                my_var = adapter.getItem(position).toString();
+//            }
+//        });
+/**
+ * Unset the var whenever the user types. Validation will
+ * then fail. This is how we enforce selecting from the list.
+ */
+//        textView.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                my_var = null;
+//                Cursor c = getContentResolver().query(CONTENT_URI, null, "Name like N'%?%'", new String[]{(String) s}, null);
+//                String[] Names = new String[c.getCount()];
+//                int index = 0;
+//                if (c.moveToFirst()) {
+//                    do {
+//                        Names[index] = c.getString(1);
+//                        Responsible = c.getString(0);
+//                        index++;
+//                    }while(c.moveToNext());
+//                }
+//                c.close();
+//
+//            }
+//            @Override
+//            public void afterTextChanged(Editable s) {}
+//        });
+
+
+//        RespAdd.setOnKeyListener(new View.OnKeyListener() {
+//            @Override
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
+//
+//                    String search = RespAdd.getText().toString();
+//                    Cursor c = getContentResolver().query(CONTENT_URI, null, "USER_NAME like ?", new String[]{search}, null);
+//                    if (c.moveToFirst()) {
+//                        search = c.getString(1);
+//                        Responsible = c.getString(0);
+//                    }
+//                    c.close();
+//                    RespAdd.setText(search);
+//                }
+//                return false;
+//            }
+//        });
 
 
         Done.setOnClickListener(new View.OnClickListener() {
@@ -114,11 +205,16 @@ public class AddActivity extends AppCompatActivity {
                 String Subject = SubjectAdd.getText().toString();
                 String TDescription = DescAdd.getText().toString();
                 String DueDate = DateAdd.getText().toString();
-//                String Responsibe = RespAdd.getText().toString();
+                String NameResponsible = RespAdd.getText().toString();
+
+                if ((Subject.isEmpty()) | (TDescription.isEmpty()) | (DueDate.isEmpty()) | (NameResponsible.isEmpty())) {
+                    startActivity(new Intent(getBaseContext(), AddActivity.class));
+                    finish();
+                }
                 String Report = "";
                 int TStatus = 1;
 
-                String[] TaskData = {TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus), Responsibe};
+                String[] TaskData = {TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus), IDResponsible, NameResponsible};
 
                 SendEdit se = new SendEdit(getBaseContext());
 

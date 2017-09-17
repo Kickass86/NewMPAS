@@ -59,7 +59,7 @@ public class SyncService extends IntentService {
     private static final String MESSAGE_BODY = "MessageBody";
     private static final String INSERT_DATE = "InsertDate";
     private static final String Critical = "Critical";
-    //    private static final String isSeen = "Seen";
+    private static final String Seen1 = "Seen";
     private static final String SSeen = "SendSeen";
 
 
@@ -124,6 +124,7 @@ public class SyncService extends IntentService {
     private String TNameResponsible;
     private String OPERATION_NAME_CHECK;
     private String OPERATION_NAME_DELIVERED;
+    private String OPERATION_NAME_EDITTASK;
     private String SOAP_ACTION_CHECK;
     private String SOAP_ACTION_EditTask;
     private String SOAP_ACTION_DELIVERED;
@@ -414,6 +415,7 @@ public class SyncService extends IntentService {
                             WSDL_TARGET_NAMESPACE = "https://mpas.migtco.com:3000/";
                             SOAP_ADDRESS = "https://mpas.migtco.com:3000/Andr/WS.asmx";
                         }
+                        OPERATION_NAME_EDITTASK = "EditTask";
 
 
                         try {
@@ -429,15 +431,16 @@ public class SyncService extends IntentService {
 
                             String plaintext = "value1=" + share.GetDeviceID() + "!!*!!value2=" + share.GetToken()
                                     + "!!*!!value3=" + TID + "!!*!!value4=" + TaskTitle + "!!*!!value5=" + TaskDescription
-                                    + "!!*!!value6=" + TaskDueDate + "!!*!!value7=" + "" + "!!*!!value8=" + TaskStatus
-                                    + "!!*!!value9=" + TNameResponsible;
+                                    + "!!*!!value6=" + TaskDueDate + "!!*!!value7=" + "" + "!!*!!value8=" + TaskStatus + "!!*!!value9=";
+                            if (TNameResponsible != null)
+                                plaintext = plaintext + TNameResponsible;
 
 
                             plaintext = new String(Base64.encode(plaintext.getBytes("UTF-8"), Base64.DEFAULT));
                             plaintext = plaintext.replaceAll("\n", "");
 
 
-                            SoapObject request = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_DELIVERED);
+                            SoapObject request = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_EDITTASK);
                             PropertyInfo pi = new PropertyInfo();
                             pi.setName("Value");
                             pi.setValue(plaintext);
@@ -862,7 +865,7 @@ public class SyncService extends IntentService {
             contentValues.put(MESSAGE_BODY, Message.getProperty(2).toString().trim());
             contentValues.put(INSERT_DATE, Message.getProperty(3).toString());
             contentValues.put(Critical, Boolean.valueOf(Message.getProperty(4).toString()));
-            contentValues.put(isSeen, false);
+            contentValues.put(Seen1, false);
             contentValues.put(SendDelivered, false);
             contentValues.put(SSeen, false);
             getContentResolver().insert(CONTENT_URI1, contentValues);

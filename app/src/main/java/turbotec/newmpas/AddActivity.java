@@ -116,7 +116,9 @@ public class AddActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //                IDResponsible = Responsible[position];
+//                NameResponsible = (String) parent.getItemAtPosition(position);
                 String selection = (String) parent.getItemAtPosition(position);
+                NameResponsible = selection;
 //                int pos = -1;
 
                 for (int i = 0; i < Names.length; i++) {
@@ -205,16 +207,16 @@ public class AddActivity extends AppCompatActivity {
                 String Subject = SubjectAdd.getText().toString();
                 String TDescription = DescAdd.getText().toString();
                 String DueDate = DateAdd.getText().toString();
-                String NameResponsible = RespAdd.getText().toString();
+
 
                 if ((Subject.isEmpty()) | (TDescription.isEmpty()) | (DueDate.isEmpty()) | (NameResponsible.isEmpty())) {
                     startActivity(new Intent(getBaseContext(), AddActivity.class));
                     finish();
                 }
                 String Report = "";
-                int TStatus = 1;
+                int TStatus = 2;
 
-                String[] TaskData = {TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus), IDResponsible, NameResponsible};
+                String[] TaskData = {TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus), "1", IDResponsible, NameResponsible};
 
                 SendEdit se = new SendEdit(getBaseContext());
 

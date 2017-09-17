@@ -94,6 +94,7 @@ public class Task_Detail_Activity extends AppCompatActivity {
                 TextView t4 = (TextView) findViewById(R.id.TStatus);
                 TextView t5 = (TextView) findViewById(R.id.TDescription);
                 TextView t6 = (TextView) findViewById(R.id.THReply);
+                TextView t7 = (TextView) findViewById(R.id.TResponsible);
 
                 Button b1 = (Button) findViewById(R.id.ButtonEdit);
                 Button b2 = (Button) findViewById(R.id.ButtonReply);
@@ -105,6 +106,7 @@ public class Task_Detail_Activity extends AppCompatActivity {
 
                 t5.setText(TDescription);
                 t6.setText(Report);
+                t7.setText(TNameResponsible);
 
 
                 switch (TStatus) {
@@ -172,7 +174,7 @@ public class Task_Detail_Activity extends AppCompatActivity {
 
                                     setContentView(R.layout.waiting_layout);
 
-                                    String[] Taskdata = {TID, Subject, TDescription, DueDate, Report, "0"};
+                                    String[] Taskdata = {TID, Subject, TDescription, DueDate, Report, "0", "0"};
 
                                     SendEdit se = new SendEdit(getBaseContext());
 

@@ -109,7 +109,7 @@ public class TasksAdapter extends BaseAdapter {
                     DelList.add("1".equals(cursor.getString(11)));
                     iCList.add("1".equals(cursor.getString(12)));
                     iRList.add("1".equals(cursor.getString(13)));
-                    NRList.add(cursor.getString(14));
+                    NRList.add(cursor.getString(15));
 
 
 //                        }
@@ -118,10 +118,18 @@ public class TasksAdapter extends BaseAdapter {
                 } while (cursor.moveToNext());
             }
         }
+        int count = cursor.getCount();
         cursor.close();
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         c = (CheckBox) activity.findViewById(R.id.tcheckbox);
         if (MainActivity.TFlag) {
+            MainActivity.TaskCheckedState = new boolean[Tlist.size()];
+            for (int i = 0; i < activity.IDList.size(); i++) {
+                MainActivity.TaskCheckedState[i] = false;
+            }
+            MainActivity.TFlag = false;
+        }
+        if (count != MainActivity.TaskCheckedState.length) {
             MainActivity.TaskCheckedState = new boolean[Tlist.size()];
             for (int i = 0; i < activity.IDList.size(); i++) {
                 MainActivity.TaskCheckedState[i] = false;

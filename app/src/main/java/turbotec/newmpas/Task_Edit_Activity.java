@@ -2,11 +2,15 @@ package turbotec.newmpas;
 
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
+import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -23,6 +27,8 @@ public class Task_Edit_Activity extends AppCompatActivity {
     static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
     static final String URL1 = "content://" + PROVIDER_NAME + "/tasks/";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
+    static final String URL = "content://" + PROVIDER_NAME + "/users/";
+    static final Uri CONTENT_URI = Uri.parse(URL);
     private static final String TASK_ID = "_id";
     private static final String TASK_Title = "TaskTitle";
     private static final String Task_Description = "TaskDescription";
@@ -52,7 +58,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
     };
     EditText SE;
     EditText DeE;
-    TextView ResE1;
+    AutoCompleteTextView ResE1;
     EditText ResE2;
     TextView CE;
     EditText DE;
@@ -75,6 +81,9 @@ public class Task_Edit_Activity extends AppCompatActivity {
     boolean TDeletable;
     boolean TEditable;
     boolean TReply;
+    private String IDResponsible;
+    private String NameResponsible;
+    private String[] Responsible;
     //    private String UserListURL;
 //    private URL url;
 //    private SharedPreferenceHandler share;
@@ -124,35 +133,45 @@ public class Task_Edit_Activity extends AppCompatActivity {
             if (W.equals("Edit")) {
                 setContentView(R.layout.task_edit_layout);
 
-                ResE1 = (TextView) findViewById(R.id.TResponsibleEdit1);
-//                ResE2 = (EditText) findViewById(R.id.TResponsibleEdit2);
-//                if (TStatus == 1) {
-//                    ResE1.setVisibility(View.GONE);
-//                    ResE2.setVisibility(View.VISIBLE);
-
-//                    GetUserList userList = new GetUserList(getBaseContext());
+                ResE1 = (AutoCompleteTextView) findViewById(R.id.TResponsibleEdit);
 
 
-//                    final String[] finalResponseMessage = responseMessage;
-//                    ResE2.setOnKeyListener(new View.OnKeyListener() {
-//                        @Override
-//                        public boolean onKey(View v, int keyCode, KeyEvent event) {
-//                            if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-//
-//                                String search = ResE2.getText().toString();
-//                                for (String st : finalResponseMessage) {
-//                                    if (st.contains(search)) {
-//                                        search = st;
-//                                    }
-//                                }
-//                                ResE2.setText(search);
-//                            }
-//                            return false;
-//                        }
-//                    });
+                Cursor c = getContentResolver().query(CONTENT_URI, null, null, null, null);
+                final String[] Names = new String[c.getCount()];
+                Responsible = new String[c.getCount()];
+                int index = 0;
+                if (c.moveToFirst()) {
+                    do {
+                        Names[index] = c.getString(1);
+                        Responsible[index] = c.getString(0);
+                        index++;
+                    } while (c.moveToNext());
+                }
+                c.close();
 
 
-//                }
+                final ArrayAdapter<String> adapter = new ArrayAdapter<>(Task_Edit_Activity.this, android.R.layout.simple_list_item_1, Names);
+
+                ResE1.setAdapter(adapter);
+                ResE1.setThreshold(1);
+                adapter.notifyDataSetChanged();
+
+                ResE1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                        String selection = (String) parent.getItemAtPosition(position);
+                        NameResponsible = selection;
+
+                        for (int i = 0; i < Names.length; i++) {
+                            if (Names[i].equals(selection)) {
+                                IDResponsible = Responsible[i];
+                                break;
+                            }
+                        }
+                    }
+                });
+
                 SE = (EditText) findViewById(R.id.SubjectEdit);
                 DeE = (EditText) findViewById(R.id.TDescriptionEdit);
                 CE = (TextView) findViewById(R.id.TCreatorEdit);
@@ -191,12 +210,19 @@ public class Task_Edit_Activity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
-                        TResponsible = ResE2.getText().toString();
+
+                        if ((Subject.isEmpty()) | (TDescription.isEmpty()) | (DueDate.isEmpty()) | (NameResponsible.isEmpty())) {
+                            startActivity(new Intent(getBaseContext(), Task_Edit_Activity.class));
+                            finish();
+                        }
+
+
+//                        TResponsible = ResE2.getText().toString();
                         String[] Taskdata;
                         if (!TResponsible.isEmpty()) {
-                            Taskdata = new String[]{TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus), TResponsible};
+                            Taskdata = new String[]{TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus), "1", IDResponsible, NameResponsible};
                         } else {
-                            Taskdata = new String[]{TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus)};
+                            Taskdata = new String[]{TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus), "1", IDResponsible, NameResponsible};
                         }
 
 

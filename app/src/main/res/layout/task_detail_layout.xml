@@ -28,6 +28,16 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2px"
+            android:layout_below="@id/Subject"
+            android:layout_gravity="center"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            android:background="#000000">
+
+        </View>
 
 
         <LinearLayout
@@ -57,7 +67,9 @@
                         android:id="@+id/TCreator"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:layout_weight="1"
+                        android:gravity="center"
                         android:singleLine="true"
                         android:textColor="#000000"
                         android:textSize="16sp" />
@@ -66,7 +78,9 @@
                         android:id="@+id/TResponsible"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center"
                         android:layout_weight="1"
+                        android:gravity="center"
                         android:singleLine="true"
                         android:textColor="#000000"
                         android:textSize="16sp" />
@@ -89,7 +103,7 @@
 
             <TextView
                 android:id="@+id/TStatus"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
                 android:layout_marginEnd="8dp"
@@ -103,33 +117,37 @@
 
         </LinearLayout>
 
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="2px"
-                android:layout_gravity="center"
-                android:layout_marginEnd="15dp"
-                android:layout_marginStart="15dp"
-                android:background="#000000">
 
-            </View>
         </LinearLayout>
+
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2px"
+            android:layout_below="@id/Row2"
+            android:layout_gravity="center"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            android:background="#000000">
+
+        </View>
 
 
         <LinearLayout
             android:id="@+id/Row6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/Row2"
-            android:layout_marginTop="15dp"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/Row2"
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/TDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/Row2"
-                android:layout_gravity="start"
+                android:layout_gravity="center"
                 android:layout_marginBottom="15dp"
                 android:layout_marginEnd="15dp"
                 android:layout_marginStart="15dp"
@@ -138,17 +156,19 @@
                 android:textColor="#000000"
                 android:textSize="16sp" />
 
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="2px"
-                android:layout_gravity="center"
-                android:layout_marginEnd="15dp"
-                android:layout_marginStart="15dp"
-                android:background="#000000">
-
-            </View>
 
         </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2px"
+            android:layout_below="@id/Row6"
+            android:layout_gravity="center"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            android:background="#000000">
+
+        </View>
 
 
         <LinearLayout

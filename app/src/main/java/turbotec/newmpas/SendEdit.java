@@ -130,15 +130,21 @@ public class SendEdit extends AsyncTask {
             DueDate = (String) params[3];
             Report = (String) params[4];
             TStatus = Integer.valueOf((String) params[5]);
-            TIDResponsible = (String) params[6];
-            TNameResponsible = (String) params[7];
+
 
             String plaintext = "value1=" + share.GetDeviceID() + "!!*!!value2=" + share.GetToken()
                     + "!!*!!value3=" + TID + "!!*!!value4=" + Subject + "!!*!!value5=" + TDescription
                     + "!!*!!value6=" + DueDate + "!!*!!value7=" + Report + "!!*!!value8=" + TStatus + "!!*!!value9=";
 
-            if (TIDResponsible != null) {
-                plaintext = plaintext + TIDResponsible;
+            boolean b = Boolean.valueOf("1".equals(params[6]));
+
+            if (b) {
+                TIDResponsible = (String) params[7];
+                TNameResponsible = (String) params[8];
+
+                if (TIDResponsible != null) {
+                    plaintext = plaintext + TIDResponsible;
+                }
             }
 
             plaintext = new String(Base64.encode(plaintext.getBytes("UTF-8"), Base64.DEFAULT));

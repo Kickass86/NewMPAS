@@ -634,8 +634,12 @@ public class SyncService extends IntentService {
             TReplyAble = Boolean.valueOf("1".equals(Task.getProperty(6).toString()));
             TEditable = Boolean.valueOf("1".equals(Task.getProperty(7).toString()));
             TReport = Task.getProperty(8).toString();
-            TReport = TReport.replaceAll("&#x0D;", "");
-            TReport = TReport.replaceAll("-@-", "\n");
+            if (!TReport.contains("&#x0D;")) {
+                TReport = "";
+            } else {
+                TReport = TReport.replaceAll("&#x0D;", "");
+                TReport = TReport.replaceAll("-@-", "\n");
+            }
             TDeletable = Boolean.valueOf("1".equals(Task.getProperty(9).toString()));
             TisCreator = Boolean.valueOf("1".equals(Task.getProperty(10).toString()));
             TisResponsible = Boolean.valueOf("1".equals(Task.getProperty(11).toString()));
@@ -722,11 +726,11 @@ public class SyncService extends IntentService {
                         new android.support.v4.app.NotificationCompat.Builder(MyContext)
                                 .setSmallIcon(R.mipmap.ic_assignment_black_24dp)
 //                                .setLargeIcon(R.mipmap.ic_assignment_black_24dp_new)
-                                .setContentTitle(MessageTitle)
+                                .setContentTitle(TaskTitle)
                                 .setContentIntent(ci)
                                 .setAutoCancel(true)
                                 .setColor(0x00FFFF)
-                                .setContentText(MessageBody);
+                                .setContentText(TaskDescription);
                 if (!isDuplicate) {
                     mBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
                 }

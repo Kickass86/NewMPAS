@@ -57,7 +57,7 @@ public class AddActivity extends AppCompatActivity {
     private void updateLabel() {
 
         EditText edittext = (EditText) findViewById(R.id.DueDateAdd);
-        String myFormat = "MMM dd yy"; //In which you need put here
+        String myFormat = "yyyy-MM-dd"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
 
         edittext.setText(sdf.format(myCalendar.getTime()));
@@ -212,6 +212,7 @@ public class AddActivity extends AppCompatActivity {
                 if ((Subject.isEmpty()) | (TDescription.isEmpty()) | (DueDate.isEmpty()) | (NameResponsible.isEmpty())) {
                     startActivity(new Intent(getBaseContext(), AddActivity.class));
                     finish();
+                    return;
                 }
                 String Report = "";
                 int TStatus = 2;
@@ -222,7 +223,6 @@ public class AddActivity extends AppCompatActivity {
 
                 se.execute(TaskData);
 
-                finish();
             }
         });
 

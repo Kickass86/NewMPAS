@@ -174,11 +174,11 @@ public class SendEdit extends AsyncTask {
 
             if (response.toString().contains(MyContext.getString(R.string.Deleted))) {
 
-                MyContext.getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{TID});
-                share.SaveChange(true);
-                Intent in = new Intent("Alarm fire");
-                in.putExtra("Type", 1);
-                MyContext.sendBroadcast(in);
+//                MyContext.getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{TID});
+////                share.SaveChange(true);
+//                Intent in = new Intent("Edit Done");
+////                in.putExtra("Type", 1);
+//                MyContext.sendBroadcast(in);
 
             }
 
@@ -202,11 +202,33 @@ public class SendEdit extends AsyncTask {
 
                 TNameResponsible = (String) params[7];
 
+
+                values.put(TASK_Title, Subject);
+                values.put(Task_Description, TDescription);
+                values.put(TASK_DueDate, DueDate);
+                values.put(TASK_NameResponsible, TNameResponsible);
+                values.put(SendDelivered, true);
+                values.put(isSeen, true);
+
+
+//                MyContext.getContentResolver().insert(CONTENT_URI1, values);
+//
+////                share.SaveChange(true);
+//                Intent in = new Intent("Edit Done");
+////                in.putExtra("Type", 1);
+//                MyContext.sendBroadcast(in);
+
+
+            } else {
+
+
+                values.put(SendDelivered, false);
+
                 values.put(TASK_ID, TID);
                 values.put(TASK_Title, Subject);
                 values.put(Task_Description, TDescription);
                 values.put(TASK_DueDate, DueDate);
-                values.put(TASK_Creator, "اینجانب");
+                values.put(TASK_Creator, share.GetName());
                 values.put(TASK_Status, TStatus);
                 values.put(TASK_Editable, true);
                 values.put(TASK_ReplyAble, false);
@@ -218,26 +240,18 @@ public class SendEdit extends AsyncTask {
                 values.put("Report", Report);
                 values.put(isSeen, true);
 
-
-                MyContext.getContentResolver().insert(CONTENT_URI1, values);
-
-                share.SaveChange(true);
-                Intent in = new Intent("Alarm fire");
-                in.putExtra("Type", 1);
-                MyContext.sendBroadcast(in);
-
-
-            } else {
-
-
-                values.put(SendDelivered, false);
-
                 MyContext.getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{TID});
             }
 
 
         } catch (XmlPullParserException | IOException soapFault) {
             soapFault.printStackTrace();
+        } finally {
+            MyContext.getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{TID});
+//                share.SaveChange(true);
+            Intent in = new Intent("Edit Done");
+//                in.putExtra("Type", 1);
+            MyContext.sendBroadcast(in);
         }
 
 

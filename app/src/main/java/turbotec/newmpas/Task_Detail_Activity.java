@@ -218,6 +218,7 @@ public class Task_Detail_Activity extends AppCompatActivity {
                     bundle.putString(activity.getString(R.string.TID), TID);
                     bundle.putString(activity.getString(R.string.Subject), Subject);
                     bundle.putString(activity.getString(R.string.TCreator), Creator);
+                    bundle.putString(activity.getString(R.string.TNameResponsible), TNameResponsible);
                     bundle.putString(activity.getString(R.string.DueDate), DueDate);
                     bundle.putInt(activity.getString(R.string.TStatus), TStatus);
                     bundle.putString(activity.getString(R.string.TDescription), TDescription);
@@ -231,8 +232,9 @@ public class Task_Detail_Activity extends AppCompatActivity {
 
 
                     EditActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    finish();
+
                     activity.startActivity(EditActivity);
+                    finish();
 
 
                 }
@@ -265,8 +267,10 @@ public class Task_Detail_Activity extends AppCompatActivity {
                     EditActivity.putExtras(bundle);
 
                     EditActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    finish();
+
                     activity.startActivity(EditActivity);
+                    finish();
+
 
 
                 }

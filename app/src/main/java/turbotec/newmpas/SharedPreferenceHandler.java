@@ -36,6 +36,16 @@ public class SharedPreferenceHandler {
     }
 
 
+    public void SaveName(String message) {
+
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(context.getString(R.string.Name), message);
+        editor.apply();
+
+    }
+
+
     public void SaveError(String message) {
 
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
@@ -188,6 +198,13 @@ public class SharedPreferenceHandler {
 
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
         return sharedPref.getString(context.getString(R.string.Status), context.getString(R.string.defaultValue));
+
+    }
+
+    public String GetName() {
+
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
+        return sharedPref.getString(context.getString(R.string.Name), context.getString(R.string.defaultValue));
 
     }
 

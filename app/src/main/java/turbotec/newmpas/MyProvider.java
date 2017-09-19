@@ -227,7 +227,7 @@ public class MyProvider extends ContentProvider {
         int count = 0;
         if (uriMatcher.match(uri) == Message_ID) {
             count = dbHelper.deleteMessage(id, selection, selectionArgs);
-        } else if (uriMatcher.match(uri) == Message_ID) {
+        } else if (uriMatcher.match(uri) == Tasks) {
             count = dbHelper.deleteTask(id, selection, selectionArgs);
         }
 

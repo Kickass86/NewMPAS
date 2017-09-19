@@ -1,12 +1,16 @@
 package turbotec.newmpas;
 
 import android.app.DatePickerDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -40,6 +44,25 @@ public class Task_Edit_Activity extends AppCompatActivity {
     private static final String SendDelivered = "SendDelivered";
     private static final String isSeen = "isSeen";
     private static final String Task_Report = "Report";
+    public final BroadcastReceiver broadcastReceiverEdit = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+
+            String action = intent.getAction();
+
+            setTitle(getString(R.string.app_name));
+            Log.e("Edit", "Done!");
+            if (action.equals("Edit Done")) {
+
+
+                MainActivity.setTab = 1;
+                finish();
+
+
+            }
+        }
+    };
     private final String ip = "192.168.1.13";
     private final int port = 80;
     Calendar myCalendar = Calendar.getInstance();
@@ -58,8 +81,8 @@ public class Task_Edit_Activity extends AppCompatActivity {
     };
     EditText SE;
     EditText DeE;
-    AutoCompleteTextView ResE1;
-    EditText ResE2;
+    AutoCompleteTextView ResE;
+    //    EditText ResE2;
     TextView CE;
     EditText DE;
     //    TextView StE;
@@ -72,6 +95,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
     //    TextView StT;
     String Subject;
     String Creator;
+    String TNameResponsible;
     String DueDate;
     int TStatus;
     String TReport;
@@ -80,9 +104,9 @@ public class Task_Edit_Activity extends AppCompatActivity {
     String Report = "";
     boolean TDeletable;
     boolean TEditable;
-    boolean TReply;
+    boolean TReplyable;
     private String IDResponsible;
-    private String NameResponsible;
+    private String NameResponsible = "";
     private String[] Responsible;
     //    private String UserListURL;
 //    private URL url;
@@ -95,14 +119,19 @@ public class Task_Edit_Activity extends AppCompatActivity {
     private void updateLabel() {
 
         EditText edittext = (EditText) findViewById(R.id.DueDateEdit);
-        String myFormat = "MMM dd yy"; //In which you need put here
+        String myFormat = "yyyy-MM-dd"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
 
         edittext.setText(sdf.format(myCalendar.getTime()));
     }
 
+    @Override
+    protected void onDestroy() {
 
+        unregisterReceiver(broadcastReceiverEdit);
+        super.onDestroy();
 
+    }
 
 
     @Override
@@ -112,6 +141,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         String W;
 
+        registerReceiver(broadcastReceiverEdit, new IntentFilter("Edit Done"));
 //        share = SharedPreferenceHandler.getInstance(this);
 //        MyContext = getBaseContext();
 
@@ -121,11 +151,12 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
             Subject = b.getString(getString(R.string.Subject));
             Creator = b.getString(getString(R.string.TCreator));
+            TNameResponsible = b.getString(getString(R.string.TNameResponsible));
             DueDate = b.getString(getString(R.string.DueDate));
             TStatus = b.getInt(getString(R.string.TStatus));
             TDescription = b.getString(getString(R.string.TDescription));
             TEditable = b.getBoolean(getString(R.string.TEditable));
-            TReply = b.getBoolean(getString(R.string.TReplyAble));
+            TReplyable = b.getBoolean(getString(R.string.TReplyAble));
             TDeletable = b.getBoolean(getString(R.string.TDeletable));
             TID = b.getString(getString(R.string.TID));
             Report = b.getString(getString(R.string.TReport));
@@ -133,7 +164,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
             if (W.equals("Edit")) {
                 setContentView(R.layout.task_edit_layout);
 
-                ResE1 = (AutoCompleteTextView) findViewById(R.id.TResponsibleEdit);
+                ResE = (AutoCompleteTextView) findViewById(R.id.TResponsibleEdit);
 
 
                 Cursor c = getContentResolver().query(CONTENT_URI, null, null, null, null);
@@ -152,11 +183,11 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
                 final ArrayAdapter<String> adapter = new ArrayAdapter<>(Task_Edit_Activity.this, android.R.layout.simple_list_item_1, Names);
 
-                ResE1.setAdapter(adapter);
-                ResE1.setThreshold(1);
+                ResE.setAdapter(adapter);
+                ResE.setThreshold(1);
                 adapter.notifyDataSetChanged();
 
-                ResE1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                ResE.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
@@ -174,7 +205,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
                 SE = (EditText) findViewById(R.id.SubjectEdit);
                 DeE = (EditText) findViewById(R.id.TDescriptionEdit);
-                CE = (TextView) findViewById(R.id.TCreatorEdit);
+//                CE = (TextView) findViewById(R.id.TCreatorEdit);
                 DE = (EditText) findViewById(R.id.DueDateEdit);
 //                StE = (TextView) findViewById(R.id.TStatusEdit);
                 RH = (TextView) findViewById(R.id.THReply);
@@ -183,7 +214,8 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
                 SE.setText(Subject);
                 DeE.setText(TDescription);
-                CE.setText(Creator);
+                ResE.setText(TNameResponsible);
+//                CE.setText(Creator);
                 DE.setText(DueDate);
 //                StE.setText(TStatus);
                 RH.setText(TReport);
@@ -211,15 +243,40 @@ public class Task_Edit_Activity extends AppCompatActivity {
                     public void onClick(View v) {
 
 
+                        setContentView(R.layout.waiting_layout);
+                        Subject = SE.getText().toString();
+                        TDescription = DeE.getText().toString();
+                        DueDate = DE.getText().toString();
+                        NameResponsible = ResE.getText().toString();
+
                         if ((Subject.isEmpty()) | (TDescription.isEmpty()) | (DueDate.isEmpty()) | (NameResponsible.isEmpty())) {
+
+                            Bundle bundle = new Bundle();
+                            bundle.putString(getString(R.string.What), "Edit");
+                            bundle.putString(getString(R.string.TID), TID);
+                            bundle.putString(getString(R.string.Subject), Subject);
+                            bundle.putString(getString(R.string.TCreator), Creator);
+                            bundle.putString(getString(R.string.TNameResponsible), TNameResponsible);
+                            bundle.putString(getString(R.string.DueDate), DueDate);
+                            bundle.putInt(getString(R.string.TStatus), TStatus);
+                            bundle.putString(getString(R.string.TDescription), TDescription);
+                            bundle.putString(getString(R.string.TReport), Report);
+                            bundle.putBoolean(getString(R.string.TEditable), TEditable);
+                            bundle.putBoolean(getString(R.string.TReplyAble), TReplyable);
+                            bundle.putBoolean(getString(R.string.TDeletable), TDeletable);
+                            Intent EditActivity = new Intent(Task_Edit_Activity.this, Task_Edit_Activity.class);
+
+                            EditActivity.putExtras(bundle);
                             startActivity(new Intent(getBaseContext(), Task_Edit_Activity.class));
                             finish();
+                            return;
                         }
 
-
+                        Subject = SE.getText().toString();
+                        TDescription = DeE.getText().toString();
 //                        TResponsible = ResE2.getText().toString();
                         String[] Taskdata;
-                        if (!TResponsible.isEmpty()) {
+                        if (!NameResponsible.isEmpty()) {
                             Taskdata = new String[]{TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus), "1", IDResponsible, NameResponsible};
                         } else {
                             Taskdata = new String[]{TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus), "1", IDResponsible, NameResponsible};
@@ -229,8 +286,6 @@ public class Task_Edit_Activity extends AppCompatActivity {
                         SendEdit se = new SendEdit(getBaseContext());
 
                         se.execute(Taskdata);
-
-                        finish();
 
                     }
                 });
@@ -288,7 +343,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
                         values.put(SendDelivered, false);
                         values.put(isSeen, true);
                         values.put(TASK_Editable, TEditable);
-                        values.put(TASK_ReplyAble, TReply);
+                        values.put(TASK_ReplyAble, TReplyable);
                         values.put(Task_Report, Report);
 
                         getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{TID});
@@ -299,7 +354,6 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
                         se.execute(TaskData);
 
-                        finish();
 
                     }
                 });

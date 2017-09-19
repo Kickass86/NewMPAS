@@ -37,33 +37,40 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/TCreatorEdit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <!--<TextView-->
+                <!--android:id="@+id/TCreatorEdit"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
 
 
-                    android:layout_weight="1"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
+                <!--android:layout_weight="1"-->
+                <!--android:textColor="#000000"-->
+                <!--android:textSize="16sp" />-->
 
-                <TextView
-                    android:id="@+id/TResponsibleEdit1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
+                <!--<TextView-->
+                <!--android:id="@+id/TResponsibleEdit1"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1"-->
+                <!--android:textColor="#000000"-->
+                <!--android:textSize="16sp" />-->
 
-                <AutoCompleteTextView
+
+                <AutoCompleteTextView xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/TResponsibleEdit"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginEnd="8dip"
+                    android:layout_marginStart="8dip"
+                    android:layout_marginTop="5dp"
                     android:layout_weight="1"
-                    android:inputType="textNoSuggestions"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:inputType="textNoSuggestions|textFilter"
                     android:textColor="#000000"
-                    android:textSize="16sp"
-                    android:visibility="gone" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
 

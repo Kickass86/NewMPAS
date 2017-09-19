@@ -299,6 +299,7 @@ public class SyncService extends IntentService {
             String Taskresp = "";
             String Authresp = "";
             String Tokenresp = "";
+            String Nameresp = "";
             Log.e("Response ", response1.toString());
 
             SoapObject Messagesresp = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_CHECK);
@@ -313,8 +314,10 @@ public class SyncService extends IntentService {
             Log.e("Task response", Taskresp);
 
 
-            if (token.getPropertyCount() > 0)
+            if (token.getPropertyCount() > 0) {
                 Tokenresp = token.getProperty(0).toString();
+                Nameresp = token.getProperty(1).toString();
+            }
             Log.e("Token Response", Tokenresp);
 
 //            FLag = (Authresp + Tokenresp);
@@ -332,6 +335,7 @@ public class SyncService extends IntentService {
             }
             if (!Tokenresp.isEmpty()) {
                 share.SaveToken(Tokenresp);
+                share.SaveName(Nameresp);
             }
 
             InsertMessages(message);
@@ -391,7 +395,7 @@ public class SyncService extends IntentService {
     private void HandleUnsendInsert() {
         int num = 0;
 
-        Cursor cursor = getContentResolver().query(CONTENT_URI4, null, "SendInsert = ?", new String[]{"0"}, null);
+        Cursor cursor = getContentResolver().query(CONTENT_URI4, null, "SendInsert = ?", new String[]{"1"}, null);
         TIDs = "";
         try {
             if (cursor != null) {
@@ -492,6 +496,10 @@ public class SyncService extends IntentService {
 
         } catch (Exception e) {
             e.getStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
 
     }
@@ -514,6 +522,10 @@ public class SyncService extends IntentService {
 
         } catch (Exception e) {
             e.getStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
 
 
@@ -651,6 +663,10 @@ public class SyncService extends IntentService {
                     if (TaskStatus == 0) {
 
                         getContentResolver().delete(CONTENT_URI3, "_id  = ?", new String[]{String.valueOf(TaskID)});
+                        index++;
+                        if (index >= tasks.getPropertyCount()) {
+                            c.close();
+                        }
                         continue;
 
                     } else {
@@ -676,6 +692,9 @@ public class SyncService extends IntentService {
                         getContentResolver().update(CONTENT_URI3, values, "_id  = ?", new String[]{String.valueOf(TaskID)});
 
                         index++;
+                        if (index >= tasks.getPropertyCount()) {
+                            c.close();
+                        }
                         continue;
                     }
                 } else {
@@ -796,6 +815,9 @@ public class SyncService extends IntentService {
             if (c != null) {
                 if (c.getCount() > 0) {
                     index++;
+                    if (index >= message.getPropertyCount()) {
+                        c.close();
+                    }
                     continue;
                 }
             }

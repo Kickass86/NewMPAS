@@ -50,7 +50,7 @@ public class VersionUpdate extends Service {
     private File myFile;
     private String MyFileAddress;
     private int latestVersion;
-    private Long downloadReference;
+    private Long downloadReference = Long.valueOf(0);
     private final BroadcastReceiver downloadReceiver = new BroadcastReceiver() {
 
         @Override
@@ -354,7 +354,7 @@ public class VersionUpdate extends Service {
                                     }
                                 }
 
-
+                                cursor.close();
                                 request.setDestinationUri(Uri.fromFile(myFile));
                                 request.setMimeType("application/vnd.android.package-archive");
                                 downloadReference = downloadManager.enqueue(request);

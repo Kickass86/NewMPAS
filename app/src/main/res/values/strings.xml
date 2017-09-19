@@ -7,6 +7,7 @@
     <string name="DeviceID">Device Unique ID</string>
     <string name="Change">Change</string>
     <string name="Token">Token</string>
+    <string name="Name">Name</string>
     <string name="FileVersion">FileVersion</string>
     <string name="defaultValue">Not_Saved</string>
     <string name="ErrorMessage">ErrorMessage</string>

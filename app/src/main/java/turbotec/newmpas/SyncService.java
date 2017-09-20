@@ -656,6 +656,9 @@ public class SyncService extends IntentService {
             TisCreator = Boolean.valueOf("1".equals(Task.getProperty(10).toString()));
             TisResponsible = Boolean.valueOf("1".equals(Task.getProperty(11).toString()));
             TNameResponsible = Task.getProperty(12).toString();
+            if (TNameResponsible.contains("anyType{}")) {
+                TNameResponsible = "";
+            }
 
             Cursor c = getContentResolver().query(CONTENT_URI3, new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(TaskID)}, null);
             if (c != null) {

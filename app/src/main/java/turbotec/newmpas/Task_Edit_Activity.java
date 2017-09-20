@@ -16,9 +16,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -44,7 +44,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
     private static final String SendDelivered = "SendDelivered";
     private static final String isSeen = "isSeen";
     private static final String Task_Report = "Report";
-    public final BroadcastReceiver broadcastReceiverEdit = new BroadcastReceiver() {
+    private final BroadcastReceiver broadcastReceiverEdit = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
@@ -81,18 +81,21 @@ public class Task_Edit_Activity extends AppCompatActivity {
     };
     EditText SE;
     EditText DeE;
+    EditText RE;
+    EditText DE;
     AutoCompleteTextView ResE;
     //    EditText ResE2;
     TextView CE;
-    EditText DE;
+
     //    TextView StE;
-    EditText RE;
+
     TextView RH;
     TextView ST;
     TextView DeT;
     TextView CT;
     TextView DT;
-    //    TextView StT;
+    TextView StT;
+    CheckBox CBF;
     String Subject;
     String Creator;
     String TNameResponsible;
@@ -207,7 +210,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
                 DeE = (EditText) findViewById(R.id.TDescriptionEdit);
 //                CE = (TextView) findViewById(R.id.TCreatorEdit);
                 DE = (EditText) findViewById(R.id.DueDateEdit);
-//                StE = (TextView) findViewById(R.id.TStatusEdit);
+                StT = (TextView) findViewById(R.id.TStatusEdit);
                 RH = (TextView) findViewById(R.id.THReply);
                 RE = (EditText) findViewById(R.id.TReply);
 
@@ -217,7 +220,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
                 ResE.setText(TNameResponsible);
 //                CE.setText(Creator);
                 DE.setText(DueDate);
-//                StE.setText(TStatus);
+                StT.setText(TStatus);
                 RH.setText(TReport);
 
 
@@ -294,14 +297,15 @@ public class Task_Edit_Activity extends AppCompatActivity {
                 setContentView(R.layout.task_reply_layout);
 
 
-                Spinner dropdown = (Spinner) findViewById(R.id.TStatusR);
-                String[] items = new String[]{"Not Assigned", "In Progress", "Finished", "Closed"};
+//                Spinner dropdown = (Spinner) findViewById(R.id.TStatusR);
+//                String[] items = new String[]{"Not Assigned", "In Progress", "Finished", "Closed"};
+//                String[] items = new String[]{"Not Assigned", "In Progress", "Finished", "Closed"};
 
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
+//                ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
 
-                dropdown.setAdapter(adapter);
+//                dropdown.setAdapter(adapter);
 
-                dropdown.setSelection(TStatus);
+//                dropdown.setSelection(TStatus);
 
 
 
@@ -309,16 +313,17 @@ public class Task_Edit_Activity extends AppCompatActivity {
                 DeT = (TextView) findViewById(R.id.TDescriptionR);
                 CT = (TextView) findViewById(R.id.TCreatorR);
                 DT = (TextView) findViewById(R.id.DueDateR);
-//                StT = (Spinner) findViewById(R.id.TStatusR);
+                StT = (TextView) findViewById(R.id.TStatusR);
                 RH = (TextView) findViewById(R.id.THReply);
                 RE = (EditText) findViewById(R.id.TReply);
+                CBF = (CheckBox) findViewById(R.id.checkboxFinished);
 
 
                 ST.setText(Subject);
                 DeT.setText(TDescription);
                 CT.setText(Creator);
                 DT.setText(DueDate);
-//                StT.setText(TStatus);
+                StT.setText(TStatus);
                 RE.setText(Report);
 
 
@@ -329,9 +334,13 @@ public class Task_Edit_Activity extends AppCompatActivity {
                     public void onClick(View v) {
 
                         Report = RE.getText().toString();
+                        boolean b = CBF.isChecked();
+                        if (b) {
+                            TStatus = 3;
+                        }
 
-                        Spinner dropdown = (Spinner) findViewById(R.id.TStatusR);
-                        TStatus = dropdown.getSelectedItemPosition();
+//                        Spinner dropdown = (Spinner) findViewById(R.id.TStatusR);
+//                        TStatus = dropdown.getSelectedItemPosition();
 
 
                         ContentValues values = new ContentValues();
@@ -348,7 +357,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
                         getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{TID});
 
-                        String[] TaskData = {TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus)};
+                        String[] TaskData = {TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus), "0"};
 
                         SendEdit se = new SendEdit(getBaseContext());
 

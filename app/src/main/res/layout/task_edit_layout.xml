@@ -32,9 +32,6 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -73,6 +70,11 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2">
+
 
             <EditText
                 android:id="@+id/DueDateEdit"
@@ -101,6 +103,8 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:textSize="16sp" />
+
+            </LinearLayout>
 
 
         </LinearLayout>

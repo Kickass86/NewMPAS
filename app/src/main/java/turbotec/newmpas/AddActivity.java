@@ -1,11 +1,15 @@
 package turbotec.newmpas;
 
 import android.app.DatePickerDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,9 +25,29 @@ import java.util.UUID;
 
 public class AddActivity extends AppCompatActivity {
 
+
     static final String PROVIDER_NAME = "turbotec.newmpas.MyProvider";
     static final String URL = "content://" + PROVIDER_NAME + "/users/";
     static final Uri CONTENT_URI = Uri.parse(URL);
+    private final BroadcastReceiver broadcastReceiverEdit = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+
+            String action = intent.getAction();
+
+            setTitle(getString(R.string.app_name));
+            Log.e("Edit", "Done!");
+            if (action.equals("Edit Done")) {
+
+
+                MainActivity.setTab = 1;
+                finish();
+
+
+            }
+        }
+    };
     private final String ip = "192.168.1.13";
     private final int port = 80;
     Calendar myCalendar = Calendar.getInstance();
@@ -71,6 +95,7 @@ public class AddActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_new_task);
         share = SharedPreferenceHandler.getInstance(getBaseContext());
+        registerReceiver(broadcastReceiverEdit, new IntentFilter("Edit Done"));
 
         DateAdd = (EditText) findViewById(R.id.DueDateAdd);
         SubjectAdd = (EditText) findViewById(R.id.SubjectAdd);
@@ -202,6 +227,8 @@ public class AddActivity extends AppCompatActivity {
         Done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                setContentView(R.layout.waiting_layout);
 
                 String TID = UUID.randomUUID().toString();
                 String Subject = SubjectAdd.getText().toString();

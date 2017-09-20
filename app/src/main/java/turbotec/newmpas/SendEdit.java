@@ -174,7 +174,7 @@ public class SendEdit extends AsyncTask {
 
             if (response.toString().contains(MyContext.getString(R.string.Deleted))) {
 
-//                MyContext.getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{TID});
+                MyContext.getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{TID});
 ////                share.SaveChange(true);
 //                Intent in = new Intent("Edit Done");
 ////                in.putExtra("Type", 1);
@@ -187,31 +187,42 @@ public class SendEdit extends AsyncTask {
                     || (response.toString().contains(MyContext.getString(R.string.True)))) {
 
 
-
+                values = new ContentValues();
                 values.put(SendDelivered, true);
                 if (!TNameResponsible.isEmpty()) {
                     values.put(TASK_NameResponsible, TNameResponsible);
                 }
 
-
+//                values.put(TASK_ID, TID);
+                values.put(TASK_Title, Subject);
+                values.put(Task_Description, TDescription);
+                values.put(TASK_DueDate, DueDate);
+//                values.put(TASK_Creator, share.GetName());
+                values.put(TASK_Status, TStatus);
+                values.put("Report", Report);
+//                values.put(isSeen, true);
 
                 MyContext.getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{TID});
 
             }
             if (response.toString().contains(MyContext.getString(R.string.Inserted))) {
 
-                TNameResponsible = (String) params[7];
+                TNameResponsible = (String) params[8];
 
-
+                values = new ContentValues();
+                values.put(TASK_ID, TID);
                 values.put(TASK_Title, Subject);
                 values.put(Task_Description, TDescription);
                 values.put(TASK_DueDate, DueDate);
                 values.put(TASK_NameResponsible, TNameResponsible);
+                values.put(TASK_isCreator, true);
+                values.put(TASK_Deletable, true);
+                values.put(TASK_Editable, true);
                 values.put(SendDelivered, true);
                 values.put(isSeen, true);
 
 
-//                MyContext.getContentResolver().insert(CONTENT_URI1, values);
+                MyContext.getContentResolver().insert(CONTENT_URI1, values);
 //
 ////                share.SaveChange(true);
 //                Intent in = new Intent("Edit Done");
@@ -219,35 +230,19 @@ public class SendEdit extends AsyncTask {
 //                MyContext.sendBroadcast(in);
 
 
-            } else {
-
-
-                values.put(SendDelivered, false);
-
-                values.put(TASK_ID, TID);
-                values.put(TASK_Title, Subject);
-                values.put(Task_Description, TDescription);
-                values.put(TASK_DueDate, DueDate);
-                values.put(TASK_Creator, share.GetName());
-                values.put(TASK_Status, TStatus);
-                values.put(TASK_Editable, true);
-                values.put(TASK_ReplyAble, false);
-                values.put(TASK_Deletable, true);
-                values.put(TASK_isCreator, true);
-                values.put(TASK_isResponsible, false);
-                values.put(TASK_NameResponsible, TNameResponsible);
-                values.put(SendDelivered, true);
-                values.put("Report", Report);
-                values.put(isSeen, true);
-
-                MyContext.getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{TID});
             }
+
+
+//                values.put(SendDelivered, false);
+
+
+//            }
 
 
         } catch (XmlPullParserException | IOException soapFault) {
             soapFault.printStackTrace();
         } finally {
-            MyContext.getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{TID});
+//            MyContext.getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{TID});
 //                share.SaveChange(true);
             Intent in = new Intent("Edit Done");
 //                in.putExtra("Type", 1);

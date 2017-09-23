@@ -31,6 +31,8 @@ public class Task_Detail_Activity extends AppCompatActivity {
     String TNameResponsible;
     String Report = "";
 
+    boolean BackFlag = true;
+
     boolean TEditable;
     boolean TReplyable;
     boolean TisCreator;
@@ -120,6 +122,7 @@ public class Task_Detail_Activity extends AppCompatActivity {
                         t4.setText("Finished");
                         break;
                     case 1002:
+                    case 0:
                     default:
                         t4.setText("Closed");
                         break;
@@ -177,6 +180,8 @@ public class Task_Detail_Activity extends AppCompatActivity {
                                     String[] Taskdata = {TID, Subject, TDescription, DueDate, Report, "0", "0"};
 
                                     SendEdit se = new SendEdit(getBaseContext());
+                                    BackFlag = false;
+                                    invalidateOptionsMenu();
 
                                     se.execute(Taskdata);
 
@@ -299,13 +304,16 @@ public class Task_Detail_Activity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (BackFlag) {
+            switch (item.getItemId()) {
+                case android.R.id.home:
+                    NavUtils.navigateUpFromSameTask(this);
+                    return true;
+                default:
+                    return super.onOptionsItemSelected(item);
+            }
         }
+        return true;
     }
 
 

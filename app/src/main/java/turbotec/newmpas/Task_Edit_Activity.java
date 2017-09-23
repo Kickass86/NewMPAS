@@ -57,6 +57,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
 
                 MainActivity.setTab = 1;
+                MainActivity.Gone = true;
                 finish();
 
 
@@ -95,6 +96,8 @@ public class Task_Edit_Activity extends AppCompatActivity {
     TextView CT;
     TextView DT;
     TextView StT;
+    CheckBox NFCB;
+    CheckBox CCB;
     CheckBox CBF;
     String Subject;
     String Creator;
@@ -213,6 +216,15 @@ public class Task_Edit_Activity extends AppCompatActivity {
                 StT = (TextView) findViewById(R.id.TStatusEdit);
                 RH = (TextView) findViewById(R.id.THReply);
                 RE = (EditText) findViewById(R.id.TReply);
+                NFCB = (CheckBox) findViewById(R.id.checkboxNotFinished);
+                CCB = (CheckBox) findViewById(R.id.checkboxClosed);
+
+
+                if (TStatus == 3) {
+                    NFCB.setVisibility(View.VISIBLE);
+                } else if (TStatus == 2) {
+                    CCB.setVisibility(View.VISIBLE);
+                }
 
 
                 SE.setText(Subject);
@@ -220,7 +232,25 @@ public class Task_Edit_Activity extends AppCompatActivity {
                 ResE.setText(TNameResponsible);
 //                CE.setText(Creator);
                 DE.setText(DueDate);
-                StT.setText(TStatus);
+                String s;
+                switch (TStatus) {
+
+                    case 1:
+                        s = "Not Assigned";
+                        break;
+                    case 2:
+                        s = "In Progress";
+                        break;
+                    case 3:
+                        s = "Finished";
+                        break;
+                    case 1002:
+                    case 0:
+                    default:
+                        s = "Closed";
+                        break;
+                }
+                StT.setText(s);
                 RH.setText(TReport);
 
 
@@ -275,8 +305,15 @@ public class Task_Edit_Activity extends AppCompatActivity {
                             return;
                         }
 
-                        Subject = SE.getText().toString();
-                        TDescription = DeE.getText().toString();
+                        if (NFCB.isChecked()) {
+                            TStatus = 2;
+                        }
+                        if (CCB.isChecked()) {
+                            TStatus = 1002;
+                        }
+
+//                        Subject = SE.getText().toString();
+//                        TDescription = DeE.getText().toString();
 //                        TResponsible = ResE2.getText().toString();
                         String[] Taskdata;
                         if (!NameResponsible.isEmpty()) {
@@ -287,6 +324,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
 
                         SendEdit se = new SendEdit(getBaseContext());
+                        invalidateOptionsMenu();
 
                         se.execute(Taskdata);
 
@@ -323,8 +361,33 @@ public class Task_Edit_Activity extends AppCompatActivity {
                 DeT.setText(TDescription);
                 CT.setText(Creator);
                 DT.setText(DueDate);
-                StT.setText(TStatus);
+
+                String s;
+                switch (TStatus) {
+
+                    case 1:
+                        s = "Not Assigned";
+                        break;
+                    case 2:
+                        s = "In Progress";
+                        break;
+                    case 3:
+                        s = "Finished";
+                        break;
+                    case 1002:
+                    case 0:
+                    default:
+                        s = "Closed";
+                        break;
+                }
+
+                StT.setText(s);
                 RE.setText(Report);
+
+                if ((TStatus == 3) | (TStatus == 1002) | (TStatus == 0)) {
+                    CBF.setVisibility(View.GONE);
+                }
+
 
 
                 Button ReplyButt = (Button) findViewById(R.id.ButtonReplyDone);
@@ -360,6 +423,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
                         String[] TaskData = {TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus), "0"};
 
                         SendEdit se = new SendEdit(getBaseContext());
+                        invalidateOptionsMenu();
 
                         se.execute(TaskData);
 

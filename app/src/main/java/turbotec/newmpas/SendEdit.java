@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Base64;
+import android.widget.Toast;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -49,6 +50,7 @@ public class SendEdit extends AsyncTask {
     String TNameResponsible;
     String TIDResponsible;
     String Report = "";
+    private boolean flag = false;
     private String SOAP_ACTION_EditTask = "EditTask";
     private String WSDL_TARGET_NAMESPACE;
     private String SOAP_ADDRESS;
@@ -67,6 +69,10 @@ public class SendEdit extends AsyncTask {
     @Override
     protected void onPostExecute(Object o) {
         super.onPostExecute(o);
+
+        if (flag) {
+            Toast.makeText(MyContext, "Network Connection Error!", Toast.LENGTH_SHORT).show();
+        }
 
         if (TStatus == 0) {
             Intent intent = new Intent(MyContext.getApplicationContext(), MainActivity.class);
@@ -198,6 +204,9 @@ public class SendEdit extends AsyncTask {
                 values.put(Task_Description, TDescription);
                 values.put(TASK_DueDate, DueDate);
 //                values.put(TASK_Creator, share.GetName());
+                if (TStatus == 1) {
+                    TStatus = 2;
+                }
                 values.put(TASK_Status, TStatus);
                 values.put("Report", Report);
 //                values.put(isSeen, true);
@@ -215,6 +224,7 @@ public class SendEdit extends AsyncTask {
                 values.put(Task_Description, TDescription);
                 values.put(TASK_DueDate, DueDate);
                 values.put(TASK_NameResponsible, TNameResponsible);
+                values.put(TASK_Status, TStatus);
                 values.put(TASK_isCreator, true);
                 values.put(TASK_Deletable, true);
                 values.put(TASK_Editable, true);
@@ -241,6 +251,7 @@ public class SendEdit extends AsyncTask {
 
         } catch (XmlPullParserException | IOException soapFault) {
             soapFault.printStackTrace();
+            flag = true;
         } finally {
 //            MyContext.getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{TID});
 //                share.SaveChange(true);

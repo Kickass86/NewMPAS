@@ -198,20 +198,24 @@ public class MainActivity extends AppCompatActivity {
                     switch (tab.getPosition()) {
                         case 0: {
                             ListView lvno = (ListView) findViewById(R.id.list_notification);
-                            lvno.setSelection(Scroll_Position);
-                            if (Gone) {
-                                NotificationsAdapter ad = NotificationsAdapter.getInstance(getBaseContext());
-                                lvno.setAdapter(ad);
-                                ad.notifyDataSetChanged();
+                            if (lvno != null) {
+                                lvno.setSelection(Scroll_Position);
+                                if (Gone) {
+                                    NotificationsAdapter ad = NotificationsAdapter.getInstance(getBaseContext());
+                                    lvno.setAdapter(ad);
+                                    ad.notifyDataSetChanged();
+                                }
                             }
                         }
                         case 1: {
                             ListView lvta = (ListView) findViewById(R.id.list_task);
-                            lvta.setSelection(Scroll_Position);
-                            if (Gone) {
-                                TasksAdapter ad = TasksAdapter.getInstance(getBaseContext());
-                                lvta.setAdapter(ad);
-                                ad.notifyDataSetChanged();
+                            if (lvta != null) {
+                                lvta.setSelection(Scroll_Position);
+                                if (Gone) {
+                                    TasksAdapter ad = TasksAdapter.getInstance(getBaseContext());
+                                    lvta.setAdapter(ad);
+                                    ad.notifyDataSetChanged();
+                                }
                             }
                         }
                     }
@@ -293,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        try {
+//        try {
 
             mPager.setCurrentItem(setTab);
 
@@ -331,11 +335,11 @@ public class MainActivity extends AppCompatActivity {
 //            });
 //        }
 
-        } catch (Exception e) {
-            share.SaveError(e.getMessage());
-            Intent SE = new Intent(this, SendError.class);
-            startService(SE);
-        }
+//        } catch (Exception e) {
+//            share.SaveError(e.getMessage());
+//            Intent SE = new Intent(this, SendError.class);
+//            startService(SE);
+//        }
 
     }
 

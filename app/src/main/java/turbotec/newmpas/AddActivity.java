@@ -42,6 +42,7 @@ public class AddActivity extends AppCompatActivity {
 
 
                 MainActivity.setTab = 1;
+                MainActivity.Gone = true;
                 finish();
 
 

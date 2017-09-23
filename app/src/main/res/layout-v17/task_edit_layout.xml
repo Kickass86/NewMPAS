@@ -154,11 +154,54 @@
 
 
         <LinearLayout
+            android:id="@+id/Row34"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/Row10"
+            android:layout_marginTop="5dp"
+            android:gravity="center">
+
+
+            <CheckBox
+                android:id="@+id/checkboxNotFinished"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:gravity="center"
+                android:text="Not Finished"
+                android:visibility="gone" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/Row33"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/Row34"
+            android:layout_marginTop="5dp"
+            android:gravity="center">
+
+
+            <CheckBox
+                android:id="@+id/checkboxClosed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:gravity="center"
+                android:text="Closed"
+                android:visibility="gone" />
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@id/Row10"
+            android:layout_below="@id/Row33"
             android:gravity="center">
 
 

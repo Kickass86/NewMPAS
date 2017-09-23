@@ -15,6 +15,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dip"
             android:textAlignment="center"
+            android:textColor="#000000"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -56,40 +57,49 @@
             </LinearLayout>
 
 
-            <TextView
-                android:id="@+id/DueDateR"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginEnd="8dip"
-                android:layout_marginStart="8dip"
-                android:layout_marginTop="5dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textSize="16sp" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="2">
 
-            <!--<Spinner-->
-            <!--android:id="@+id/TStatusR"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginBottom="5dp"-->
-            <!--android:layout_marginEnd="8dip"-->
-            <!--android:layout_marginRight="8dip"-->
-            <!--android:layout_marginTop="5dp"-->
-            <!--android:layout_weight="1"-->
-            <!--android:gravity="center"-->
-            <!--android:textSize="16sp" />-->
-            <TextView
-                android:id="@+id/TStatusR"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginEnd="8dip"
-                android:layout_marginStart="8dip"
-                android:layout_marginTop="5dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/DueDateR"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginEnd="8dip"
+                    android:layout_marginStart="8dip"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <!--<Spinner-->
+                <!--android:id="@+id/TStatusR"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginBottom="5dp"-->
+                <!--android:layout_marginEnd="8dip"-->
+                <!--android:layout_marginRight="8dip"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:gravity="center"-->
+                <!--android:textSize="16sp" />-->
+                <TextView
+                    android:id="@+id/TStatusR"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginEnd="8dip"
+                    android:layout_marginStart="8dip"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
 
 
         </LinearLayout>
@@ -114,7 +124,7 @@
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
                 android:gravity="start"
-
+                android:textColor="#000000"
                 android:textSize="16sp" />
         </LinearLayout>
 

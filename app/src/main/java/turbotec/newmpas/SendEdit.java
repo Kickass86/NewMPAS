@@ -50,6 +50,7 @@ public class SendEdit extends AsyncTask {
     String TNameResponsible;
     String TIDResponsible;
     String Report = "";
+    boolean HasResponsible;
     private boolean flag = false;
     private String SOAP_ACTION_EditTask = "EditTask";
     private String WSDL_TARGET_NAMESPACE;
@@ -142,9 +143,9 @@ public class SendEdit extends AsyncTask {
                     + "!!*!!value3=" + TID + "!!*!!value4=" + Subject + "!!*!!value5=" + TDescription
                     + "!!*!!value6=" + DueDate + "!!*!!value7=" + Report + "!!*!!value8=" + TStatus + "!!*!!value9=";
 
-            boolean b = Boolean.valueOf("1".equals(params[6]));
+            HasResponsible = Boolean.valueOf("1".equals(params[6]));
 
-            if (b) {
+            if (HasResponsible) {
                 TIDResponsible = (String) params[7];
                 TNameResponsible = (String) params[8];
 
@@ -195,7 +196,7 @@ public class SendEdit extends AsyncTask {
 
                 values = new ContentValues();
                 values.put(SendDelivered, true);
-                if (!TNameResponsible.isEmpty()) {
+                if (HasResponsible) {
                     values.put(TASK_NameResponsible, TNameResponsible);
                 }
 

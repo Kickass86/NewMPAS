@@ -62,11 +62,11 @@ public class NotificationFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         ListView list = (ListView) view.findViewById(R.id.list_notification);
-        list.setScrollingCacheEnabled(false);
+//        list.setScrollingCacheEnabled(false);
 //        getActivity();
 //        NotificationsAdapter.set(acticity);
-        NotificationsAdapter adapter = NotificationsAdapter.getInstance(getContext());
-
+//        NotificationsAdapter adapter = NotificationsAdapter.getInstance(getContext());
+        MainActivity.AdaptNo = NotificationsAdapter.getInstance(getContext());
 
         TextView tv = (TextView) view.findViewById(R.id.empty1);
         tv.setText("No Message");
@@ -74,7 +74,8 @@ public class NotificationFragment extends Fragment {
 //        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 //        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
 //        recyclerView.setLayoutManager(layoutManager);
-        list.setAdapter(adapter);
+//        list.setAdapter(adapter);
+        list.setAdapter(MainActivity.AdaptNo);
     }
 
 //    private void refreshValuesFromContentProvider() {

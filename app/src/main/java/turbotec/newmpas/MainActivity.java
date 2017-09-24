@@ -42,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     static boolean NFlag = true;
     static boolean TFlag = true;
     static boolean Gone = false;
+
+    static NotificationsAdapter AdaptNo;
+    static TasksAdapter AdaptTa;
     //    List<Boolean> CList = new ArrayList<>(); //Critical
 //    List<Boolean> SSList = new ArrayList<>(); //SendSeen
     //    boolean isSelected = false;
@@ -66,27 +69,30 @@ public class MainActivity extends AppCompatActivity {
 
                 boolean stat = share.GetChange();
                 if (stat) {
-                    int i = intent.getIntExtra("Type", 0);
+//                    int i = intent.getIntExtra("Type", 0);
 
-                    ListView lvno = (ListView) findViewById(R.id.list_notification);
-                    ListView lvta = (ListView) findViewById(R.id.list_task);
+//                    ListView lvno = (ListView) findViewById(R.id.list_notification);
+//                    ListView lvta = (ListView) findViewById(R.id.list_task);
 
                     TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-                    TabLayout.Tab tab = tabLayout.getTabAt(i);
+                    TabLayout.Tab tab = tabLayout.getTabAt(setTab);
                     tab.select();
 
-                    if (i == 0) {
 
-                        NotificationsAdapter ad = NotificationsAdapter.getInstance(context);
-                        lvno.setAdapter(ad);
-                        ad.notifyDataSetChanged();
+//                    if (i == 0) {
 
-                    } else {
+//                        NotificationsAdapter ad = NotificationsAdapter.getInstance(context);
+//                        lvno.setAdapter(ad);
+                    AdaptNo = NotificationsAdapter.getInstance(context);
+                    AdaptNo.notifyDataSetChanged();
 
-                        TasksAdapter ad = TasksAdapter.getInstance(context);
-                        lvta.setAdapter(ad);
-                        ad.notifyDataSetChanged();
-                    }
+//                    } else {
+
+//                        TasksAdapter ad = TasksAdapter.getInstance(context);
+//                        lvta.setAdapter(ad);
+                    AdaptTa = TasksAdapter.getInstance(context);
+                    AdaptTa.notifyDataSetChanged();
+//                    }
                     Log.i("is this ", "BroadcastReceiver");
                     share.SaveChange(false);
                 }
@@ -201,9 +207,10 @@ public class MainActivity extends AppCompatActivity {
                             if (lvno != null) {
                                 lvno.setSelection(Scroll_Position);
                                 if (Gone) {
-                                    NotificationsAdapter ad = NotificationsAdapter.getInstance(getBaseContext());
-                                    lvno.setAdapter(ad);
-                                    ad.notifyDataSetChanged();
+//                                    NotificationsAdapter ad = NotificationsAdapter.getInstance(getBaseContext());
+//                                    lvno.setAdapter(ad);
+                                    AdaptNo = NotificationsAdapter.getInstance(getBaseContext());
+                                    AdaptNo.notifyDataSetChanged();
                                 }
                             }
                         }
@@ -212,9 +219,10 @@ public class MainActivity extends AppCompatActivity {
                             if (lvta != null) {
                                 lvta.setSelection(Scroll_Position);
                                 if (Gone) {
-                                    TasksAdapter ad = TasksAdapter.getInstance(getBaseContext());
-                                    lvta.setAdapter(ad);
-                                    ad.notifyDataSetChanged();
+//                                    TasksAdapter ad = TasksAdapter.getInstance(getBaseContext());
+//                                    lvta.setAdapter(ad);
+                                    AdaptTa = TasksAdapter.getInstance(getBaseContext());
+                                    AdaptTa.notifyDataSetChanged();
                                 }
                             }
                         }
@@ -241,8 +249,9 @@ public class MainActivity extends AppCompatActivity {
                             if (sumN > 0) {
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
-                                        NotificationsAdapter NAda = NotificationsAdapter.getInstance(Myactivity);
-                                        NAda.notifyDataSetChanged();
+//                                        NotificationsAdapter NAda = NotificationsAdapter.getInstance(Myactivity);
+                                        AdaptNo = NotificationsAdapter.getInstance(Myactivity);
+                                        AdaptNo.notifyDataSetChanged();
                                     }
                                 }, 300);
                             }
@@ -253,8 +262,9 @@ public class MainActivity extends AppCompatActivity {
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
 
-                                        TasksAdapter TAda = TasksAdapter.getInstance(Myactivity);
-                                        TAda.notifyDataSetChanged();
+//                                        TasksAdapter TAda = TasksAdapter.getInstance(Myactivity);
+                                        AdaptTa = TasksAdapter.getInstance(Myactivity);
+                                        AdaptTa.notifyDataSetChanged();
                                     }
                                 }, 300);
                             }
@@ -307,17 +317,19 @@ public class MainActivity extends AppCompatActivity {
                 ListView lvno = (ListView) findViewById(R.id.list_notification);
                 ListView lvta = (ListView) findViewById(R.id.list_task);
                 if ((tabLayout.getSelectedTabPosition() == 0) & (lvno != null)) {
-                    NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
-                    lvno.setAdapter(ad);
-                    ad.notifyDataSetChanged();
+//                    NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
+//                    lvno.setAdapter(ad);
+                    AdaptNo = NotificationsAdapter.getInstance(this);
+                    AdaptNo.notifyDataSetChanged();
                     lvno.setSelection(Scroll_Position);
                     Gone = false;
 
                 } else if ((tabLayout.getSelectedTabPosition() == 1) & (lvta != null)) {
 
-                    TasksAdapter ad = TasksAdapter.getInstance(this);
-                    lvta.setAdapter(ad);
-                    ad.notifyDataSetChanged();
+//                    TasksAdapter ad = TasksAdapter.getInstance(this);
+//                    lvta.setAdapter(ad);
+                    AdaptTa = TasksAdapter.getInstance(this);
+                    AdaptTa.notifyDataSetChanged();
                     lvta.setSelection(Scroll_Position);
                     Gone = false;
                 }
@@ -422,15 +434,16 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < total; i++) {
                 NotiCheckedState[i] = opposite;
             }
-            NotificationsAdapter ad = NotificationsAdapter.getInstance();
-            ad.notifyDataSetChanged();
+            AdaptNo = NotificationsAdapter.getInstance(this);
+            AdaptNo.notifyDataSetChanged();
 
         } else if (tabLayout.getSelectedTabPosition() == 1) {
             for (int i = 0; i < total; i++) {
                 TaskCheckedState[i] = opposite;
             }
-            TasksAdapter ad = TasksAdapter.getInstance(this);
-            ad.notifyDataSetChanged();
+//            TasksAdapter ad = TasksAdapter.getInstance(this);
+            AdaptTa = TasksAdapter.getInstance(this);
+            AdaptTa.notifyDataSetChanged();
         }
 
         invalidateOptionsMenu();
@@ -458,9 +471,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
-            lvno.setAdapter(ad);
-            ad.notifyDataSetChanged();
+//            NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
+//            lvno.setAdapter(ad);
+            AdaptNo = NotificationsAdapter.getInstance(this);
+            AdaptNo.notifyDataSetChanged();
 
         } else if (tabLayout.getSelectedTabPosition() == 1) {
             for (int i = 0; i < TaskCheckedState.length; i++) {
@@ -474,9 +488,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            TasksAdapter ad = TasksAdapter.getInstance(this);
-            lvta.setAdapter(ad);
-            ad.notifyDataSetChanged();
+//            TasksAdapter ad = TasksAdapter.getInstance(this);
+//            lvta.setAdapter(ad);
+            AdaptTa = TasksAdapter.getInstance(this);
+            AdaptTa.notifyDataSetChanged();
                 }
 
         invalidateOptionsMenu();
@@ -510,9 +525,10 @@ public class MainActivity extends AppCompatActivity {
                 NotiCheckedState[i] = false;
             }
 
-            NotificationsAdapter ad = NotificationsAdapter.getInstance(getApplication());
-            lvno.setAdapter(ad);
-            ad.notifyDataSetChanged();
+//            NotificationsAdapter ad = NotificationsAdapter.getInstance(getApplication());
+//            lvno.setAdapter(ad);
+            AdaptNo = NotificationsAdapter.getInstance(getApplication());
+            AdaptNo.notifyDataSetChanged();
         } else if (tabLayout.getSelectedTabPosition() == 1) {
             for (int i = 0; i < TaskCheckedState.length; i++) {
 
@@ -527,9 +543,10 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < TaskCheckedState.length; i++) {
                 TaskCheckedState[i] = false;
             }
-            TasksAdapter ad = TasksAdapter.getInstance(getApplication());
-            lvta.setAdapter(ad);
-            ad.notifyDataSetChanged();
+//            TasksAdapter ad = TasksAdapter.getInstance(getApplication());
+//            lvta.setAdapter(ad);
+            AdaptTa = TasksAdapter.getInstance(getApplication());
+            AdaptTa.notifyDataSetChanged();
                 }
 
         invalidateOptionsMenu();
@@ -607,9 +624,10 @@ public class MainActivity extends AppCompatActivity {
                     NotiCheckedState[i] = false;
                 }
 
-                NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
-                lvno.setAdapter(ad);
-                ad.notifyDataSetChanged();
+//                NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
+//                lvno.setAdapter(ad);
+                AdaptNo = NotificationsAdapter.getInstance(this);
+                AdaptNo.notifyDataSetChanged();
             }
         } else if (tabLayout.getSelectedTabPosition() == 1) {
             for (boolean i : TaskCheckedState) {
@@ -622,9 +640,10 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < TaskCheckedState.length; i++) {
                     TaskCheckedState[i] = false;
                 }
-                TasksAdapter ad = TasksAdapter.getInstance(this);
-                lvta.setAdapter(ad);
-                ad.notifyDataSetChanged();
+//                TasksAdapter ad = TasksAdapter.getInstance(this);
+//                lvta.setAdapter(ad);
+                AdaptTa = TasksAdapter.getInstance(this);
+                AdaptTa.notifyDataSetChanged();
             }
         }
         if (!fl) {

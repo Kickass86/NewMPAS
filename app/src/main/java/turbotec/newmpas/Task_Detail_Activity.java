@@ -23,6 +23,7 @@ public class Task_Detail_Activity extends AppCompatActivity {
     static final String URL1 = "content://" + PROVIDER_NAME + "/tasks/";
     //    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
+    static boolean BackFlag = true;
     String Subject;
     String Creator;
     String DueDate;
@@ -30,9 +31,6 @@ public class Task_Detail_Activity extends AppCompatActivity {
     String TDescription;
     String TNameResponsible;
     String Report = "";
-
-    boolean BackFlag = true;
-
     boolean TEditable;
     boolean TReplyable;
     boolean TisCreator;

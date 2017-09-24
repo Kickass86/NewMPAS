@@ -43,6 +43,9 @@ public class AddActivity extends AppCompatActivity {
 
                 MainActivity.setTab = 1;
                 MainActivity.Gone = true;
+                Intent in = new Intent(context, MainActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(in);
                 finish();
 
 

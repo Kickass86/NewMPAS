@@ -110,6 +110,8 @@ public class SyncService extends IntentService {
 
     private boolean SendSeen;
     private String TaskID;
+    private String[] DeletedTIDs;
+    private int ind = 0;
     private String TaskTitle;
     private String TaskDescription;
     private String TaskDueDate;
@@ -546,6 +548,11 @@ public class SyncService extends IntentService {
             e.getStackTrace();
         }
 
+//        for(int i = 0; i < DeletedTIDs.length; i++){
+//            TIDs = TIDs + DeletedTIDs[i] + ";";
+//        }
+//        num = num + DeletedTIDs.length;
+
 
         if (num > 0) {
             String Status = "0";
@@ -598,9 +605,14 @@ public class SyncService extends IntentService {
                     getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
                 }
                 String[] TDs = TIDs.split(";");
+
                 for (String TID : TDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
                     getContentResolver().update(CONTENT_URI3, values, "_id  = ?", new String[]{TID});
+
+                }
+                for (String TID : DeletedTIDs) {
+                    getContentResolver().delete(CONTENT_URI3, "_id  = ?", new String[]{String.valueOf(TID)});
                 }
 
             } else if (response.toString().contains(MyContext.getString(R.string.Seen))) {
@@ -608,16 +620,20 @@ public class SyncService extends IntentService {
                 ContentValues values = new ContentValues();
 //            values.put("SendSeen", true);
                 values.put(SendDelivered, true);
-                String[] MIDs = IDs.split(";");
-                for (String MID : MIDs) {
-//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
-                    getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
-                }
                 String[] TDs = TIDs.split(";");
                 for (String TID : TDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
                     getContentResolver().update(CONTENT_URI3, values, "_id  = ?", new String[]{TID});
                 }
+
+                values.put("SendSeen", true);
+
+                String[] MIDs = IDs.split(";");
+                for (String MID : MIDs) {
+//                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
+                    getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
+                }
+
             }
         }
 
@@ -632,6 +648,7 @@ public class SyncService extends IntentService {
 //            FLag = "OK";
             Change = "OK";
             FlagChange = true;
+            MainActivity.setTab = 1;
 
 
             SoapObject Task = (SoapObject) tasks.getProperty(index);
@@ -665,7 +682,13 @@ public class SyncService extends IntentService {
                 if ((c.getCount() > 0) & (c.moveToFirst())) {
                     if (TaskStatus == 0) {
 
-                        getContentResolver().delete(CONTENT_URI3, "_id  = ?", new String[]{String.valueOf(TaskID)});
+//                        getContentResolver().delete(CONTENT_URI3, "_id  = ?", new String[]{String.valueOf(TaskID)});
+                        ContentValues v = new ContentValues();
+                        v.put(SendDelivered, false);
+
+                        getContentResolver().update(CONTENT_URI3, v, "_id  = ?", new String[]{String.valueOf(TaskID)});
+                        DeletedTIDs[ind] = TaskID;
+                        ind++;
                         index++;
                         if (index >= tasks.getPropertyCount()) {
                             c.close();
@@ -687,7 +710,7 @@ public class SyncService extends IntentService {
                         values.put(TASK_isResponsible, TisResponsible);
                         values.put(TASK_NameResponsible, TNameResponsible);
                         values.put(SendInsert, false);
-                        values.put(SendDelivered, false);
+                        values.put(SendDelivered, true);
                         values.put(Report, TReport);
                         values.put(isSeen, false);
 
@@ -800,6 +823,7 @@ public class SyncService extends IntentService {
 //            FLag = "OK";
             Change = "OK";
             FlagChange = true;
+            MainActivity.setTab = 0;
 
 
             SoapObject Message = (SoapObject) message.getProperty(index);

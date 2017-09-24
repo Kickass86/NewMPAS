@@ -58,6 +58,9 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
                 MainActivity.setTab = 1;
                 MainActivity.Gone = true;
+                Intent in = new Intent(context, MainActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(in);
                 finish();
 
 
@@ -324,6 +327,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
 
                         SendEdit se = new SendEdit(getBaseContext());
+                        Task_Detail_Activity.BackFlag = false;
                         invalidateOptionsMenu();
 
                         se.execute(Taskdata);
@@ -396,6 +400,8 @@ public class Task_Edit_Activity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
+                        setContentView(R.layout.waiting_layout);
+
                         Report = RE.getText().toString();
                         boolean b = CBF.isChecked();
                         if (b) {
@@ -423,6 +429,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
                         String[] TaskData = {TID, Subject, TDescription, DueDate, Report, String.valueOf(TStatus), "0"};
 
                         SendEdit se = new SendEdit(getBaseContext());
+                        Task_Detail_Activity.BackFlag = false;
                         invalidateOptionsMenu();
 
                         se.execute(TaskData);

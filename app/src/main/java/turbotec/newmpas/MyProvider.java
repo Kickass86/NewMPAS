@@ -45,7 +45,9 @@ public class MyProvider extends ContentProvider {
     private static final String MESSAGE_Title = "MessageTitle";
     private static final String MESSAGE_BODY = "MessageBody";
     private static final String INSERT_DATE = "InsertDate";
+    private static final String Link = "Link";
     private static final String Critical = "Critical";
+    private static final String WillDeleted = "WillDeleted";
     private static final String Seen = "Seen";
     private static final String SendSeen = "SendSeen";
     private static final String SendDelivered = "SendDelivered";
@@ -54,7 +56,7 @@ public class MyProvider extends ContentProvider {
                     MESSAGE_ID + " INTEGER PRIMARY KEY," +
                     MESSAGE_Title + " TEXT," + MESSAGE_BODY + " TEXT," + INSERT_DATE +
                     " TEXT," + Critical + " Boolean," + Seen + " Boolean,"
-                    + SendDelivered + " Boolean," + SendSeen + " Boolean)";
+                    + SendDelivered + " Boolean," + SendSeen + " Boolean, " + WillDeleted + " Boolean, " + Link + "TEXT)";
     private static final String TASK_ID = "_id";
     private static final String TASK_Title = "TaskTitle";
     private static final String Task_Description = "TaskDescription";
@@ -261,7 +263,7 @@ public class MyProvider extends ContentProvider {
     class DatabaseHandler extends SQLiteOpenHelper {
 
 
-        private static final int DATABASE_VERSION = 6;
+        private static final int DATABASE_VERSION = 7;
 
 
         private DatabaseHandler(Context context) {

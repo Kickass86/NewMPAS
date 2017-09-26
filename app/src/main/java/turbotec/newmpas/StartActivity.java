@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
@@ -18,6 +20,12 @@ import java.io.File;
 import io.fabric.sdk.android.Fabric;
 
 public class StartActivity extends AppCompatActivity {
+
+    static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
+    static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
+    static final String URL2 = "content://" + PROVIDER_NAME + "/tasks/";
+    static final Uri CONTENT_URI1 = Uri.parse(URL1);
+    static final Uri CONTENT_URI2 = Uri.parse(URL2);
 
     private SharedPreferenceHandler share;
     private PendingIntent pendingIntent;
@@ -35,7 +43,20 @@ public class StartActivity extends AppCompatActivity {
 
         try {
 
-
+            if (share.GetName().equals(getString(R.string.defaultValue)) & (!share.GetError().equals(getString(R.string.app_name)))) {
+                if (Build.VERSION_CODES.KITKAT <= Build.VERSION.SDK_INT) {
+//                    ((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE)).clearApplicationUserData();
+                    share.ClearAll();
+                    getContentResolver().delete(CONTENT_URI1, null, null);
+                    getContentResolver().delete(CONTENT_URI2, null, null);
+                    share.SaveError(getString(R.string.app_name));
+                } else {
+                    share.ClearAll();
+                    getContentResolver().delete(CONTENT_URI1, null, null);
+                    getContentResolver().delete(CONTENT_URI2, null, null);
+                    share.SaveError(getString(R.string.app_name));
+                }
+            }
 
 
             String fv = share.GetFileVersion();
@@ -61,10 +82,12 @@ public class StartActivity extends AppCompatActivity {
                 if ((myFile.exists()) & (VersionCode < v)) {
                     Intent InstallIntent = new Intent(this, InstallActivity.class);
                     InstallIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    InstallIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     Bundle bundle = new Bundle();
                     bundle.putString(getString(R.string.MyFile), MyFileAddress);
                     InstallIntent.putExtras(bundle);
                     startActivity(InstallIntent);
+                    overridePendingTransition(0, 0);
                     finish();
                     return;
                 }
@@ -98,6 +121,7 @@ public class StartActivity extends AppCompatActivity {
                     Intent intent = new Intent(this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+                    overridePendingTransition(0, 0);
                     finish();
                     return;
                 }
@@ -118,10 +142,11 @@ public class StartActivity extends AppCompatActivity {
                 case Not_Saved:
                 default: {
                     Intent intent = new Intent(this, LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
-//                    finish();
-//                    return;
+                    overridePendingTransition(0, 0);
+                    finish();
+                    return;
                 }
 
             }

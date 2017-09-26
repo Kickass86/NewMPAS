@@ -138,6 +138,13 @@ public class SharedPreferenceHandler {
         editor.apply();
     }
 
+    public void SaveTabControl(String tabsControl) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(context.getString(R.string.TabsControl), tabsControl);
+        editor.apply();
+    }
+
 
     public void SaveStatus(String newDeviceID) {
 
@@ -233,6 +240,14 @@ public class SharedPreferenceHandler {
     }
 
 
+    public String GetTabsControl() {
+
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
+        return sharedPref.getString(context.getString(R.string.TabsControl), context.getString(R.string.defaultValue));
+
+    }
+
+
 //    public String GetUserID() {
 //
 //        SharedPreferences sharedPref = main_menu.getSharedPreferences(main_menu.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
@@ -287,5 +302,15 @@ public class SharedPreferenceHandler {
         return sharedPref.getString(context.getString(R.string.Password), context.getString(R.string.defaultValue));
 
     }
+
+
+    public void ClearAll() {
+        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
+        preferences.edit().clear().commit();
+
+        preferences = context.getSharedPreferences(context.getString(R.string.Username_Password_File), Context.MODE_PRIVATE);
+        preferences.edit().clear().commit();
+    }
+
 
 }

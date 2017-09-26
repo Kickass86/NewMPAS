@@ -79,6 +79,7 @@ public class SendEdit extends AsyncTask {
             Intent intent = new Intent(MyContext.getApplicationContext(), MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
             MyContext.startActivity(intent);
+//            MyContext.overridePendingTransition (0, 0);
         }
     }
 
@@ -204,7 +205,7 @@ public class SendEdit extends AsyncTask {
                 values.put(TASK_Title, Subject);
                 values.put(Task_Description, TDescription);
                 values.put(TASK_DueDate, DueDate);
-//                values.put(TASK_Creator, share.GetName());
+//                values.put(TASK_Creator,share.GetName());
                 if (TStatus == 1) {
                     TStatus = 2;
                 }
@@ -225,6 +226,7 @@ public class SendEdit extends AsyncTask {
                 values.put(Task_Description, TDescription);
                 values.put(TASK_DueDate, DueDate);
                 values.put(TASK_NameResponsible, TNameResponsible);
+                values.put(TASK_Creator, share.GetName());
                 values.put(TASK_Status, TStatus);
                 values.put(TASK_isCreator, true);
                 values.put(TASK_Deletable, true);

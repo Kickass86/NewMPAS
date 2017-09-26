@@ -178,7 +178,13 @@ public class Task_Detail_Activity extends AppCompatActivity {
                                     String[] Taskdata = {TID, Subject, TDescription, DueDate, Report, "0", "0"};
 
                                     SendEdit se = new SendEdit(getBaseContext());
-                                    BackFlag = false;
+
+//                                    getActionBar().setHomeButtonEnabled(false);
+//                                    getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(false);
+//                                    getSupportActionBar().setHomeButtonEnabled(false);
+                                    getSupportActionBar().setDisplayHomeAsUpEnabled(false); // remove the left caret
+                                    getSupportActionBar().setDisplayShowHomeEnabled(false);
+//                                    BackFlag = false;
                                     invalidateOptionsMenu();
 
                                     se.execute(Taskdata);
@@ -237,6 +243,7 @@ public class Task_Detail_Activity extends AppCompatActivity {
                     EditActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                     activity.startActivity(EditActivity);
+                    overridePendingTransition(0, 0);
                     finish();
 
 
@@ -272,6 +279,7 @@ public class Task_Detail_Activity extends AppCompatActivity {
                     EditActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                     activity.startActivity(EditActivity);
+                    overridePendingTransition(0, 0);
                     finish();
 
 
@@ -302,7 +310,7 @@ public class Task_Detail_Activity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (BackFlag) {
+//        if (BackFlag) {
             switch (item.getItemId()) {
                 case android.R.id.home:
                     NavUtils.navigateUpFromSameTask(this);
@@ -310,8 +318,11 @@ public class Task_Detail_Activity extends AppCompatActivity {
                 default:
                     return super.onOptionsItemSelected(item);
             }
-        }
-        return true;
+//        }else
+//        {
+//
+//        }
+//        return true;
     }
 
 

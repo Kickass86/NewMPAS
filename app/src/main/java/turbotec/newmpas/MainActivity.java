@@ -26,6 +26,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
     static final String URL2 = "content://" + PROVIDER_NAME + "/tasks/";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
     static final Uri CONTENT_URI2 = Uri.parse(URL2);
-    private static final int NUM_PAGES = 2;
+    static final int NUM_PAGES = 2;
+    static final String[] TABS_Names = {"Messages", "Tasks"};
     static boolean[] NotiCheckedState;
     static boolean[] TaskCheckedState;
     static int Scroll_Position = 0;
@@ -75,8 +78,9 @@ public class MainActivity extends AppCompatActivity {
 //                    ListView lvta = (ListView) findViewById(R.id.list_task);
 
                     TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-                    TabLayout.Tab tab = tabLayout.getTabAt(setTab);
-                    tab.select();
+                    tabLayout.getTabAt(setTab).select();
+//                    TabLayout.Tab tab = tabLayout.getTabAt(setTab);
+//                    tab.select();
 
 
 //                    if (i == 0) {
@@ -148,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
                                     Gone = true;
                                     setTab = 0;
                                     startActivity(showActivity);
+                                    overridePendingTransition(0, 0);
                                 }
                         } else {
                             Intent showActivity = new Intent(MainActivity.this, Task_Detail_Activity.class);
@@ -172,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
 //                            Log.i("Task Detail", Tlist.get(position));
 //                    finish();
                             startActivity(showActivity);
+                            overridePendingTransition(0, 0);
                         }
                     }
                 }
@@ -184,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             List<Fragment> fragments = new Vector<>();
+            //add Dynamic Tabs here
             fragments.add(Fragment.instantiate(this, NotificationFragment.class.getName()));
             fragments.add(Fragment.instantiate(this, TaskFragment.class.getName()));
 
@@ -197,36 +204,41 @@ public class MainActivity extends AppCompatActivity {
 
             mPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
             tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+//                @Override
+//                public void onTabSelected(TabLayout.Tab tab) {
+////                    setTab = tab.getPosition();
+//                    //do stuff here
+//                    switch (tab.getPosition()) {
+//                        case 0: {
+//                            ListView lvno = (ListView) findViewById(R.id.list_notification);
+//                            if (lvno != null) {
+//                                lvno.setSelection(Scroll_Position);
+//                                if (Gone) {
+////                                    NotificationsAdapter ad = NotificationsAdapter.getInstance(getBaseContext());
+////                                    lvno.setAdapter(ad);
+//                                    AdaptNo = NotificationsAdapter.getInstance(getBaseContext());
+//                                    AdaptNo.notifyDataSetChanged();
+//                                }
+//                            }
+//                        }
+//                        case 1: {
+//                            ListView lvta = (ListView) findViewById(R.id.list_task);
+//                            if (lvta != null) {
+//                                lvta.setSelection(Scroll_Position);
+//                                if (Gone) {
+////                                    TasksAdapter ad = TasksAdapter.getInstance(getBaseContext());
+////                                    lvta.setAdapter(ad);
+//                                    AdaptTa = TasksAdapter.getInstance(getBaseContext());
+//                                    AdaptTa.notifyDataSetChanged();
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
-//                    setTab = tab.getPosition();
-                    //do stuff here
-                    switch (tab.getPosition()) {
-                        case 0: {
-                            ListView lvno = (ListView) findViewById(R.id.list_notification);
-                            if (lvno != null) {
-                                lvno.setSelection(Scroll_Position);
-                                if (Gone) {
-//                                    NotificationsAdapter ad = NotificationsAdapter.getInstance(getBaseContext());
-//                                    lvno.setAdapter(ad);
-                                    AdaptNo = NotificationsAdapter.getInstance(getBaseContext());
-                                    AdaptNo.notifyDataSetChanged();
-                                }
-                            }
-                        }
-                        case 1: {
-                            ListView lvta = (ListView) findViewById(R.id.list_task);
-                            if (lvta != null) {
-                                lvta.setSelection(Scroll_Position);
-                                if (Gone) {
-//                                    TasksAdapter ad = TasksAdapter.getInstance(getBaseContext());
-//                                    lvta.setAdapter(ad);
-                                    AdaptTa = TasksAdapter.getInstance(getBaseContext());
-                                    AdaptTa.notifyDataSetChanged();
-                                }
-                            }
-                        }
-                    }
+
                 }
 
                 @Override
@@ -301,40 +313,43 @@ public class MainActivity extends AppCompatActivity {
 
         outState.putBoolean("first", first);
         super.onSaveInstanceState(outState);
-        }
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
 
 //        try {
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancelAll();
 
-            mPager.setCurrentItem(setTab);
+        mPager.setCurrentItem(setTab);
 
-            NFlag = true;
-            TFlag = true;
-            if (Gone) {
-                ListView lvno = (ListView) findViewById(R.id.list_notification);
-                ListView lvta = (ListView) findViewById(R.id.list_task);
-                if ((tabLayout.getSelectedTabPosition() == 0) & (lvno != null)) {
+        NFlag = true;
+        TFlag = true;
+        if (Gone) {
+            ListView lvno = (ListView) findViewById(R.id.list_notification);
+            ListView lvta = (ListView) findViewById(R.id.list_task);
+            if ((tabLayout.getSelectedTabPosition() == 0) & (lvno != null)) {
 //                    NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
 //                    lvno.setAdapter(ad);
-                    AdaptNo = NotificationsAdapter.getInstance(this);
-                    AdaptNo.notifyDataSetChanged();
-                    lvno.setSelection(Scroll_Position);
-                    Gone = false;
+                AdaptNo = NotificationsAdapter.getInstance(this);
+                AdaptNo.notifyDataSetChanged();
+                lvno.setSelection(Scroll_Position);
+                Gone = false;
 
-                } else if ((tabLayout.getSelectedTabPosition() == 1) & (lvta != null)) {
+            } else if ((tabLayout.getSelectedTabPosition() == 1) & (lvta != null)) {
 
 //                    TasksAdapter ad = TasksAdapter.getInstance(this);
 //                    lvta.setAdapter(ad);
-                    AdaptTa = TasksAdapter.getInstance(this);
-                    AdaptTa.notifyDataSetChanged();
-                    lvta.setSelection(Scroll_Position);
-                    Gone = false;
-                }
-
+                AdaptTa = TasksAdapter.getInstance(this);
+                AdaptTa.notifyDataSetChanged();
+                lvta.setSelection(Scroll_Position);
+                Gone = false;
             }
+
+        }
 
 //        ListView lv = (ListView) findViewById(R.id.list_notification);
 //        if ((tabLayout.getSelectedTabPosition() == 0)&(lv != null)) {
@@ -492,7 +507,7 @@ public class MainActivity extends AppCompatActivity {
 //            lvta.setAdapter(ad);
             AdaptTa = TasksAdapter.getInstance(this);
             AdaptTa.notifyDataSetChanged();
-                }
+        }
 
         invalidateOptionsMenu();
 //            }
@@ -547,7 +562,7 @@ public class MainActivity extends AppCompatActivity {
 //            lvta.setAdapter(ad);
             AdaptTa = TasksAdapter.getInstance(getApplication());
             AdaptTa.notifyDataSetChanged();
-                }
+        }
 
         invalidateOptionsMenu();
 //            }
@@ -657,12 +672,14 @@ public class MainActivity extends AppCompatActivity {
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
 
+        String Enable;
         private List<Fragment> mfragments;
 
         //On fournit à l'adapter la liste des mfragments à afficher
         public ScreenSlidePagerAdapter(FragmentManager fm, List fragments) {
             super(fm);
             this.mfragments = fragments;
+            Enable = share.GetTabsControl();
         }
 
         @Override
@@ -679,19 +696,43 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public int getCount() {
 //            return this.mfragments.size();
-            return NUM_PAGES;
+            int num = 0;
+            for (int i = 0; i < NUM_PAGES; i++) {
+                if ("1".equals(Enable.charAt(i))) {
+                    num++;
+                }
+            }
+            return num;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            String title = null;
-            if (position == 0) {
-                title = "Notifications";
-            } else if (position == 1) {
-                title = "Tasks";
-            }
-            return title;
+//            String title = null;
+//            if (position == 0) {
+//                title = "Notifications";
+//            } else if (position == 1) {
+//                title = "Tasks";
+//            }
+//            return title;
+//            String Enable = share.GetTabsControl();
+            int num = findNthIndexOf(Enable, "1", position);
+            return TABS_Names[num];
 //            return super.getPageTitle(position);
+        }
+
+        public int findNthIndexOf(String str, String needle, int occurence)
+                throws IndexOutOfBoundsException {
+            int index = -1;
+            Pattern p = Pattern.compile(needle, Pattern.MULTILINE);
+            Matcher m = p.matcher(str);
+            while (m.find()) {
+                if (--occurence == 0) {
+                    index = m.start();
+                    break;
+                }
+            }
+            if (index < 0) throw new IndexOutOfBoundsException();
+            return index;
         }
 
 

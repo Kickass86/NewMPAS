@@ -17,4 +17,9 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="NoDarkPreview" parent="Theme.AppCompat">
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+
+
 </resources>

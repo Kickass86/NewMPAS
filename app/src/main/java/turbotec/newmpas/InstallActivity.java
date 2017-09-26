@@ -34,6 +34,7 @@ public class InstallActivity extends AppCompatActivity {
                             "application/vnd.android.package-archive");
                     installIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(installIntent);
+                    overridePendingTransition(0, 0);
                     finish();
                 }
             }

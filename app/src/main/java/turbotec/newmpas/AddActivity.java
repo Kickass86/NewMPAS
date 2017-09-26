@@ -45,6 +45,8 @@ public class AddActivity extends AppCompatActivity {
                 MainActivity.Gone = true;
                 Intent in = new Intent(context, MainActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                overridePendingTransition(0, 0);
                 startActivity(in);
                 finish();
 
@@ -71,7 +73,7 @@ public class AddActivity extends AppCompatActivity {
     String my_var;
     //    private String UserListURL;
     private String IDResponsible;
-    private String NameResponsible;
+    private String NameResponsible = "";
     private String[] Responsible;
     //    private URL url;
     private EditText DateAdd;

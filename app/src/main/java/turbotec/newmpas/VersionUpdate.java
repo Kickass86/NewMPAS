@@ -82,6 +82,7 @@ public class VersionUpdate extends Service {
                             bundle.putString(getString(R.string.MyFile), MyFileAddress);
                             InstallIntent.putExtras(bundle);
                             startActivity(InstallIntent);
+//                            overridePendingTransition (0, 0);
 
 
                         }
@@ -244,7 +245,11 @@ public class VersionUpdate extends Service {
                     }
                     c.disconnect();
                     if (!(s.contains("Invalid") | s.contains("Error") | s.contains("Unable") | (s.contains("unexpected")))) {
-                        responseMessage = Integer.valueOf(s);
+
+                        String[] resp = s.split("-@-");
+                        responseMessage = Integer.valueOf(resp[0]);
+                        String TabsControl = resp[1];
+                        share.SaveTabControl(TabsControl);
                     } else {
                         responseMessage = 0;
                     }
@@ -301,6 +306,7 @@ public class VersionUpdate extends Service {
                     bundle.putString(getString(R.string.MyFile), MyFileAddress);
                     InstallIntent.putExtras(bundle);
                     startActivity(InstallIntent);
+//                    overridePendingTransition (0, 0);
 
                 } else {
 
@@ -324,6 +330,7 @@ public class VersionUpdate extends Service {
                                 bundle.putString(getString(R.string.MyFile), MyFileAddress);
                                 InstallIntent.putExtras(bundle);
                                 startActivity(InstallIntent);
+//                                overridePendingTransition (0, 0);
 
                             } else {
 

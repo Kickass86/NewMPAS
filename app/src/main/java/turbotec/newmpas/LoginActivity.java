@@ -54,12 +54,14 @@ public class LoginActivity extends AppCompatActivity {
                     intent = new Intent(context, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+                    overridePendingTransition(0, 0);
                     finish();
 
 //                    Log.i("is this ", "BroadcastReceiver");
                 }
                 else{
                     startActivity(new Intent(context, LoginActivity.class));
+                    overridePendingTransition(0, 0);
                     finish();
                 }
 
@@ -179,6 +181,7 @@ public class LoginActivity extends AppCompatActivity {
                     Intent intent = new Intent(this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+                    overridePendingTransition(0, 0);
 
 
                     break;

@@ -61,6 +61,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
                 Intent in = new Intent(context, MainActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(in);
+                overridePendingTransition(0, 0);
                 finish();
 
 
@@ -304,6 +305,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
 
                             EditActivity.putExtras(bundle);
                             startActivity(new Intent(getBaseContext(), Task_Edit_Activity.class));
+                            overridePendingTransition(0, 0);
                             finish();
                             return;
                         }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,7 +68,7 @@ static List<Boolean> CList = new ArrayList<>();
 
     static void Initialize() {
 
-        Cursor cursor = activity.getContentResolver().query(CONTENT_URI1, null, null, null, null);
+        Cursor cursor = activity.getContentResolver().query(CONTENT_URI1, null, "WillDeleted = ?", new String[]{"0"}, null);
 
         Tlist = new ArrayList<>();
         Mlist = new ArrayList<>();
@@ -239,6 +240,15 @@ static List<Boolean> CList = new ArrayList<>();
                 } else {
 
                     v.setBackgroundColor(ContextCompat.getColor(activity.getApplicationContext(), R.color.SelectColor1));
+                    final View vi = v;
+                    final Handler handler = new Handler();
+                    final Runnable r = new Runnable() {
+                        public void run() {
+                            vi.setBackgroundResource(0);
+                        }
+                    };
+
+                    handler.postDelayed(r, 1000);
 
                     Intent showActivity = new Intent(activity, Message_Detail_Activity.class);
                     Bundle bundle = new Bundle();
@@ -254,6 +264,7 @@ static List<Boolean> CList = new ArrayList<>();
                     showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //                    finish();
                     activity.startActivity(showActivity);
+                    activity.overridePendingTransition(0, 0);
                 }
 
 

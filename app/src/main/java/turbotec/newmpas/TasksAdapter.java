@@ -291,6 +291,7 @@ public class TasksAdapter extends BaseAdapter {
                     Log.i("Task Detail", Tlist.get(position));
 //                    finish();
                     activity.startActivity(showActivity);
+                    activity.overridePendingTransition(0, 0);
                 }
 
 

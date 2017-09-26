@@ -4,6 +4,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="PREFERENCE_FILE">turbotec.mpas.PREFERENCE_FILE</string>
+    <string name="TabsControl">TabsControl</string>
     <string name="DeviceID">Device Unique ID</string>
     <string name="Change">Change</string>
     <string name="Token">Token</string>

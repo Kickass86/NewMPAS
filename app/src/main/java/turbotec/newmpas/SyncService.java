@@ -59,8 +59,10 @@ public class SyncService extends IntentService {
     private static final String MESSAGE_BODY = "MessageBody";
     private static final String INSERT_DATE = "InsertDate";
     private static final String Critical = "Critical";
+    private static final String Link = "Link";
     private static final String Seen1 = "Seen";
     private static final String SSeen = "SendSeen";
+    private static final String WillDeleted = "WillDeleted";
 
 
     private static final String TASK_ID = "_id";
@@ -95,6 +97,7 @@ public class SyncService extends IntentService {
     private SoapSerializationEnvelope envelopeDel;
     private Object response;
     private boolean isCritical = false;
+    private boolean Deleted = false;
     private String Change;
     private boolean isDuplicate = false;
     private boolean FlagChange = false;
@@ -643,12 +646,14 @@ public class SyncService extends IntentService {
 
 
         int index = 0;
+        DeletedTIDs = new String[tasks.getPropertyCount()];
         while (index < tasks.getPropertyCount()) {
 
 //            FLag = "OK";
             Change = "OK";
             FlagChange = true;
             MainActivity.setTab = 1;
+
 
 
             SoapObject Task = (SoapObject) tasks.getProperty(index);
@@ -834,6 +839,8 @@ public class SyncService extends IntentService {
             MessageBody = Message.getProperty(2).toString().trim();
             InsertDate = Message.getProperty(3).toString();
             isCritical = Boolean.valueOf(Message.getProperty(4).toString());
+            Deleted = Boolean.valueOf(Message.getProperty(5).toString());
+//            Link         = Message.getProperty(6).toString();
             Seen = false;
 //            SendDelivered = false;
             SendSeen = false;
@@ -844,6 +851,13 @@ public class SyncService extends IntentService {
                     index++;
                     if (index >= message.getPropertyCount()) {
                         c.close();
+                    }
+                    if (Deleted) {
+                        ContentValues contentValues = new ContentValues();
+
+                        contentValues.put(SendDelivered, false);
+                        contentValues.put(WillDeleted, Deleted);
+                        getContentResolver().update(CONTENT_URI1, contentValues, "_id  = ?", new String[]{String.valueOf(MessageID)});
                     }
                     continue;
                 }
@@ -918,6 +932,8 @@ public class SyncService extends IntentService {
             contentValues.put(MESSAGE_BODY, Message.getProperty(2).toString().trim());
             contentValues.put(INSERT_DATE, Message.getProperty(3).toString());
             contentValues.put(Critical, Boolean.valueOf(Message.getProperty(4).toString()));
+            contentValues.put(WillDeleted, Boolean.valueOf(Message.getProperty(5).toString()));
+            contentValues.put(Link, Boolean.valueOf(Message.getProperty(6).toString()));
             contentValues.put(Seen1, false);
             contentValues.put(SendDelivered, false);
             contentValues.put(SSeen, false);

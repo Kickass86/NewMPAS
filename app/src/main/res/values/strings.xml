@@ -11,6 +11,7 @@
     <string name="Name">Name</string>
     <string name="FileVersion">FileVersion</string>
     <string name="defaultValue">Not_Saved</string>
+    <string name="defaultTabs">11</string>
     <string name="ErrorMessage">ErrorMessage</string>
     <string name="Username">Username</string>
     <string name="Activation">Activation</string>

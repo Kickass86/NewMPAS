@@ -243,7 +243,7 @@ public class SharedPreferenceHandler {
     public String GetTabsControl() {
 
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
-        return sharedPref.getString(context.getString(R.string.TabsControl), context.getString(R.string.defaultValue));
+        return sharedPref.getString(context.getString(R.string.TabsControl), context.getString(R.string.defaultTabs));
 
     }
 

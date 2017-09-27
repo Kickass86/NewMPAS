@@ -933,7 +933,7 @@ public class SyncService extends IntentService {
             contentValues.put(INSERT_DATE, Message.getProperty(3).toString());
             contentValues.put(Critical, Boolean.valueOf(Message.getProperty(4).toString()));
             contentValues.put(WillDeleted, Boolean.valueOf(Message.getProperty(5).toString()));
-            contentValues.put(Link, Boolean.valueOf(Message.getProperty(6).toString()));
+            contentValues.put(Link, Message.getProperty(6).toString());
             contentValues.put(Seen1, false);
             contentValues.put(SendDelivered, false);
             contentValues.put(SSeen, false);

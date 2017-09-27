@@ -110,6 +110,21 @@ public class MainActivity extends AppCompatActivity {
     private ScreenSlidePagerAdapter mPagerAdapter;
     private TabLayout tabLayout;
 
+    public static int findNthIndexOf(String str, String needle, int occurence)
+            throws IndexOutOfBoundsException {
+        int index = -1;
+        Pattern p = Pattern.compile(needle, Pattern.MULTILINE);
+        Matcher m = p.matcher(str);
+        while (m.find()) {
+            if (--occurence == 0) {
+                index = m.start();
+                break;
+            }
+        }
+        if (index < 0) throw new IndexOutOfBoundsException();
+        return index;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -382,18 +397,42 @@ public class MainActivity extends AppCompatActivity {
 //        mMenu = menu;
         int sum = 0;
         int total = 0;
-        if (tabLayout.getSelectedTabPosition() == 0) {
-            for (boolean b : NotiCheckedState) {
-                sum += b ? 1 : 0;
-            }
-            total = NotiCheckedState.length;
+        int num = tabLayout.getSelectedTabPosition();
+        String Enable = share.GetTabsControl();
+        switch (num) {
+            case 0:
+                if (0 == findNthIndexOf(Enable, "1", 1)) {
+                    for (boolean b : NotiCheckedState) {
+                        sum += b ? 1 : 0;
+                    }
+                    total = NotiCheckedState.length;
+                } else {
+                    for (boolean b : TaskCheckedState) {
+                        sum += b ? 1 : 0;
+                    }
+                    total = TaskCheckedState.length;
+                }
+                break;
+            case 1:
+                for (boolean b : TaskCheckedState) {
+                    sum += b ? 1 : 0;
+                }
+                total = TaskCheckedState.length;
+                break;
 
-        } else if (tabLayout.getSelectedTabPosition() == 1) {
-            for (boolean b : TaskCheckedState) {
-                sum += b ? 1 : 0;
-            }
-            total = TaskCheckedState.length;
         }
+//        if (tabLayout.getSelectedTabPosition() == 0) {
+//            for (boolean b : NotiCheckedState) {
+//                sum += b ? 1 : 0;
+//            }
+//            total = NotiCheckedState.length;
+//
+//        } else if (tabLayout.getSelectedTabPosition() == 1) {
+//            for (boolean b : TaskCheckedState) {
+//                sum += b ? 1 : 0;
+//            }
+//            total = TaskCheckedState.length;
+//        }
 
         if (sum > 0) {
             item_read.setVisible(true);
@@ -417,8 +456,6 @@ public class MainActivity extends AppCompatActivity {
 //        mMenu.getItem(1).setVisible(false);
         return true;
     }
-
-
 
     private void MarkAll() {
         boolean opposite = true;
@@ -464,7 +501,6 @@ public class MainActivity extends AppCompatActivity {
         invalidateOptionsMenu();
 
     }
-
 
     private void MarkDelete() {
 
@@ -571,7 +607,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -668,7 +703,6 @@ public class MainActivity extends AppCompatActivity {
         invalidateOptionsMenu();
     }
 
-
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
 
@@ -685,9 +719,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public Fragment getItem(int pos) {
 
-
+            int num = findNthIndexOf(Enable, "1", pos + 1);
             if (mfragments != null) {
-                return mfragments.get(pos);
+                return mfragments.get(num);
             }
             return null;
 
@@ -698,7 +732,7 @@ public class MainActivity extends AppCompatActivity {
 //            return this.mfragments.size();
             int num = 0;
             for (int i = 0; i < NUM_PAGES; i++) {
-                if ("1".equals(Enable.charAt(i))) {
+                if ('1' == (Enable.charAt(i))) {
                     num++;
                 }
             }
@@ -715,32 +749,13 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //            return title;
 //            String Enable = share.GetTabsControl();
-            int num = findNthIndexOf(Enable, "1", position);
+            int num = findNthIndexOf(Enable, "1", position + 1);
             return TABS_Names[num];
 //            return super.getPageTitle(position);
         }
 
-        public int findNthIndexOf(String str, String needle, int occurence)
-                throws IndexOutOfBoundsException {
-            int index = -1;
-            Pattern p = Pattern.compile(needle, Pattern.MULTILINE);
-            Matcher m = p.matcher(str);
-            while (m.find()) {
-                if (--occurence == 0) {
-                    index = m.start();
-                    break;
-                }
-            }
-            if (index < 0) throw new IndexOutOfBoundsException();
-            return index;
-        }
-
 
     }
-
-
-
-
 
 
 

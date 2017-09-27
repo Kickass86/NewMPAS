@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -55,21 +57,86 @@ public class TaskFragment extends Fragment {
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        GetUserList userList = new GetUserList(getContext());
+        userList.execute();
+
         b = (FloatingActionButton) view.findViewById(R.id.fab);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                GetUserList userList = new GetUserList(getContext());
-                userList.execute();
+
 
                 Intent intent = new Intent(getContext(), AddActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                MainActivity.setTab = 1;
+                MainActivity.Gone = true;
 
 
             }
         });
+
+
+        b.setOnTouchListener(new View.OnTouchListener() {
+
+            float x, y;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+
+//                    case MotionEvent.ACTION_MOVE:
+//
+//                        b.setX(b.getX() + (event.getX() - x));
+//                        b.setY(b.getY() + (event.getY() - y));
+//                        return true;
+                    case MotionEvent.ACTION_MOVE:
+
+                        float new_x = b.getX() + (event.getX() - x);
+                        float new_y = b.getY() + (event.getY() - y);
+
+                        int[] Outloaction = new int[2];
+                        DisplayMetrics metrics = getResources().getDisplayMetrics();
+                        Outloaction[0] = metrics.widthPixels;
+                        Outloaction[1] = metrics.heightPixels;
+
+                        if (new_x > Outloaction[0]) {
+                            new_x = (event.getX() - x) + Outloaction[0];
+//                            new_x = x;
+                        } else if (new_x < 0) {
+                            new_x = 0;
+//                            new_x = -x;
+                        } else if (b.getY() + (event.getY() - y) > Outloaction[1]) {
+                            new_y = (event.getY() - y) + Outloaction[1];
+//                            new_y = y;
+                        } else if (new_y < 0) {
+                            new_y = 0;
+//                            new_y = -y;
+                        }
+                        b.setX(new_x);
+                        b.setY(new_y);
+                        return true;
+
+
+                    case MotionEvent.ACTION_DOWN:
+                        x = event.getX();
+                        y = event.getY();
+                        return true;
+//                    case MotionEvent.ACTION_UP:
+//                        Intent intent = new Intent(getContext(), AddActivity.class);
+//                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                        startActivity(intent);
+//                        MainActivity.Gone = true;
+//                        MainActivity.setTab = 1;
+//                        return true;
+                }
+
+                return false;
+            }
+        });
+
+
 //        DisplayMetrics metrics = getResources().getDisplayMetrics();
 //        final int windowWidth = metrics.widthPixels;
 //        final int windowHeight = metrics.heightPixels;

@@ -59,7 +59,6 @@ public class SyncService extends IntentService {
     private static final String MESSAGE_BODY = "MessageBody";
     private static final String INSERT_DATE = "InsertDate";
     private static final String Critical = "Critical";
-    private static final String Link = "Link";
     private static final String Seen1 = "Seen";
     private static final String SSeen = "SendSeen";
     private static final String WillDeleted = "WillDeleted";
@@ -107,6 +106,7 @@ public class SyncService extends IntentService {
     private int MessageID;
     private String MessageTitle;
     private String MessageBody;
+    private String Link;
     private String InsertDate;
     //    private boolean Critical;
     private boolean Seen;
@@ -652,7 +652,7 @@ public class SyncService extends IntentService {
 //            FLag = "OK";
             Change = "OK";
             FlagChange = true;
-            MainActivity.setTab = 1;
+            MainActivity.setTab = TabController.Tabs.Task;
 
 
 
@@ -828,7 +828,7 @@ public class SyncService extends IntentService {
 //            FLag = "OK";
             Change = "OK";
             FlagChange = true;
-            MainActivity.setTab = 0;
+            MainActivity.setTab = TabController.Tabs.Message;
 
 
             SoapObject Message = (SoapObject) message.getProperty(index);
@@ -840,7 +840,7 @@ public class SyncService extends IntentService {
             InsertDate = Message.getProperty(3).toString();
             isCritical = Boolean.valueOf(Message.getProperty(4).toString());
             Deleted = Boolean.valueOf(Message.getProperty(5).toString());
-//            Link         = Message.getProperty(6).toString();
+            Link = Message.getProperty(6).toString();
             Seen = false;
 //            SendDelivered = false;
             SendSeen = false;
@@ -896,6 +896,7 @@ public class SyncService extends IntentService {
                     Bundle bundle = new Bundle();
                     bundle.putString(MyContext.getString(R.string.Title), MessageTitle);
                     bundle.putString(MyContext.getString(R.string.Body), MessageBody);
+                    bundle.putString(getString(R.string.Link), Link);
                     bundle.putBoolean(MyContext.getString(R.string.Critical), isCritical);
                     bundle.putBoolean(MyContext.getString(R.string.SendSeen), SendSeen);
                     bundle.putInt(MyContext.getString(R.string.ID), MessageID);
@@ -933,7 +934,7 @@ public class SyncService extends IntentService {
             contentValues.put(INSERT_DATE, Message.getProperty(3).toString());
             contentValues.put(Critical, Boolean.valueOf(Message.getProperty(4).toString()));
             contentValues.put(WillDeleted, Boolean.valueOf(Message.getProperty(5).toString()));
-            contentValues.put(Link, Message.getProperty(6).toString());
+            contentValues.put("Link", Message.getProperty(6).toString());
             contentValues.put(Seen1, false);
             contentValues.put(SendDelivered, false);
             contentValues.put(SSeen, false);

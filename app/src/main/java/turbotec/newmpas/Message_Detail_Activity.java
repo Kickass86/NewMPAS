@@ -37,7 +37,7 @@ public class Message_Detail_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.message_detail_layout);
 
-        MainActivity.setTab = 0;
+        MainActivity.setTab = TabController.Tabs.Message;
 
         try {
             share = SharedPreferenceHandler.getInstance(this);
@@ -48,6 +48,7 @@ public class Message_Detail_Activity extends AppCompatActivity {
             Bundle b = getIntent().getExtras();
             String Title;
             String Body;
+            String Link;
             Boolean Critical;
             Boolean isSeen;
             Boolean isSendSeen = false;
@@ -58,15 +59,19 @@ public class Message_Detail_Activity extends AppCompatActivity {
                 Critical = b.getBoolean(getString(R.string.Critical));
                 isSeen = b.getBoolean(getString(R.string.Seen));
                 isSendSeen = b.getBoolean(getString(R.string.SendSeen));
+                Link = b.getString(getString(R.string.Link));
                 ID = b.getInt(getString(R.string.ID));
 
 
                 TextView t1 = (TextView) findViewById(R.id.titledetail2);
                 TextView t2 = (TextView) findViewById(R.id.bodydetail2);
+                TextView t3 = (TextView) findViewById(R.id.link);
                 ImageView i1 = (ImageView) findViewById(R.id.statedetail2);
                 ImageView i2 = (ImageView) findViewById(R.id.Critical2);
+
                 t1.setText(Title);
                 t2.setText(Body);
+                t3.setText(Link);
                 i1.setImageResource(R.mipmap.ic_done_all_black_24dp);
                 if (Critical) {
                     i2.setImageResource(R.mipmap.ic_priority_high_black_24dp);

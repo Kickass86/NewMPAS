@@ -31,6 +31,7 @@ public class NotificationsAdapter extends BaseAdapter {
     static CheckBox c;
     static List<String> Tlist = new ArrayList<>();
     static List<String> Mlist = new ArrayList<>();
+    static List<String> Llist = new ArrayList<>();
     static List<Boolean> isSeen = new ArrayList<>();
 //    static List<Integer> IList = new ArrayList<>();
 static List<Boolean> CList = new ArrayList<>();
@@ -72,6 +73,7 @@ static List<Boolean> CList = new ArrayList<>();
 
         Tlist = new ArrayList<>();
         Mlist = new ArrayList<>();
+        Llist = new ArrayList<>();
         isSeen = new ArrayList<>();
         activity.IList = new ArrayList<>();
         CList = new ArrayList<>();
@@ -88,6 +90,7 @@ static List<Boolean> CList = new ArrayList<>();
                     CList.add("1".equals(cursor.getString(4)));
                     isSeen.add("1".equals(cursor.getString(5)));
                     SSList.add("1".equals(cursor.getString(7)));
+                    Llist.add(cursor.getString(9));
 //                        }
 //                    activity.NotiCheckedState = new boolean[activity.IList.size()];
 //                    activity.num_selected = 0;
@@ -161,6 +164,7 @@ static List<Boolean> CList = new ArrayList<>();
 
         holder.tv1.setText(Tlist.get(position));
         holder.tv2.setText(Mlist.get(position));
+
 
         if (isSeen.get(position))
             holder.iv.setImageResource(R.mipmap.ic_done_all_black_24dp);
@@ -254,6 +258,7 @@ static List<Boolean> CList = new ArrayList<>();
                     Bundle bundle = new Bundle();
                     bundle.putString(activity.getString(R.string.Title), Tlist.get(position));
                     bundle.putString(activity.getString(R.string.Body), Mlist.get(position));
+                    bundle.putString(activity.getString(R.string.Link), Llist.get(position));
                     bundle.putBoolean(activity.getString(R.string.Critical), CList.get(position));
                     bundle.putBoolean(activity.getString(R.string.SendSeen), SSList.get(position));
                     bundle.putInt(activity.getString(R.string.ID), activity.IList.get(position));

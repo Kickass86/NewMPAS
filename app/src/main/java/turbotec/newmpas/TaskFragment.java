@@ -6,9 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -20,6 +18,7 @@ import android.widget.TextView;
 public class TaskFragment extends Fragment {
 
     FloatingActionButton b;
+    View rootView;
 
 
 
@@ -31,7 +30,7 @@ public class TaskFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.tasks_tab, container, false);
+        rootView = inflater.inflate(R.layout.tasks_tab, container, false);
 
 //        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.notification_tab, container, false);
 //        ListView list = (ListView)view.findViewById(R.id.list);
@@ -61,6 +60,7 @@ public class TaskFragment extends Fragment {
         userList.execute();
 
         b = (FloatingActionButton) view.findViewById(R.id.fab);
+
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,7 +70,7 @@ public class TaskFragment extends Fragment {
                 Intent intent = new Intent(getContext(), AddActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
-                MainActivity.setTab = 1;
+                MainActivity.setTab = TabController.Tabs.Task;
                 MainActivity.Gone = true;
 
 
@@ -78,63 +78,70 @@ public class TaskFragment extends Fragment {
         });
 
 
-        b.setOnTouchListener(new View.OnTouchListener() {
-
-            float x, y;
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-
+//        b.setOnTouchListener(new View.OnTouchListener() {
+//
+//            float x, y;
+//            float[] Outlocation = new float[2];
+//
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//
+////                    case MotionEvent.ACTION_MOVE:
+////
+////                        b.setX(b.getRawX() + (event.getRawX() - x));
+////                        b.setY(b.getRawY() + (event.getRawY() - y));
+////                        return true;
 //                    case MotionEvent.ACTION_MOVE:
 //
-//                        b.setX(b.getX() + (event.getX() - x));
-//                        b.setY(b.getY() + (event.getY() - y));
-//                        return true;
-                    case MotionEvent.ACTION_MOVE:
-
-                        float new_x = b.getX() + (event.getX() - x);
-                        float new_y = b.getY() + (event.getY() - y);
-
-                        int[] Outloaction = new int[2];
-                        DisplayMetrics metrics = getResources().getDisplayMetrics();
-                        Outloaction[0] = metrics.widthPixels;
-                        Outloaction[1] = metrics.heightPixels;
-
-                        if (new_x > Outloaction[0]) {
-                            new_x = (event.getX() - x) + Outloaction[0];
+//                        float new_x = event.getRawX() ;
+//                        float new_y = event.getRawY();
+//
+//
+////                        v.getLocationOnScreen(Outlocation);
+////                        DisplayMetrics metrics = getResources().getDisplayMetrics();
+////                        Outlocation[0] = metrics.widthPixels;
+////                        Outlocation[1] = metrics.heightPixels;
+//
+//                        if (new_x > Outlocation[0]) {
+//                            new_x =  x ;
+////                            new_x = x;
+//                        } else if (new_x < 0) {
 //                            new_x = x;
-                        } else if (new_x < 0) {
-                            new_x = 0;
-//                            new_x = -x;
-                        } else if (b.getY() + (event.getY() - y) > Outloaction[1]) {
-                            new_y = (event.getY() - y) + Outloaction[1];
+////                            new_x = -x;
+//                        }
+//                        if (new_y > Outlocation[1]) {
 //                            new_y = y;
-                        } else if (new_y < 0) {
-                            new_y = 0;
-//                            new_y = -y;
-                        }
-                        b.setX(new_x);
-                        b.setY(new_y);
-                        return true;
-
-
-                    case MotionEvent.ACTION_DOWN:
-                        x = event.getX();
-                        y = event.getY();
-                        return true;
-//                    case MotionEvent.ACTION_UP:
-//                        Intent intent = new Intent(getContext(), AddActivity.class);
-//                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                        startActivity(intent);
-//                        MainActivity.Gone = true;
-//                        MainActivity.setTab = 1;
+////                            new_y = y;
+//                        } else if (new_y < 0) {
+//                            new_y = y;
+////                            new_y = -y;
+//                        }
+//                        b.setX(b.getX() + (new_x - x));
+//                        b.setY(b.getY() + (new_y - y));
 //                        return true;
-                }
-
-                return false;
-            }
-        });
+//
+//
+//                    case MotionEvent.ACTION_DOWN:
+//                        x = event.getRawX();
+//                        y = event.getRawY();
+//                        Outlocation[0] = x;
+//                        Outlocation[1] = y;
+//                        return true;
+//                    case MotionEvent.ACTION_UP:
+//                        if(x == event.getRawX() & (y == event.getRawY())) {
+//                            Intent intent = new Intent(getContext(), AddActivity.class);
+//                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            startActivity(intent);
+//                            MainActivity.Gone = true;
+//                            MainActivity.setTab = 1;
+//                            return true;
+//                        }
+//                }
+//
+//                return false;
+//            }
+//        });
 
 
 //        DisplayMetrics metrics = getResources().getDisplayMetrics();
@@ -155,8 +162,8 @@ public class TaskFragment extends Fragment {
 //                switch (event.getActionMasked()) {
 //                    case MotionEvent.ACTION_DOWN:
 //
-//                        dX = x - b.getX();
-//                        dY = y - b.getY();
+//                        dX = x - b.getRawX();
+//                        dY = y - b.getRawY();
 //                        lastAction = MotionEvent.ACTION_DOWN;
 //                        break;
 //

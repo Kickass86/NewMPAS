@@ -61,7 +61,7 @@ public class Task_Detail_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.task_detail_layout);
 
-        MainActivity.setTab = 1;
+        MainActivity.setTab = TabController.Tabs.Task;
 
         try {
             share = SharedPreferenceHandler.getInstance(this);

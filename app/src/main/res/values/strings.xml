@@ -36,6 +36,7 @@
     <string name="ID">Unique ID</string>
     <string name="Title">Title</string>
     <string name="Body">Body</string>
+    <string name="Link">Link</string>
     <string name="Critical">Critical</string>
     <string name="Delivered">Delivered</string>
     <string name="Seen">Seen</string>

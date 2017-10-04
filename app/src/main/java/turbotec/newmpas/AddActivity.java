@@ -41,7 +41,7 @@ public class AddActivity extends AppCompatActivity {
             if (action.equals("Edit Done")) {
 
 
-                MainActivity.setTab = 1;
+                MainActivity.setTab = TabController.Tabs.Task;
                 MainActivity.Gone = true;
                 Intent in = new Intent(context, MainActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

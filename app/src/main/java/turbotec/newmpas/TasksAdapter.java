@@ -285,8 +285,6 @@ public class TasksAdapter extends BaseAdapter {
                     bundle.putBoolean(activity.getString(R.string.TisResponsible), iRList.get(position));
                     showActivity.putExtras(bundle);
                     MainActivity.Scroll_Position = position;
-                    MainActivity.Gone = true;
-                    MainActivity.setTab = 1;
                     showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     Log.i("Task Detail", Tlist.get(position));
 //                    finish();

@@ -39,20 +39,20 @@ public class MainActivity extends AppCompatActivity {
     static final Uri CONTENT_URI2 = Uri.parse(URL2);
     static final int NUM_PAGES = 2;
     static final String[] TABS_Names = {"Messages", "Tasks"};
-    static boolean[] NotiCheckedState;
-    static boolean[] TaskCheckedState;
+    static boolean[] NotiCheckedState = new boolean[1];
+    static boolean[] TaskCheckedState = new boolean[1];
     static int Scroll_Position = 0;
     static boolean NFlag = true;
     static boolean TFlag = true;
     static boolean Gone = false;
-
     static NotificationsAdapter AdaptNo;
     static TasksAdapter AdaptTa;
     //    List<Boolean> CList = new ArrayList<>(); //Critical
 //    List<Boolean> SSList = new ArrayList<>(); //SendSeen
     //    boolean isSelected = false;
 //    private Menu mMenu;
-    static int setTab = 0;
+    static TabController.Tabs setTab = TabController.Tabs.Message;
+    TabController tabController;
     //    List<String> Mlist = new ArrayList<>(); //Messages List
 //    List<String> Tlist = new ArrayList<>(); //Title List
 //    List<Boolean> SList = new ArrayList<>(); //is Seen
@@ -78,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
 //                    ListView lvta = (ListView) findViewById(R.id.list_task);
 
                     TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-                    tabLayout.getTabAt(setTab).select();
+                    int nt = tabController.GetTabNum(setTab);
+                    tabLayout.getTabAt(nt).select();
 //                    TabLayout.Tab tab = tabLayout.getTabAt(setTab);
 //                    tab.select();
 
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
 //        NotiCheckedState[0] = false;
 
         Myactivity = this;
-
+        tabController = TabController.getInstance(getApplicationContext());
         try {
 
             NotificationManager mNotificationManager =
@@ -153,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                             Bundle bundle = new Bundle();
                             bundle.putString(getString(R.string.Title), b.getString(getString(R.string.Title)));
                             bundle.putString(getString(R.string.Body), b.getString(getString(R.string.Body)));
+                            bundle.putString(getString(R.string.Link), b.getString(getString(R.string.Link)));
                             bundle.putInt(getString(R.string.ID), b.getInt(getString(R.string.ID)));
                             bundle.putBoolean(getString(R.string.Seen), b.getBoolean(getString(R.string.Seen)));
                             bundle.putBoolean(getString(R.string.Critical), b.getBoolean(getString(R.string.Critical)));
@@ -165,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
 //            showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     Gone = true;
-                                    setTab = 0;
+                                    setTab = TabController.Tabs.Message;
                                     startActivity(showActivity);
                                     overridePendingTransition(0, 0);
                                 }
@@ -187,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                             bundle.putString(getString(R.string.TReport), b.getString(getString(R.string.TReport)));
                             showActivity.putExtras(bundle);
                             Gone = true;
-                            setTab = 1;
+                            setTab = TabController.Tabs.Task;
                             showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //                            Log.i("Task Detail", Tlist.get(position));
 //                    finish();
@@ -339,7 +341,8 @@ public class MainActivity extends AppCompatActivity {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancelAll();
 
-        mPager.setCurrentItem(setTab);
+        int nt = tabController.GetTabNum(setTab);
+        mPager.setCurrentItem(nt);
 
         NFlag = true;
         TFlag = true;

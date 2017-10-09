@@ -37,7 +37,7 @@ public class StartActivity extends AppCompatActivity {
         share = SharedPreferenceHandler.getInstance(this);
 
         Fabric.with(this, new Crashlytics());
-        // TODO: Move this to where you establish a user session
+
         logUser();
 
 
@@ -158,7 +158,7 @@ public class StartActivity extends AppCompatActivity {
     }
 
     private void logUser() {
-        // TODO: Use the current user's information
+
         // You can call any combination of these three methods
         Crashlytics.setUserIdentifier(share.GetDeviceID());
         Crashlytics.setUserEmail(share.GetUsername());

@@ -36,7 +36,7 @@ public class TaskFragment extends Fragment {
 //        ListView list = (ListView)view.findViewById(R.id.list);
 //        ListView list = (ListView) view.findViewById(R.id.list_task);
 
-//        NotificationsAdapter adapter = NotificationsAdapter.getInstance();
+//        MessagesListAdapter adapter = MessagesListAdapter.getInstance();
 //        list.setAdapter(adapter);
 
 //        tv.setText("No Task");
@@ -202,7 +202,7 @@ public class TaskFragment extends Fragment {
 //        list.setEmptyView(tv);
         ListView list = (ListView) view.findViewById(R.id.list_task);
 //        getActivity();
-//        NotificationsAdapter.set(acticity);
+//        MessagesListAdapter.set(acticity);
 //        TasksAdapter adapter = TasksAdapter.getInstance(getContext());
         MainActivity.AdaptTa = TasksAdapter.getInstance(getContext());
 
@@ -216,7 +216,7 @@ public class TaskFragment extends Fragment {
 //        list.setAdapter(adapter);
         list.setAdapter(MainActivity.AdaptTa);
 
-//        NotificationsAdapter adapter = NotificationsAdapter.getInstance();
+//        MessagesListAdapter adapter = MessagesListAdapter.getInstance();
 //        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
 //        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
 //        recyclerView.setLayoutManager(layoutManager);

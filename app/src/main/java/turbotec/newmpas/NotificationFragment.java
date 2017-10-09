@@ -43,7 +43,7 @@ public class NotificationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.notification_tab, container, false);
+        View rootView = inflater.inflate(R.layout.message_tab, container, false);
 
 //        LinearLayout view = (LinearLayout) inflater.inflate(R.layout.notification_tab, container, false);
 //        ListView list = (ListView)view.findViewById(R.id.list);
@@ -61,12 +61,12 @@ public class NotificationFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ListView list = (ListView) view.findViewById(R.id.list_notification);
+        ListView list = (ListView) view.findViewById(R.id.list_messages);
 //        list.setScrollingCacheEnabled(false);
 //        getActivity();
-//        NotificationsAdapter.set(acticity);
-//        NotificationsAdapter adapter = NotificationsAdapter.getInstance(getContext());
-        MainActivity.AdaptNo = NotificationsAdapter.getInstance(getContext());
+//        MessagesListAdapter.set(acticity);
+//        MessagesListAdapter adapter = MessagesListAdapter.getInstance(getContext());
+        MainActivity.AdaptNo = MessagesListAdapter.getInstance(getContext());
 
         TextView tv = (TextView) view.findViewById(R.id.empty1);
         tv.setText("No Message");

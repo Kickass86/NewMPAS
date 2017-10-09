@@ -82,7 +82,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             Log.v("AAA", "Alarm fired now!");
 
-            //TODO service for getting new notifications
+
             //                b = (Boolean) task.execute(Userdata).get();
 //            NetworkAsyncTask task1 = new NetworkAsyncTask(mContext);
 //                task1.execute(Userdata).get();

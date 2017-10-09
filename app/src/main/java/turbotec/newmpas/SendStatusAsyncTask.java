@@ -53,9 +53,14 @@ public class SendStatusAsyncTask extends AsyncTask {
 //        database = db.getWritableDatabase();
     }
 
-    protected void onPreExecute() {
+//    protected void onPreExecute() {
+//
+//    }
 
-    }
+//    @Override
+//    protected void onPostExecute(Object o) {
+//        super.onPostExecute(o);
+//    }
 
 
     private boolean isLocalReachable() {

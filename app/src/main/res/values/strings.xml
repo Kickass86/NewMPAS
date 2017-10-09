@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">"MPAS"</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="PREFERENCE_FILE">turbotec.mpas.PREFERENCE_FILE</string>
     <string name="TabsControl">TabsControl</string>
@@ -68,11 +68,13 @@
     <string name="Connecting">Connecting ...</string>
     <string name="Updating">Updating ... </string>
 
+    <string name="action_search">Search</string>
     <string name="menu_read">Mark as Read</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_select_all">Select All</string>
     <string name="menu_deselect_all">Deselect All</string>
     <string name="action_help">Help</string>
+    <string name="search_hint">Search</string>
 
     <string name="dialog_message">Are you sure?</string>
     <string name="Delete_Button">Delete</string>

@@ -37,7 +37,6 @@ import java.util.Random;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
 public class SyncService extends IntentService {
@@ -79,12 +78,12 @@ public class SyncService extends IntentService {
     private static final String TASK_NameResponsible = "NameResponsible";
     private static final String isSeen = "isSeen";
     private static final String Report = "Report";
-    // TODO: Rename actions, choose action names that describe tasks that this
+
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
 //    private static final String ACTION_FOO = "turbotec.newmpas.action.FOO";
 //    private static final String ACTION_BAZ = "turbotec.newmpas.action.BAZ";
-//    // TODO: Rename parameters
-//    private static final String EXTRA_PARAM1 = "turbotec.newmpas.extra.PARAM1";
+
+    //    private static final String EXTRA_PARAM1 = "turbotec.newmpas.extra.PARAM1";
 //    private static final String EXTRA_PARAM2 = "turbotec.newmpas.extra.PARAM2";
     private final String ip = "192.168.1.13";
     private final int port = 80;
@@ -149,7 +148,6 @@ public class SyncService extends IntentService {
      *
      * @see IntentService
      */
-    // TODO: Customize helper method
 //    public static void startActionFoo(Context context, String param1, String param2) {
 //        Intent intent = new Intent(context, SyncService.class);
 //        intent.setAction(ACTION_FOO);
@@ -164,7 +162,6 @@ public class SyncService extends IntentService {
      *
      * @see IntentService
      */
-    // TODO: Customize helper method
 //    public static void startActionBaz(Context context, String param1, String param2) {
 //        Intent intent = new Intent(context, SyncService.class);
 //        intent.setAction(ACTION_BAZ);
@@ -239,7 +236,6 @@ public class SyncService extends IntentService {
      * parameters.
      */
     private void GetNotificationFromServer() {
-        // TODO: Handle action Foo
 //        throw new UnsupportedOperationException("Not yet implemented");
 
 

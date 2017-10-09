@@ -248,7 +248,7 @@ public class MyProvider extends ContentProvider {
 //            //Update is for one single image. Get the ID from the URI.
 //            id = uri.getPathSegments().get(1);
 //        }
-            //TODO Update Multiple messages
+
 
             count = dbHelper.updateMessage(values, selection, selectionArgs);
 

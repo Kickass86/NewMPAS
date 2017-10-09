@@ -2,6 +2,7 @@ package turbotec.newmpas;
 
 import android.app.AlertDialog;
 import android.app.NotificationManager;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,6 +22,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -39,19 +41,21 @@ public class MainActivity extends AppCompatActivity {
     static final Uri CONTENT_URI2 = Uri.parse(URL2);
     static final int NUM_PAGES = 2;
     static final String[] TABS_Names = {"Messages", "Tasks"};
-    static boolean[] NotiCheckedState = new boolean[1];
+    static boolean[] MessaCheckedState = new boolean[1];
     static boolean[] TaskCheckedState = new boolean[1];
     static int Scroll_Position = 0;
     static boolean NFlag = true;
     static boolean TFlag = true;
     static boolean Gone = false;
-    static NotificationsAdapter AdaptNo;
+    static MessagesListAdapter AdaptNo;
     static TasksAdapter AdaptTa;
     //    List<Boolean> CList = new ArrayList<>(); //Critical
 //    List<Boolean> SSList = new ArrayList<>(); //SendSeen
     //    boolean isSelected = false;
 //    private Menu mMenu;
     static TabController.Tabs setTab = TabController.Tabs.Message;
+    MenuItem item_search;
+    SearchView searchView;
     TabController tabController;
     //    List<String> Mlist = new ArrayList<>(); //Messages List
 //    List<String> Tlist = new ArrayList<>(); //Title List
@@ -86,9 +90,9 @@ public class MainActivity extends AppCompatActivity {
 
 //                    if (i == 0) {
 
-//                        NotificationsAdapter ad = NotificationsAdapter.getInstance(context);
+//                        MessagesListAdapter ad = MessagesListAdapter.getInstance(context);
 //                        lvno.setAdapter(ad);
-                    AdaptNo = NotificationsAdapter.getInstance(context);
+                    AdaptNo = MessagesListAdapter.getInstance(context);
                     AdaptNo.notifyDataSetChanged();
 
 //                    } else {
@@ -129,9 +133,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        NotificationsAdapter.getInstance(this);
+//        MessagesListAdapter.getInstance(this);
         setContentView(R.layout.activity_main);
-//        NotiCheckedState[0] = false;
+//        MessaCheckedState[0] = false;
 
         Myactivity = this;
         tabController = TabController.getInstance(getApplicationContext());
@@ -202,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
 
             registerReceiver(broadcastReceiver, new IntentFilter("Alarm fire"));
 
-            NotificationsAdapter.set(this);
+            MessagesListAdapter.set(this);
             TasksAdapter.set(this);
 
 
@@ -231,9 +235,9 @@ public class MainActivity extends AppCompatActivity {
 //                            if (lvno != null) {
 //                                lvno.setSelection(Scroll_Position);
 //                                if (Gone) {
-////                                    NotificationsAdapter ad = NotificationsAdapter.getInstance(getBaseContext());
+////                                    MessagesListAdapter ad = MessagesListAdapter.getInstance(getBaseContext());
 ////                                    lvno.setAdapter(ad);
-//                                    AdaptNo = NotificationsAdapter.getInstance(getBaseContext());
+//                                    AdaptNo = MessagesListAdapter.getInstance(getBaseContext());
 //                                    AdaptNo.notifyDataSetChanged();
 //                                }
 //                            }
@@ -255,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
-
+                    SearchableActivity.TAB = tab.getPosition();
                 }
 
                 @Override
@@ -263,9 +267,9 @@ public class MainActivity extends AppCompatActivity {
 
                     final TabLayout.Tab tb = tab;
                     int sumN = 0;
-                    for (int i = 0; i < NotiCheckedState.length; i++) {
-                        sumN += NotiCheckedState[i] ? 1 : 0;
-                        NotiCheckedState[i] = false;
+                    for (int i = 0; i < MessaCheckedState.length; i++) {
+                        sumN += MessaCheckedState[i] ? 1 : 0;
+                        MessaCheckedState[i] = false;
                     }
                     int sumT = 0;
                     for (int i = 0; i < TaskCheckedState.length; i++) {
@@ -278,8 +282,8 @@ public class MainActivity extends AppCompatActivity {
                             if (sumN > 0) {
                                 new Handler().postDelayed(new Runnable() {
                                     public void run() {
-//                                        NotificationsAdapter NAda = NotificationsAdapter.getInstance(Myactivity);
-                                        AdaptNo = NotificationsAdapter.getInstance(Myactivity);
+//                                        MessagesListAdapter NAda = MessagesListAdapter.getInstance(Myactivity);
+                                        AdaptNo = MessagesListAdapter.getInstance(Myactivity);
                                         AdaptNo.notifyDataSetChanged();
                                     }
                                 }, 300);
@@ -347,12 +351,12 @@ public class MainActivity extends AppCompatActivity {
         NFlag = true;
         TFlag = true;
         if (Gone) {
-            ListView lvno = (ListView) findViewById(R.id.list_notification);
+            ListView lvno = (ListView) findViewById(R.id.list_messages);
             ListView lvta = (ListView) findViewById(R.id.list_task);
             if ((tabLayout.getSelectedTabPosition() == 0) & (lvno != null)) {
-//                    NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
+//                    MessagesListAdapter ad = MessagesListAdapter.getInstance(this);
 //                    lvno.setAdapter(ad);
-                AdaptNo = NotificationsAdapter.getInstance(this);
+                AdaptNo = MessagesListAdapter.getInstance(this);
                 AdaptNo.notifyDataSetChanged();
                 lvno.setSelection(Scroll_Position);
                 Gone = false;
@@ -366,6 +370,9 @@ public class MainActivity extends AppCompatActivity {
                 lvta.setSelection(Scroll_Position);
                 Gone = false;
             }
+
+            item_search.collapseActionView();
+            searchView.setQuery("", false);
 
         }
 
@@ -395,6 +402,7 @@ public class MainActivity extends AppCompatActivity {
         MenuItem item_read = menu.findItem(R.id.menu_read);
         MenuItem item_delete = menu.findItem(R.id.menu_delete);
         MenuItem item_select = menu.findItem(R.id.menu_select_all);
+        item_search = menu.findItem(R.id.action_search);
 //        main_menu.findItem(R.id.menu_read).setVisible(false);
 //        main_menu.findItem(R.id.menu_delete).setVisible(false);
 //        mMenu = menu;
@@ -405,10 +413,10 @@ public class MainActivity extends AppCompatActivity {
         switch (num) {
             case 0:
                 if (0 == findNthIndexOf(Enable, "1", 1)) {
-                    for (boolean b : NotiCheckedState) {
+                    for (boolean b : MessaCheckedState) {
                         sum += b ? 1 : 0;
                     }
-                    total = NotiCheckedState.length;
+                    total = MessaCheckedState.length;
                 } else {
                     for (boolean b : TaskCheckedState) {
                         sum += b ? 1 : 0;
@@ -425,10 +433,10 @@ public class MainActivity extends AppCompatActivity {
 
         }
 //        if (tabLayout.getSelectedTabPosition() == 0) {
-//            for (boolean b : NotiCheckedState) {
+//            for (boolean b : MessaCheckedState) {
 //                sum += b ? 1 : 0;
 //            }
-//            total = NotiCheckedState.length;
+//            total = MessaCheckedState.length;
 //
 //        } else if (tabLayout.getSelectedTabPosition() == 1) {
 //            for (boolean b : TaskCheckedState) {
@@ -454,6 +462,28 @@ public class MainActivity extends AppCompatActivity {
             item_select.setIcon(R.mipmap.ic_check_box_outline_blank_black_24dp);
         }
 
+//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        SearchView searchView = (SearchView) item_search.getActionView();
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getApplicationContext(), SearchableActivity.class)));
+
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView =
+                (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(false);
+        searchView.setFocusableInTouchMode(true);
+        MessagesListAdapter.valid = false;
+        searchView.setFocusable(true);
+//        searchView.requestFocus();
+
+//        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//        mgr.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT);
+//        mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+
+//        searchView.setIconified(false);
+//        searchView.requestFocusFromTouch();
 
 //        mMenu.getItem(0).setVisible(false);
 //        mMenu.getItem(1).setVisible(false);
@@ -468,10 +498,10 @@ public class MainActivity extends AppCompatActivity {
         int sum = 0;
         int total = 0;
         if (tabLayout.getSelectedTabPosition() == 0) {
-            for (boolean b : NotiCheckedState) {
+            for (boolean b : MessaCheckedState) {
                 sum += b ? 1 : 0;
             }
-            total = NotiCheckedState.length;
+            total = MessaCheckedState.length;
 
         } else if (tabLayout.getSelectedTabPosition() == 1) {
             for (boolean b : TaskCheckedState) {
@@ -487,9 +517,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (tabLayout.getSelectedTabPosition() == 0) {
             for (int i = 0; i < total; i++) {
-                NotiCheckedState[i] = opposite;
+                MessaCheckedState[i] = opposite;
             }
-            AdaptNo = NotificationsAdapter.getInstance(this);
+            AdaptNo = MessagesListAdapter.getInstance(this);
             AdaptNo.notifyDataSetChanged();
 
         } else if (tabLayout.getSelectedTabPosition() == 1) {
@@ -510,24 +540,24 @@ public class MainActivity extends AppCompatActivity {
 //        new Thread(new Runnable() {
 //            public void run() {
 
-        ListView lvno = (ListView) findViewById(R.id.list_notification);
+        ListView lvno = (ListView) findViewById(R.id.list_messages);
         ListView lvta = (ListView) findViewById(R.id.list_task);
 
         if (tabLayout.getSelectedTabPosition() == 0) {
-            for (int i = 0; i < NotiCheckedState.length; i++) {
+            for (int i = 0; i < MessaCheckedState.length; i++) {
 
-                if (NotiCheckedState[i]) {
+                if (MessaCheckedState[i]) {
                     Integer ID;
                     ID = IList.get(i);
                     getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{String.valueOf(ID)});
-                    NotiCheckedState[i] = false;
+                    MessaCheckedState[i] = false;
                 }
             }
 
 
-//            NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
+//            MessagesListAdapter ad = MessagesListAdapter.getInstance(this);
 //            lvno.setAdapter(ad);
-            AdaptNo = NotificationsAdapter.getInstance(this);
+            AdaptNo = MessagesListAdapter.getInstance(this);
             AdaptNo.notifyDataSetChanged();
 
         } else if (tabLayout.getSelectedTabPosition() == 1) {
@@ -561,13 +591,13 @@ public class MainActivity extends AppCompatActivity {
 //        new Thread(new Runnable() {
 //            public void run() {
 
-        ListView lvno = (ListView) findViewById(R.id.list_notification);
+        ListView lvno = (ListView) findViewById(R.id.list_messages);
         ListView lvta = (ListView) findViewById(R.id.list_task);
 
         if (tabLayout.getSelectedTabPosition() == 0) {
-            for (int i = 0; i < NotiCheckedState.length; i++) {
+            for (int i = 0; i < MessaCheckedState.length; i++) {
 
-                if (NotiCheckedState[i]) {
+                if (MessaCheckedState[i]) {
                     Integer ID;
                     ID = IList.get(i);
                     ContentValues values = new ContentValues();
@@ -575,13 +605,13 @@ public class MainActivity extends AppCompatActivity {
                     getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{String.valueOf(ID)});
                 }
             }
-            for (int i = 0; i < NotiCheckedState.length; i++) {
-                NotiCheckedState[i] = false;
+            for (int i = 0; i < MessaCheckedState.length; i++) {
+                MessaCheckedState[i] = false;
             }
 
-//            NotificationsAdapter ad = NotificationsAdapter.getInstance(getApplication());
+//            MessagesListAdapter ad = MessagesListAdapter.getInstance(getApplication());
 //            lvno.setAdapter(ad);
-            AdaptNo = NotificationsAdapter.getInstance(getApplication());
+            AdaptNo = MessagesListAdapter.getInstance(getApplication());
             AdaptNo.notifyDataSetChanged();
         } else if (tabLayout.getSelectedTabPosition() == 1) {
             for (int i = 0; i < TaskCheckedState.length; i++) {
@@ -649,6 +679,14 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
                 Toast.makeText(this, "Info about MPAS", Toast.LENGTH_SHORT).show();
                 return true;
+//            case R.id.action_search:
+//                Intent intent = new Intent(MainActivity.this,SearchableActivity.class);
+//////                intent.putExtra("Tab#", tabLayout.getSelectedTabPosition());
+//                intent.setAction(Intent.ACTION_SEARCH);
+////                SearchableActivity.TAB = tabLayout.getSelectedTabPosition();
+//                this.startActivity(intent);
+////                finish();
+//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -662,24 +700,24 @@ public class MainActivity extends AppCompatActivity {
         boolean fl = false;
 
 
-        ListView lvno = (ListView) findViewById(R.id.list_notification);
+        ListView lvno = (ListView) findViewById(R.id.list_messages);
         ListView lvta = (ListView) findViewById(R.id.list_task);
 
         if (tabLayout.getSelectedTabPosition() == 0) {
-            for (boolean i : NotiCheckedState) {
+            for (boolean i : MessaCheckedState) {
                 if (i) {
                     fl = true;
                     break;
                 }
             }
             if (fl) {
-                for (int i = 0; i < NotiCheckedState.length; i++) {
-                    NotiCheckedState[i] = false;
+                for (int i = 0; i < MessaCheckedState.length; i++) {
+                    MessaCheckedState[i] = false;
                 }
 
-//                NotificationsAdapter ad = NotificationsAdapter.getInstance(this);
+//                MessagesListAdapter ad = MessagesListAdapter.getInstance(this);
 //                lvno.setAdapter(ad);
-                AdaptNo = NotificationsAdapter.getInstance(this);
+                AdaptNo = MessagesListAdapter.getInstance(this);
                 AdaptNo.notifyDataSetChanged();
             }
         } else if (tabLayout.getSelectedTabPosition() == 1) {

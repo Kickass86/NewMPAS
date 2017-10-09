@@ -21,11 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class NotificationsAdapter extends BaseAdapter {
+public class MessagesListAdapter extends BaseAdapter {
     static final String PROVIDER_NAME = SyncService.PROVIDER_NAME;
     static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
     //    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent/";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
+    public static boolean valid;
     //    static final Uri CONTENT_URI2 = Uri.parse(URL2);
     static MainActivity activity;
     static CheckBox c;
@@ -36,13 +37,13 @@ public class NotificationsAdapter extends BaseAdapter {
 //    static List<Integer> IList = new ArrayList<>();
 static List<Boolean> CList = new ArrayList<>();
     static List<Boolean> SSList = new ArrayList<>();
-    private static NotificationsAdapter instance;
+    private static MessagesListAdapter instance;
     private static LayoutInflater inflater = null;
     //    int num_selected;
     Holder holder;
     Context context;
 
-    private NotificationsAdapter(Context act) {
+    private MessagesListAdapter(Context act) {
         context = act;
     }
 
@@ -53,21 +54,84 @@ static List<Boolean> CList = new ArrayList<>();
 
     }
 
-    public static NotificationsAdapter getInstance(Context context) {
+    public static MessagesListAdapter getSearchInstance(Context context, String search) {
         if (instance == null) {
-            instance = new NotificationsAdapter(context);
+            instance = new MessagesListAdapter(context);
+        }
+        SearchQuery(search);
+        return instance;
+    }
+
+    private static void SearchQuery(String search) {
+        search = "%" + search + "%";
+        valid = false;
+
+        Cursor cursor = activity.getContentResolver().query(CONTENT_URI1, null, "WillDeleted = ? AND (MessageTitle like ? OR MessageBody like ?)", new String[]{"0", search, search}, null);
+
+        Tlist = new ArrayList<>();
+        Mlist = new ArrayList<>();
+        Llist = new ArrayList<>();
+        isSeen = new ArrayList<>();
+        activity.IList = new ArrayList<>();
+        CList = new ArrayList<>();
+        SSList = new ArrayList<>();
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+
+//                        for (int i = 0; i < MESSAGES.size(); i++) {
+                    activity.IList.add(Integer.valueOf(cursor.getString(0)));
+                    Tlist.add(cursor.getString(1));
+                    Mlist.add(cursor.getString(2));
+                    CList.add("1".equals(cursor.getString(4)));
+                    isSeen.add("1".equals(cursor.getString(5)));
+                    SSList.add("1".equals(cursor.getString(7)));
+                    Llist.add(cursor.getString(9));
+//                        }
+//                    activity.MessaCheckedState = new boolean[activity.IList.size()];
+//                    activity.num_selected = 0;
+                } while (cursor.moveToNext());
+            }
+        }
+        int count = cursor.getCount();
+        cursor.close();
+        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        c = (CheckBox) activity.findViewById(R.id.checkbox1);
+        if (MainActivity.NFlag) {
+            MainActivity.MessaCheckedState = new boolean[activity.IList.size()];
+            for (int i = 0; i < activity.IList.size(); i++) {
+                MainActivity.MessaCheckedState[i] = false;
+            }
+            MainActivity.NFlag = false;
+        }
+        if (count != MainActivity.MessaCheckedState.length) {
+            MainActivity.MessaCheckedState = new boolean[activity.IList.size()];
+            for (int i = 0; i < activity.IList.size(); i++) {
+                MainActivity.MessaCheckedState[i] = false;
+            }
+            MainActivity.NFlag = false;
+        }
+
+
+    }
+
+    public static MessagesListAdapter getInstance(Context context) {
+        if (instance == null) {
+            instance = new MessagesListAdapter(context);
 
         }
         Initialize();
         return instance;
     }
 
-    public static NotificationsAdapter getInstance() {
+    public static MessagesListAdapter getInstance() {
 //        Initialize();
         return instance;
     }
 
     static void Initialize() {
+        valid = true;
 
         Cursor cursor = activity.getContentResolver().query(CONTENT_URI1, null, "WillDeleted = ?", new String[]{"0"}, null);
 
@@ -92,7 +156,7 @@ static List<Boolean> CList = new ArrayList<>();
                     SSList.add("1".equals(cursor.getString(7)));
                     Llist.add(cursor.getString(9));
 //                        }
-//                    activity.NotiCheckedState = new boolean[activity.IList.size()];
+//                    activity.MessaCheckedState = new boolean[activity.IList.size()];
 //                    activity.num_selected = 0;
                 } while (cursor.moveToNext());
             }
@@ -102,16 +166,16 @@ static List<Boolean> CList = new ArrayList<>();
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         c = (CheckBox) activity.findViewById(R.id.checkbox1);
         if (MainActivity.NFlag) {
-            MainActivity.NotiCheckedState = new boolean[activity.IList.size()];
+            MainActivity.MessaCheckedState = new boolean[activity.IList.size()];
             for (int i = 0; i < activity.IList.size(); i++) {
-                MainActivity.NotiCheckedState[i] = false;
+                MainActivity.MessaCheckedState[i] = false;
             }
             MainActivity.NFlag = false;
         }
-        if (count != MainActivity.NotiCheckedState.length) {
-            MainActivity.NotiCheckedState = new boolean[activity.IList.size()];
+        if (count != MainActivity.MessaCheckedState.length) {
+            MainActivity.MessaCheckedState = new boolean[activity.IList.size()];
             for (int i = 0; i < activity.IList.size(); i++) {
-                MainActivity.NotiCheckedState[i] = false;
+                MainActivity.MessaCheckedState[i] = false;
             }
             MainActivity.NFlag = false;
         }
@@ -119,19 +183,19 @@ static List<Boolean> CList = new ArrayList<>();
 
     @Override
     public int getCount() {
-        // TODO Auto-generated method stub
+
         return Tlist.size();
     }
 
     @Override
     public Object getItem(int position) {
-        // TODO Auto-generated method stub
+
         return position;
     }
 
     @Override
     public long getItemId(int position) {
-        // TODO Auto-generated method stub
+
         return position;
     }
 
@@ -180,9 +244,9 @@ static List<Boolean> CList = new ArrayList<>();
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 //                    countCheck(isChecked);
-                MainActivity.NotiCheckedState[position] = isChecked;
+                MainActivity.MessaCheckedState[position] = isChecked;
                 int sum = 0;
-                for (boolean b : MainActivity.NotiCheckedState) {
+                for (boolean b : MainActivity.MessaCheckedState) {
                     sum += b ? 1 : 0;
                 }
 
@@ -207,7 +271,7 @@ static List<Boolean> CList = new ArrayList<>();
             holder.cb.setOnCheckedChangeListener(checkListener);
 
         int sum = 0;
-        for (boolean b : MainActivity.NotiCheckedState) {
+        for (boolean b : MainActivity.MessaCheckedState) {
             sum += b ? 1 : 0;
         }
         if (sum > 0) {
@@ -219,7 +283,9 @@ static List<Boolean> CList = new ArrayList<>();
                 holder.cb.setVisibility(View.GONE);
             notifyDataSetChanged();
         }
-        activity.invalidateOptionsMenu();
+        if (valid) {
+            activity.invalidateOptionsMenu();
+        }
 
 
         rowView.setOnClickListener(new View.OnClickListener() {
@@ -227,7 +293,7 @@ static List<Boolean> CList = new ArrayList<>();
             public void onClick(View v) {
 
                 boolean fl = false;
-                for (boolean i : MainActivity.NotiCheckedState) {
+                for (boolean i : MainActivity.MessaCheckedState) {
                     if (i) {
                         fl = true;
                         break;
@@ -235,7 +301,7 @@ static List<Boolean> CList = new ArrayList<>();
                 }
 
                 if (fl) {
-                    MainActivity.NotiCheckedState[position] = !MainActivity.NotiCheckedState[position];
+                    MainActivity.MessaCheckedState[position] = !MainActivity.MessaCheckedState[position];
 
                     notifyDataSetChanged();
                     activity.invalidateOptionsMenu();
@@ -290,19 +356,19 @@ static List<Boolean> CList = new ArrayList<>();
                 CheckBox c = (CheckBox) v.findViewById(R.id.checkbox1);
 
                 int sum = 0;
-                for (boolean b : MainActivity.NotiCheckedState) {
+                for (boolean b : MainActivity.MessaCheckedState) {
                     sum += b ? 1 : 0;
                 }
                 if ((sum == 1) & (htemp.cb.isChecked())) {
 
-                    MainActivity.NotiCheckedState[position] = false;
+                    MainActivity.MessaCheckedState[position] = false;
                     activity.invalidateOptionsMenu();
 
                     notifyDataSetChanged();
 
                 } else if (htemp.cb.isChecked()) {
 //                        htemp.cb.setChecked(false);
-                    MainActivity.NotiCheckedState[position] = false;
+                    MainActivity.MessaCheckedState[position] = false;
 //                    notifyDataSetChanged();
 
                 } else {
@@ -310,7 +376,7 @@ static List<Boolean> CList = new ArrayList<>();
                     c.setVisibility(View.VISIBLE);
 //
                     notifyDataSetChanged();
-                    MainActivity.NotiCheckedState[position] = true;
+                    MainActivity.MessaCheckedState[position] = true;
                     htemp.cb.setVisibility(View.VISIBLE);
 //                        htemp.cb.setChecked(true);
 
@@ -331,7 +397,7 @@ static List<Boolean> CList = new ArrayList<>();
                 return true;
             }
         });
-        holder.cb.setChecked(MainActivity.NotiCheckedState[position]);
+        holder.cb.setChecked(MainActivity.MessaCheckedState[position]);
 
         return rowView;
     }

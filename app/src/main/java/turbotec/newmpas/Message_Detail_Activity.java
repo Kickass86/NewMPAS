@@ -5,14 +5,21 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.util.concurrent.ExecutionException;
 
 //import android.app.IntentService;
 //import android.content.Intent;
@@ -24,11 +31,14 @@ public class Message_Detail_Activity extends AppCompatActivity {
     static final String URL1 = "content://" + PROVIDER_NAME + "/messages/";
     //    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
-    private SharedPreferenceHandler share;
     //    static final Uri CONTENT_URI2 = Uri.parse(URL2);
 //    private static DatabaseHandler db;
     //    private final Context main_menu;
     //    SQLiteDatabase database;
+    private final String ip = "192.168.1.13";
+    private final int port = 80;
+    private SharedPreferenceHandler share;
+    private String Link;
     private Button DelBut;
     private Integer ID = 1;
 
@@ -48,7 +58,7 @@ public class Message_Detail_Activity extends AppCompatActivity {
             Bundle b = getIntent().getExtras();
             String Title;
             String Body;
-            String Link;
+//            String Link;
             Boolean Critical;
             Boolean isSeen;
             Boolean isSendSeen = false;
@@ -71,7 +81,62 @@ public class Message_Detail_Activity extends AppCompatActivity {
 
                 t1.setText(Title);
                 t2.setText(Body);
-                t3.setText(Link);
+//                t3.setText(Link);
+                t3.setText(Html.fromHtml("<u> Click Here </u>"));
+                t3.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+
+                        setContentView(R.layout.waiting_layout);
+                        AsyncTask n = new AsyncTask() {
+                            @Override
+                            protected Object doInBackground(Object[] params) {
+                                boolean exists = false;
+
+                                try {
+                                    SocketAddress sockaddr = new InetSocketAddress(ip, port);
+                                    // Create an unbound socket
+                                    Socket sock = new Socket();
+
+                                    // This method will block no more than timeoutMs.
+                                    // If the timeout occurs, SocketTimeoutException is thrown.
+                                    int timeoutMs = 1000;   // 200 milliseconds
+                                    sock.connect(sockaddr, timeoutMs);
+                                    exists = true;
+
+                                    sock.close();
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                //TODO GetLinkRequest
+
+                                return exists;
+                            }
+                        };
+                        try {
+                            if ((boolean) n.execute().get()) {
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://192.168.1.13/" + Link));
+                                startActivity(browserIntent);
+                            } else {
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://mpas.migtco.com:3000/" + Link));
+                                startActivity(browserIntent);
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        }
+//                        setContentView(R.layout.message_detail_layout);
+
+//                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Link));
+//                        startActivity(browserIntent);
+                    }
+                });
+
+//                t3.setText(Html.fromHtml(" <a href=" + Link +">Click Here</a> "));
+//                t3.setMovementMethod(LinkMovementMethod.getInstance());
                 i1.setImageResource(R.mipmap.ic_done_all_black_24dp);
                 if (Critical) {
                     i2.setImageResource(R.mipmap.ic_priority_high_black_24dp);

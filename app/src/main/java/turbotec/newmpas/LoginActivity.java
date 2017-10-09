@@ -137,7 +137,7 @@ public class LoginActivity extends AppCompatActivity {
         try {
 
 
-//        NotificationsAdapter.getInstance(this);
+//        MessagesListAdapter.getInstance(this);
             share = SharedPreferenceHandler.getInstance(this);
             first = true;
             mCheckedState = new boolean[0];
@@ -166,7 +166,7 @@ public class LoginActivity extends AppCompatActivity {
             switch (st) {
                 case OK: {
 
-                    setContentView(R.layout.notification_tab);
+                    setContentView(R.layout.message_tab);
 
                     alarmIntent = new Intent(this, AlarmReceiver.class);
                     alarmIntent.setAction("Alarm");

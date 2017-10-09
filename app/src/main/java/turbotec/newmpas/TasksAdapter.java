@@ -58,6 +58,90 @@ public class TasksAdapter extends BaseAdapter {
 
     }
 
+
+    public static TasksAdapter getSearchInstance(Context context, String search) {
+        if (instance == null) {
+            instance = new TasksAdapter(context);
+        }
+        SearchQuery(search);
+        return instance;
+    }
+
+    private static void SearchQuery(String search) {
+        search = "%" + search + "%";
+//        valid = false;
+
+        Cursor cursor = activity.getContentResolver().query(CONTENT_URI1, null, "TaskTitle like ? OR TaskDescription like ?", new String[]{search, search}, null);
+
+        Tlist = new ArrayList<>();
+        DesList = new ArrayList<>();
+        isSeen = new ArrayList<>();
+        EList = new ArrayList<>();
+        RList = new ArrayList<>();
+        DelList = new ArrayList<>();
+        ReList = new ArrayList<>();
+        iCList = new ArrayList<>();
+        iRList = new ArrayList<>();
+        NRList = new ArrayList<>();
+        activity.IDList = new ArrayList<>();
+        CrList = new ArrayList<>();
+        StList = new ArrayList<>();
+        DateList = new ArrayList<>();
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+
+//                        for (int i = 0; i < MESSAGES.size(); i++) {
+                    activity.IDList.add(cursor.getString(0));
+                    Tlist.add(cursor.getString(1));
+                    DesList.add(cursor.getString(2));
+                    DateList.add(cursor.getString(3));
+                    CrList.add(cursor.getString(4));
+                    StList.add(cursor.getInt(5));
+                    ReList.add(cursor.getString(6));
+                    isSeen.add("1".equals(cursor.getString(7)));
+                    EList.add("1".equals(cursor.getString(9)));
+                    RList.add("1".equals(cursor.getString(10)));
+                    DelList.add("1".equals(cursor.getString(11)));
+                    iCList.add("1".equals(cursor.getString(12)));
+                    iRList.add("1".equals(cursor.getString(13)));
+                    NRList.add(cursor.getString(15));
+
+
+//                        }
+//                    activity.TaskCheckedState = new boolean[activity.IList.size()];
+//                    activity.num_selected = 0;
+                } while (cursor.moveToNext());
+            }
+        }
+        int count = cursor.getCount();
+        cursor.close();
+        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        c = (CheckBox) activity.findViewById(R.id.tcheckbox);
+        if (MainActivity.TFlag) {
+            MainActivity.TaskCheckedState = new boolean[Tlist.size()];
+            for (int i = 0; i < activity.IDList.size(); i++) {
+                MainActivity.TaskCheckedState[i] = false;
+            }
+            MainActivity.TFlag = false;
+        }
+        if (count != MainActivity.TaskCheckedState.length) {
+            MainActivity.TaskCheckedState = new boolean[Tlist.size()];
+            for (int i = 0; i < activity.IDList.size(); i++) {
+                MainActivity.TaskCheckedState[i] = false;
+            }
+            MainActivity.TFlag = false;
+        }
+
+
+    }
+
+
+
+
+
+
     public static TasksAdapter getInstance(Context context) {
         if (instance == null) {
             instance = new TasksAdapter(context);
@@ -140,19 +224,19 @@ public class TasksAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        // TODO Auto-generated method stub
+
         return Tlist.size();
     }
 
     @Override
     public Object getItem(int position) {
-        // TODO Auto-generated method stub
+
         return position;
     }
 
     @Override
     public long getItemId(int position) {
-        // TODO Auto-generated method stub
+
         return position;
     }
 

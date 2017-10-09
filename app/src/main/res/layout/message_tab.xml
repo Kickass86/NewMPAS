@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
         <ListView
-            android:id="@+id/list_notification"
+            android:id="@+id/list_messages"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp">

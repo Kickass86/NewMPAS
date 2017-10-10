@@ -10,16 +10,22 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.util.Base64;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.util.concurrent.ExecutionException;
+import java.net.URL;
 
 //import android.app.IntentService;
 //import android.content.Intent;
@@ -38,9 +44,16 @@ public class Message_Detail_Activity extends AppCompatActivity {
     private final String ip = "192.168.1.13";
     private final int port = 80;
     private SharedPreferenceHandler share;
+    private Intent starterIntent;
     private String Link;
     private Button DelBut;
     private Integer ID = 1;
+    private String Title;
+    private String Body;
+    //            String Link;
+    private Boolean Critical;
+    private Boolean isSeen;
+    private Boolean isSendSeen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +69,8 @@ public class Message_Detail_Activity extends AppCompatActivity {
 
 
             Bundle b = getIntent().getExtras();
-            String Title;
-            String Body;
-//            String Link;
-            Boolean Critical;
-            Boolean isSeen;
-            Boolean isSendSeen = false;
+
+            starterIntent = getIntent();
 
             if (b != null) {
                 Title = b.getString(getString(R.string.Title));
@@ -89,10 +98,18 @@ public class Message_Detail_Activity extends AppCompatActivity {
                     public void onClick(View v) {
 
                         setContentView(R.layout.waiting_layout);
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+
                         AsyncTask n = new AsyncTask() {
+
+                            String responseMessage;
+                            boolean exists = false;
+
                             @Override
                             protected Object doInBackground(Object[] params) {
-                                boolean exists = false;
+
+                                String requestString;
+                                URL url;
 
                                 try {
                                     SocketAddress sockaddr = new InetSocketAddress(ip, port);
@@ -112,26 +129,89 @@ public class Message_Detail_Activity extends AppCompatActivity {
                                 }
                                 //TODO GetLinkRequest
 
-                                return exists;
-                            }
-                        };
-                        try {
-                            if ((boolean) n.execute().get()) {
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://192.168.1.13/" + Link));
-                                startActivity(browserIntent);
-                            } else {
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://mpas.migtco.com:3000/" + Link));
-                                startActivity(browserIntent);
-                            }
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
-                        }
-//                        setContentView(R.layout.message_detail_layout);
+//                                return exists;
 
-//                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Link));
-//                        startActivity(browserIntent);
+
+                                if (exists) {
+                                    requestString = "http://192.168.1.13/Andr/GetLinkRequest.ashx?Value=";
+                                } else {
+                                    requestString = "https://mpas.migtco.com:3000/Andr/GetLinkRequest.ashx?Value=";
+                                }
+
+//        String requestString = intent.getStringExtra(REQUEST_STRING);
+                                Log.v("Intent Service", "Check Request");
+
+
+                                try {
+
+
+                                    String value = "Val1=" + share.GetDeviceID() + ",Val2=" + share.GetToken() + ",Val3=1";
+                                    requestString = requestString + new String(Base64.encode(value.getBytes("UTF-8"), Base64.DEFAULT));
+                                    requestString = requestString.replaceAll("\n", "");
+
+
+                                    url = new URL(requestString);
+                                    HttpURLConnection c = (HttpURLConnection) url.openConnection();
+                                    c.setRequestMethod("GET");
+                                    c.connect();
+
+                                    int code = c.getResponseCode();
+                                    String s = "";
+                                    if (code == 200) {
+
+                                        final InputStream is = c.getInputStream();
+
+                                        if (is != null) {
+                                            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+                                            String line;
+
+                                            while ((line = bufferedReader.readLine()) != null)
+                                                s += line;
+                                            is.close();
+                                        }
+
+                                    }
+                                    c.disconnect();
+                                    if (!(s.contains("Invalid") | s.contains("Error") | s.contains("Unable") | (s.contains("unexpected")))) {
+
+                                        responseMessage = s;
+                                    } else {
+                                        responseMessage = "";
+                                    }
+
+
+                                } catch (Exception e) {
+                                    Log.w("HTTP:", e);
+                                    responseMessage = "";
+                                }
+
+
+                                return responseMessage;
+
+                            }
+
+                            @Override
+                            protected void onPostExecute(Object o) {
+
+                                finish();
+                                startActivity(starterIntent);
+
+                                if (exists) {
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://192.168.1.13/" + responseMessage));
+                                    startActivity(browserIntent);
+                                } else {
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://mpas.migtco.com:3000/" + responseMessage));
+                                    startActivity(browserIntent);
+                                }
+
+                                super.onPostExecute(o);
+                            }
+
+
+                        };
+
+                        n.execute();
+
                     }
                 });
 
@@ -152,10 +232,10 @@ public class Message_Detail_Activity extends AppCompatActivity {
 
 //                        SQLiteDatabase database = db.getWritableDatabase();
 
-                            ContentValues values = new ContentValues();
-                            values.put("Seen", true);
+                    ContentValues values = new ContentValues();
+                    values.put("Seen", true);
 
-                            getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{String.valueOf(ID)});
+                    getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{String.valueOf(ID)});
 
 
 //                        }

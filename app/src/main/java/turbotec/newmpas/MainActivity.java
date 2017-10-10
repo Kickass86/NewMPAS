@@ -354,8 +354,8 @@ public class MainActivity extends AppCompatActivity {
             ListView lvno = (ListView) findViewById(R.id.list_messages);
             ListView lvta = (ListView) findViewById(R.id.list_task);
             if ((tabLayout.getSelectedTabPosition() == 0) & (lvno != null)) {
-//                    MessagesListAdapter ad = MessagesListAdapter.getInstance(this);
-//                    lvno.setAdapter(ad);
+                MessagesListAdapter ad = MessagesListAdapter.getInstance(this);
+                lvno.setAdapter(ad);
                 AdaptNo = MessagesListAdapter.getInstance(this);
                 AdaptNo.notifyDataSetChanged();
                 lvno.setSelection(Scroll_Position);
@@ -363,35 +363,21 @@ public class MainActivity extends AppCompatActivity {
 
             } else if ((tabLayout.getSelectedTabPosition() == 1) & (lvta != null)) {
 
-//                    TasksAdapter ad = TasksAdapter.getInstance(this);
-//                    lvta.setAdapter(ad);
+                TasksAdapter ad = TasksAdapter.getInstance(this);
+                lvta.setAdapter(ad);
                 AdaptTa = TasksAdapter.getInstance(this);
                 AdaptTa.notifyDataSetChanged();
                 lvta.setSelection(Scroll_Position);
                 Gone = false;
             }
 
-            item_search.collapseActionView();
-            searchView.setQuery("", false);
+            if (item_search != null) {
+                item_search.collapseActionView();
+                searchView.setQuery("", false);
+            }
 
         }
 
-//        ListView lv = (ListView) findViewById(R.id.list_notification);
-//        if ((tabLayout.getSelectedTabPosition() == 0)&(lv != null)) {
-//            lv.post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    ListView lv = (ListView) findViewById(R.id.list_notification);
-//                    lv.setSelection(Scroll_Position);
-//                }
-//            });
-//        }
-
-//        } catch (Exception e) {
-//            share.SaveError(e.getMessage());
-//            Intent SE = new Intent(this, SendError.class);
-//            startService(SE);
-//        }
 
     }
 

@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Base64;
@@ -97,6 +98,7 @@ public class Message_Detail_Activity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
+                        v.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.SelectColor1));
                         setContentView(R.layout.waiting_layout);
                         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 

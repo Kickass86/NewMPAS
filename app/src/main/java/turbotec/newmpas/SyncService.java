@@ -762,7 +762,7 @@ public class SyncService extends IntentService {
                 bundle.putBoolean(MyContext.getString(R.string.TisCreator), TisCreator);
                 bundle.putBoolean(MyContext.getString(R.string.TisResponsible), TisResponsible);
                 bundle.putString(MyContext.getString(R.string.TNameResponsible), TNameResponsible);
-                bundle.putBoolean("Type", false);
+                bundle.putInt("Type", 1);
                 nid.putExtras(bundle);
                 nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 Random i = new Random();
@@ -897,7 +897,7 @@ public class SyncService extends IntentService {
                     bundle.putBoolean(MyContext.getString(R.string.SendSeen), SendSeen);
                     bundle.putInt(MyContext.getString(R.string.ID), MessageID);
                     bundle.putBoolean(MyContext.getString(R.string.Seen), Seen);
-                    bundle.putBoolean("Type", true);
+                    bundle.putInt("Type", 0);
                     nid.putExtras(bundle);
                     nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     PendingIntent ci = PendingIntent.getActivity(MyContext, MessageID, nid, 0);

@@ -49,9 +49,13 @@
     <string name="TID">TID</string>
     <string name="Subject">Subject</string>
     <string name="TCreator">TCreator</string>
+    <string name="Creator">Creator</string>
     <string name="DueDate">DueDate</string>
     <string name="TStatus">TStatus</string>
     <string name="TDescription">TDescription</string>
+    v
+    <string name="Description">Description</string>
+    <string name="Responsible">Responsible</string>
     <string name="TReport">TReport</string>
     <string name="TEditable">TEditable</string>
     <string name="TReplyAble">TReplyAble</string>
@@ -69,17 +73,20 @@
     <string name="Updating">Updating ... </string>
 
     <string name="action_search">Search</string>
+    <string name="action_filter">Filter</string>
+    <string name="action_help">Help</string>
     <string name="menu_read">Mark as Read</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_select_all">Select All</string>
     <string name="menu_deselect_all">Deselect All</string>
-    <string name="action_help">Help</string>
+
     <string name="search_hint">Search</string>
 
     <string name="dialog_message">Are you sure?</string>
     <string name="Delete_Button">Delete</string>
     <string name="Reply_Button">Reply</string>
     <string name="Edit_Done_Button">Done</string>
+    <string name="Filter_Done_Button">Done</string>
     <string name="Add_Done_Button">Done</string>
     <string name="Reply_Done_Button">Done</string>
     <string name="Edit_Button">Edit</string>

@@ -17,9 +17,12 @@ import android.widget.TextView;
  */
 public class TaskFragment extends Fragment {
 
+    static boolean isSearch;
+    static boolean isFilter;
+    static String query;
+    static String Subject = "", Description = "", Creator = "", Responsible = "";
     FloatingActionButton b;
     View rootView;
-
 
 
     public TaskFragment() {
@@ -204,8 +207,14 @@ public class TaskFragment extends Fragment {
 //        getActivity();
 //        MessagesListAdapter.set(acticity);
 //        TasksAdapter adapter = TasksAdapter.getInstance(getContext());
-        MainActivity.AdaptTa = TasksAdapter.getInstance(getContext());
-
+        if (isSearch) {
+            MainActivity.AdaptTa = TasksAdapter.getSearchInstance(getContext(), query);
+            b.setVisibility(View.GONE);
+        } else if (isFilter) {
+            MainActivity.AdaptTa = TasksAdapter.Filter(Subject, Description, Creator, Responsible);
+        } else {
+            MainActivity.AdaptTa = TasksAdapter.getInstance(getContext());
+        }
 
         TextView tv = (TextView) view.findViewById(R.id.tempty);
         tv.setText("No Task");

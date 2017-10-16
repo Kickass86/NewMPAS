@@ -27,9 +27,11 @@ public class MessagesListAdapter extends BaseAdapter {
     //    static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent/";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
     public static boolean valid;
+    static Cursor cursor;
     //    static final Uri CONTENT_URI2 = Uri.parse(URL2);
     static MainActivity activity;
     static CheckBox c;
+    static boolean isSearch;
     static List<String> Tlist = new ArrayList<>();
     static List<String> Mlist = new ArrayList<>();
     static List<String> Llist = new ArrayList<>();
@@ -37,11 +39,11 @@ public class MessagesListAdapter extends BaseAdapter {
 //    static List<Integer> IList = new ArrayList<>();
 static List<Boolean> CList = new ArrayList<>();
     static List<Boolean> SSList = new ArrayList<>();
+    static Context context;
     private static MessagesListAdapter instance;
     private static LayoutInflater inflater = null;
     //    int num_selected;
     Holder holder;
-    Context context;
 
     private MessagesListAdapter(Context act) {
         context = act;
@@ -66,55 +68,64 @@ static List<Boolean> CList = new ArrayList<>();
         search = "%" + search + "%";
         valid = false;
 
-        Cursor cursor = activity.getContentResolver().query(CONTENT_URI1, null, "WillDeleted = ? AND (MessageTitle like ? OR MessageBody like ?)", new String[]{"0", search, search}, null);
+        cursor = activity.getContentResolver().query(CONTENT_URI1, null, "WillDeleted = ? AND (MessageTitle like ? OR MessageBody like ?)", new String[]{"0", search, search}, null);
 
-        Tlist = new ArrayList<>();
-        Mlist = new ArrayList<>();
-        Llist = new ArrayList<>();
-        isSeen = new ArrayList<>();
-        activity.IList = new ArrayList<>();
-        CList = new ArrayList<>();
-        SSList = new ArrayList<>();
-
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                do {
-
-//                        for (int i = 0; i < MESSAGES.size(); i++) {
-                    activity.IList.add(Integer.valueOf(cursor.getString(0)));
-                    Tlist.add(cursor.getString(1));
-                    Mlist.add(cursor.getString(2));
-                    CList.add("1".equals(cursor.getString(4)));
-                    isSeen.add("1".equals(cursor.getString(5)));
-                    SSList.add("1".equals(cursor.getString(7)));
-                    Llist.add(cursor.getString(9));
-//                        }
-//                    activity.MessaCheckedState = new boolean[activity.IList.size()];
-//                    activity.num_selected = 0;
-                } while (cursor.moveToNext());
-            }
-        }
-        int count = cursor.getCount();
-        cursor.close();
-        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        c = (CheckBox) activity.findViewById(R.id.checkbox1);
-        if (MainActivity.NFlag) {
-            MainActivity.MessaCheckedState = new boolean[activity.IList.size()];
-            for (int i = 0; i < activity.IList.size(); i++) {
-                MainActivity.MessaCheckedState[i] = false;
-            }
-            MainActivity.NFlag = false;
-        }
-        if (count != MainActivity.MessaCheckedState.length) {
-            MainActivity.MessaCheckedState = new boolean[activity.IList.size()];
-            for (int i = 0; i < activity.IList.size(); i++) {
-                MainActivity.MessaCheckedState[i] = false;
-            }
-            MainActivity.NFlag = false;
-        }
-
+        Populate();
 
     }
+
+
+    public static MessagesListAdapter Filter(String title, String body) {
+
+        instance = new MessagesListAdapter(context);
+
+
+        String Select = " WillDeleted = ? ";
+        String[] SelectArgtemp = new String[3];
+        String[] SelectArg;
+        SelectArgtemp[0] = "0";
+
+        if (!title.isEmpty()) {
+            title = "%" + title + "%";
+            Select = Select + " AND MessageTitle like ? ";
+            if (SelectArgtemp[1] == null) {
+                SelectArgtemp[1] = title;
+            }
+        }
+
+        if (!body.isEmpty()) {
+            body = "%" + body + "%";
+
+            if (SelectArgtemp[1] == null) {
+                Select = Select + " AND MessageBody like ? ";
+                SelectArgtemp[1] = body;
+            } else {
+                Select = Select + " AND MessageBody like ? ";
+                SelectArgtemp[2] = body;
+            }
+        }
+
+        List<String> list = new ArrayList<>();
+
+        for (String s : SelectArgtemp) {
+            if (s != null && s.length() > 0) {
+                list.add(s);
+            }
+        }
+
+        SelectArg = list.toArray(new String[list.size()]);
+
+
+        valid = false;
+
+        cursor = activity.getContentResolver().query(CONTENT_URI1, null, Select, SelectArg, null);
+
+        Populate();
+
+        return instance;
+
+    }
+
 
     public static MessagesListAdapter getInstance(Context context) {
         if (instance == null) {
@@ -133,7 +144,11 @@ static List<Boolean> CList = new ArrayList<>();
     static void Initialize() {
         valid = true;
 
-        Cursor cursor = activity.getContentResolver().query(CONTENT_URI1, null, "WillDeleted = ?", new String[]{"0"}, null);
+        cursor = activity.getContentResolver().query(CONTENT_URI1, null, "WillDeleted = ?", new String[]{"0"}, null);
+        Populate();
+    }
+
+    private static void Populate() {
 
         Tlist = new ArrayList<>();
         Mlist = new ArrayList<>();

@@ -16,7 +16,7 @@
         android:checked="false"
         android:textAllCaps="false"
         android:title="@string/menu_select_all"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
 
     <item
@@ -24,7 +24,7 @@
         android:icon="@mipmap/ic_done_all_black_24dp"
         android:textAllCaps="false"
         android:title="@string/menu_read"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
 
     <item
@@ -32,7 +32,7 @@
         android:icon="@mipmap/ic_delete_black_24dp"
         android:textAllCaps="false"
         android:title="@string/menu_delete"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_search"
@@ -45,6 +45,13 @@
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_help"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/action_filter"
+        android:orderInCategory="100"
+        android:title="@string/action_filter"
         app:showAsAction="never" />
 
 

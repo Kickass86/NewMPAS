@@ -43,9 +43,10 @@ public class TasksAdapter extends BaseAdapter {
     static List<String> CrList = new ArrayList<>();
     static List<Integer> StList = new ArrayList<>();
     static List<String> DateList = new ArrayList<>();
+    static Context context;
+    private static Cursor cursor;
     private static TasksAdapter instance;
     private static LayoutInflater inflater = null;
-    Context context;
 
     private TasksAdapter(Context act) {
         context = act;
@@ -56,6 +57,11 @@ public class TasksAdapter extends BaseAdapter {
         activity = mainActivity;
 //        }
 
+    }
+
+    public static TasksAdapter getInstance() {
+
+        return instance;
     }
 
 
@@ -71,74 +77,98 @@ public class TasksAdapter extends BaseAdapter {
         search = "%" + search + "%";
 //        valid = false;
 
-        Cursor cursor = activity.getContentResolver().query(CONTENT_URI1, null, "TaskTitle like ? OR TaskDescription like ?", new String[]{search, search}, null);
+        cursor = activity.getContentResolver().query(CONTENT_URI1, null, "TaskTitle like ? OR TaskDescription like ?", new String[]{search, search}, null);
 
-        Tlist = new ArrayList<>();
-        DesList = new ArrayList<>();
-        isSeen = new ArrayList<>();
-        EList = new ArrayList<>();
-        RList = new ArrayList<>();
-        DelList = new ArrayList<>();
-        ReList = new ArrayList<>();
-        iCList = new ArrayList<>();
-        iRList = new ArrayList<>();
-        NRList = new ArrayList<>();
-        activity.IDList = new ArrayList<>();
-        CrList = new ArrayList<>();
-        StList = new ArrayList<>();
-        DateList = new ArrayList<>();
-
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                do {
-
-//                        for (int i = 0; i < MESSAGES.size(); i++) {
-                    activity.IDList.add(cursor.getString(0));
-                    Tlist.add(cursor.getString(1));
-                    DesList.add(cursor.getString(2));
-                    DateList.add(cursor.getString(3));
-                    CrList.add(cursor.getString(4));
-                    StList.add(cursor.getInt(5));
-                    ReList.add(cursor.getString(6));
-                    isSeen.add("1".equals(cursor.getString(7)));
-                    EList.add("1".equals(cursor.getString(9)));
-                    RList.add("1".equals(cursor.getString(10)));
-                    DelList.add("1".equals(cursor.getString(11)));
-                    iCList.add("1".equals(cursor.getString(12)));
-                    iRList.add("1".equals(cursor.getString(13)));
-                    NRList.add(cursor.getString(15));
-
-
-//                        }
-//                    activity.TaskCheckedState = new boolean[activity.IList.size()];
-//                    activity.num_selected = 0;
-                } while (cursor.moveToNext());
-            }
-        }
-        int count = cursor.getCount();
-        cursor.close();
-        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        c = (CheckBox) activity.findViewById(R.id.tcheckbox);
-        if (MainActivity.TFlag) {
-            MainActivity.TaskCheckedState = new boolean[Tlist.size()];
-            for (int i = 0; i < activity.IDList.size(); i++) {
-                MainActivity.TaskCheckedState[i] = false;
-            }
-            MainActivity.TFlag = false;
-        }
-        if (count != MainActivity.TaskCheckedState.length) {
-            MainActivity.TaskCheckedState = new boolean[Tlist.size()];
-            for (int i = 0; i < activity.IDList.size(); i++) {
-                MainActivity.TaskCheckedState[i] = false;
-            }
-            MainActivity.TFlag = false;
-        }
+        Populate();
 
 
     }
 
 
+    public static TasksAdapter Filter(String title, String description, String Creator, String Responsible) {
 
+        instance = new TasksAdapter(context);
+
+
+        String Select = null;
+        String[] SelectArgTemp = new String[4];
+        String[] SelectArg;
+
+        if (!title.isEmpty()) {
+            title = "%" + title + "%";
+            Select = " TaskTitle like ? ";
+            if (SelectArgTemp[0] == null) {
+                SelectArgTemp[0] = title;
+            }
+        }
+
+        if (!description.isEmpty()) {
+            description = "%" + description + "%";
+
+            if (SelectArgTemp[0] == null) {
+                Select = " TaskDescription like ? ";
+                SelectArgTemp[0] = description;
+            } else {
+                Select = Select + " AND TaskDescription like ? ";
+                SelectArgTemp[1] = description;
+            }
+        }
+
+
+        if (!Responsible.isEmpty()) {
+
+
+            if (SelectArgTemp[0] == null) {
+                Select = " NameResponsible = ? ";
+                SelectArgTemp[0] = Responsible;
+            } else if (SelectArgTemp[1] == null) {
+                Select = Select + " AND NameResponsible = ? ";
+                SelectArgTemp[1] = Responsible;
+            } else if (SelectArgTemp[2] == null) {
+                Select = Select + " AND NameResponsible = ? ";
+                SelectArgTemp[2] = Responsible;
+            } else if (SelectArgTemp[3] == null) {
+                Select = Select + " AND NameResponsible = ? ";
+                SelectArgTemp[3] = Responsible;
+            }
+        }
+
+        if (!Creator.isEmpty()) {
+
+
+            if (SelectArgTemp[0] == null) {
+                Select = " TaskCreator = ? ";
+                SelectArgTemp[0] = Creator;
+            } else if (SelectArgTemp[1] == null) {
+                Select = Select + " AND TaskCreator = ? ";
+                SelectArgTemp[1] = Creator;
+            } else if (SelectArgTemp[2] == null) {
+                Select = Select + " AND TaskCreator = ? ";
+                SelectArgTemp[2] = Creator;
+            } else if (SelectArgTemp[3] == null) {
+                Select = Select + " AND TaskCreator = ? ";
+                SelectArgTemp[3] = Creator;
+            }
+        }
+
+
+        List<String> list = new ArrayList<>();
+
+        for (String s : SelectArgTemp) {
+            if (s != null && s.length() > 0) {
+                list.add(s);
+            }
+        }
+
+        SelectArg = list.toArray(new String[list.size()]);
+
+
+        cursor = activity.getContentResolver().query(CONTENT_URI1, null, Select, SelectArg, null);
+
+        Populate();
+
+        return instance;
+    }
 
 
 
@@ -158,7 +188,11 @@ public class TasksAdapter extends BaseAdapter {
 
     static void Initialize() {
 
-        Cursor cursor = activity.getContentResolver().query(CONTENT_URI1, null, null, null, null);
+        cursor = activity.getContentResolver().query(CONTENT_URI1, null, null, null, null);
+        Populate();
+    }
+
+    private static void Populate() {
 
         Tlist = new ArrayList<>();
         DesList = new ArrayList<>();
@@ -368,6 +402,7 @@ public class TasksAdapter extends BaseAdapter {
                     bundle.putBoolean(activity.getString(R.string.TisCreator), iCList.get(position));
                     bundle.putBoolean(activity.getString(R.string.TisResponsible), iRList.get(position));
                     showActivity.putExtras(bundle);
+                    MainActivity.Gone = true;
                     MainActivity.Scroll_Position = position;
                     showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     Log.i("Task Detail", Tlist.get(position));

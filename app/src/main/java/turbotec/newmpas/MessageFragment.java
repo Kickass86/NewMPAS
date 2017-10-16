@@ -14,17 +14,21 @@ import android.widget.TextView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class NotificationFragment extends Fragment {
+public class MessageFragment extends Fragment {
 
 
     //    private SimpleCursorAdapter m_adapter;
     static final String PROVIDER_NAME = "TURBOTEC.NEWMPAS.MESSAGEPROVIDER";
     static final String URL = "content://" + PROVIDER_NAME + "/messages";
     static final Uri CONTENT_URI = Uri.parse(URL);
+    static boolean isSearch;
+    static boolean isFilter;
+    static String Title = "", Body = "";
+    static String query;
 
 //    static MainActivity acticity;
 
-    public NotificationFragment() {
+    public MessageFragment() {
         // Required empty public constructor
     }
 
@@ -66,8 +70,13 @@ public class NotificationFragment extends Fragment {
 //        getActivity();
 //        MessagesListAdapter.set(acticity);
 //        MessagesListAdapter adapter = MessagesListAdapter.getInstance(getContext());
-        MainActivity.AdaptNo = MessagesListAdapter.getInstance(getContext());
-
+        if (isSearch) {
+            MainActivity.AdaptNo = MessagesListAdapter.getSearchInstance(getContext(), query);
+        } else if (isFilter) {
+            MainActivity.AdaptNo = MessagesListAdapter.Filter(Title, Body);
+        } else {
+            MainActivity.AdaptNo = MessagesListAdapter.getInstance(getContext());
+        }
         TextView tv = (TextView) view.findViewById(R.id.empty1);
         tv.setText("No Message");
         list.setEmptyView(tv);

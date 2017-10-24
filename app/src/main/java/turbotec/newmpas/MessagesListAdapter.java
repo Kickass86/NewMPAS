@@ -36,8 +36,8 @@ public class MessagesListAdapter extends BaseAdapter {
     static List<String> Mlist = new ArrayList<>();
     static List<String> Llist = new ArrayList<>();
     static List<Boolean> isSeen = new ArrayList<>();
-//    static List<Integer> IList = new ArrayList<>();
-static List<Boolean> CList = new ArrayList<>();
+    //    static List<Integer> MIDList = new ArrayList<>();
+    static List<Boolean> CList = new ArrayList<>();
     static List<Boolean> SSList = new ArrayList<>();
     static Context context;
     private static MessagesListAdapter instance;
@@ -127,19 +127,19 @@ static List<Boolean> CList = new ArrayList<>();
     }
 
 
-    public static MessagesListAdapter getInstance(Context context) {
+    public static MessagesListAdapter getInstance() {
         if (instance == null) {
-            instance = new MessagesListAdapter(context);
+            instance = new MessagesListAdapter(activity.getApplicationContext());
 
         }
         Initialize();
         return instance;
     }
 
-    public static MessagesListAdapter getInstance() {
-//        Initialize();
-        return instance;
-    }
+//    public static MessagesListAdapter getInstance() {
+////        Initialize();
+//        return instance;
+//    }
 
     static void Initialize() {
         valid = true;
@@ -154,7 +154,7 @@ static List<Boolean> CList = new ArrayList<>();
         Mlist = new ArrayList<>();
         Llist = new ArrayList<>();
         isSeen = new ArrayList<>();
-        activity.IList = new ArrayList<>();
+        activity.MIDList = new ArrayList<>();
         CList = new ArrayList<>();
         SSList = new ArrayList<>();
 
@@ -163,7 +163,7 @@ static List<Boolean> CList = new ArrayList<>();
                 do {
 
 //                        for (int i = 0; i < MESSAGES.size(); i++) {
-                    activity.IList.add(Integer.valueOf(cursor.getString(0)));
+                    activity.MIDList.add(Integer.valueOf(cursor.getString(0)));
                     Tlist.add(cursor.getString(1));
                     Mlist.add(cursor.getString(2));
                     CList.add("1".equals(cursor.getString(4)));
@@ -171,7 +171,7 @@ static List<Boolean> CList = new ArrayList<>();
                     SSList.add("1".equals(cursor.getString(7)));
                     Llist.add(cursor.getString(9));
 //                        }
-//                    activity.MessaCheckedState = new boolean[activity.IList.size()];
+//                    activity.MessaCheckedState = new boolean[activity.MIDList.size()];
 //                    activity.num_selected = 0;
                 } while (cursor.moveToNext());
             }
@@ -181,15 +181,15 @@ static List<Boolean> CList = new ArrayList<>();
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         c = (CheckBox) activity.findViewById(R.id.checkbox1);
         if (MainActivity.NFlag) {
-            MainActivity.MessaCheckedState = new boolean[activity.IList.size()];
-            for (int i = 0; i < activity.IList.size(); i++) {
+            MainActivity.MessaCheckedState = new boolean[activity.MIDList.size()];
+            for (int i = 0; i < activity.MIDList.size(); i++) {
                 MainActivity.MessaCheckedState[i] = false;
             }
             MainActivity.NFlag = false;
         }
         if (count != MainActivity.MessaCheckedState.length) {
-            MainActivity.MessaCheckedState = new boolean[activity.IList.size()];
-            for (int i = 0; i < activity.IList.size(); i++) {
+            MainActivity.MessaCheckedState = new boolean[activity.MIDList.size()];
+            for (int i = 0; i < activity.MIDList.size(); i++) {
                 MainActivity.MessaCheckedState[i] = false;
             }
             MainActivity.NFlag = false;
@@ -273,7 +273,7 @@ static List<Boolean> CList = new ArrayList<>();
                 } else {
                     htemp.cb.setVisibility(View.VISIBLE);
                 }
-                    activity.invalidateOptionsMenu();
+                activity.invalidateOptionsMenu();
 //                    notifyDataSetChanged();
 //                }
 
@@ -283,7 +283,7 @@ static List<Boolean> CList = new ArrayList<>();
 //        if (c != null)
 //            c.setOnCheckedChangeListener(checkListener);
 //        if (holder.cb != null)
-            holder.cb.setOnCheckedChangeListener(checkListener);
+        holder.cb.setOnCheckedChangeListener(checkListener);
 
         int sum = 0;
         for (boolean b : MainActivity.MessaCheckedState) {
@@ -342,7 +342,7 @@ static List<Boolean> CList = new ArrayList<>();
                     bundle.putString(activity.getString(R.string.Link), Llist.get(position));
                     bundle.putBoolean(activity.getString(R.string.Critical), CList.get(position));
                     bundle.putBoolean(activity.getString(R.string.SendSeen), SSList.get(position));
-                    bundle.putInt(activity.getString(R.string.ID), activity.IList.get(position));
+                    bundle.putInt(activity.getString(R.string.ID), activity.MIDList.get(position));
                     bundle.putBoolean(activity.getString(R.string.Seen), isSeen.get(position));
                     showActivity.putExtras(bundle);
                     MainActivity.Scroll_Position = position;
@@ -398,7 +398,7 @@ static List<Boolean> CList = new ArrayList<>();
 
 //                    if (!activity.isSelected) {
 
-                        activity.invalidateOptionsMenu();
+                    activity.invalidateOptionsMenu();
 
 //                        activity.isSelected = true;
 //                    } else {

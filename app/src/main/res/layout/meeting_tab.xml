@@ -5,12 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1">
+
         <ListView
-            android:id="@+id/list_messages"
+            android:id="@+id/list_meeting"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp">
@@ -19,7 +21,9 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
             <TextView
                 android:id="@+id/empty"
                 android:layout_width="wrap_content"
@@ -27,7 +31,10 @@
                 android:layout_centerInParent="true"
                 android:gravity="center"
                 tools:ignore="ObsoleteLayoutParam" />
+
+
         </RelativeLayout>
+
     </FrameLayout>
 
 </LinearLayout>

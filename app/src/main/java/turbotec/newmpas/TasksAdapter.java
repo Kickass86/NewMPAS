@@ -61,13 +61,18 @@ public class TasksAdapter extends BaseAdapter {
 
     public static TasksAdapter getInstance() {
 
+        if (instance == null) {
+            instance = new TasksAdapter(activity.getApplicationContext());
+
+        }
+        Initialize();
         return instance;
     }
 
 
-    public static TasksAdapter getSearchInstance(Context context, String search) {
+    public static TasksAdapter getSearchInstance(String search) {
         if (instance == null) {
-            instance = new TasksAdapter(context);
+            instance = new TasksAdapter(activity.getApplicationContext());
         }
         SearchQuery(search);
         return instance;
@@ -171,15 +176,14 @@ public class TasksAdapter extends BaseAdapter {
     }
 
 
-
-    public static TasksAdapter getInstance(Context context) {
-        if (instance == null) {
-            instance = new TasksAdapter(context);
-
-        }
-        Initialize();
-        return instance;
-    }
+//    public static TasksAdapter getInstance(Context context) {
+//        if (instance == null) {
+//            instance = new TasksAdapter(context);
+//
+//        }
+//        Initialize();
+//        return instance;
+//    }
 
 //    public static TasksAdapter getInstance() {
 ////        Initialize();
@@ -204,7 +208,7 @@ public class TasksAdapter extends BaseAdapter {
         iCList = new ArrayList<>();
         iRList = new ArrayList<>();
         NRList = new ArrayList<>();
-        activity.IDList = new ArrayList<>();
+        activity.TIDList = new ArrayList<>();
         CrList = new ArrayList<>();
         StList = new ArrayList<>();
         DateList = new ArrayList<>();
@@ -214,7 +218,7 @@ public class TasksAdapter extends BaseAdapter {
                 do {
 
 //                        for (int i = 0; i < MESSAGES.size(); i++) {
-                    activity.IDList.add(cursor.getString(0));
+                    activity.TIDList.add(cursor.getString(0));
                     Tlist.add(cursor.getString(1));
                     DesList.add(cursor.getString(2));
                     DateList.add(cursor.getString(3));
@@ -231,7 +235,7 @@ public class TasksAdapter extends BaseAdapter {
 
 
 //                        }
-//                    activity.TaskCheckedState = new boolean[activity.IList.size()];
+//                    activity.TaskCheckedState = new boolean[activity.MIDList.size()];
 //                    activity.num_selected = 0;
                 } while (cursor.moveToNext());
             }
@@ -242,14 +246,14 @@ public class TasksAdapter extends BaseAdapter {
         c = (CheckBox) activity.findViewById(R.id.tcheckbox);
         if (MainActivity.TFlag) {
             MainActivity.TaskCheckedState = new boolean[Tlist.size()];
-            for (int i = 0; i < activity.IDList.size(); i++) {
+            for (int i = 0; i < activity.TIDList.size(); i++) {
                 MainActivity.TaskCheckedState[i] = false;
             }
             MainActivity.TFlag = false;
         }
         if (count != MainActivity.TaskCheckedState.length) {
             MainActivity.TaskCheckedState = new boolean[Tlist.size()];
-            for (int i = 0; i < activity.IDList.size(); i++) {
+            for (int i = 0; i < activity.TIDList.size(); i++) {
                 MainActivity.TaskCheckedState[i] = false;
             }
             MainActivity.TFlag = false;
@@ -396,7 +400,7 @@ public class TasksAdapter extends BaseAdapter {
                     bundle.putBoolean(activity.getString(R.string.TEditable), EList.get(position));
                     bundle.putBoolean(activity.getString(R.string.TReplyAble), RList.get(position));
                     bundle.putBoolean(activity.getString(R.string.TDeletable), DelList.get(position));
-                    bundle.putString(activity.getString(R.string.TID), activity.IDList.get(position));
+                    bundle.putString(activity.getString(R.string.TID), activity.TIDList.get(position));
                     bundle.putString(activity.getString(R.string.TReport), ReList.get(position));
                     bundle.putString(activity.getString(R.string.TNameResponsible), NRList.get(position));
                     bundle.putBoolean(activity.getString(R.string.TisCreator), iCList.get(position));

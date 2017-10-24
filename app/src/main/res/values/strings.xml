@@ -11,7 +11,7 @@
     <string name="Name">Name</string>
     <string name="FileVersion">FileVersion</string>
     <string name="defaultValue">Not_Saved</string>
-    <string name="defaultTabs">11</string>
+    <string name="defaultTabs">111</string>
     <string name="ErrorMessage">ErrorMessage</string>
     <string name="Username">Username</string>
     <string name="Activation">Activation</string>
@@ -31,6 +31,20 @@
     <string name="What">What</string>
 
     <string name="Report">Report</string>
+
+    <string name="MEETING_ID">Meeting ID</string>
+    <string name="MEETING_TOPIC">MEETING TOPIC</string>
+    <string name="MEETING_CREATOR">MEETING CREATOR</string>
+    <string name="MEETING_ATTENDANCE">MEETING ATTENDANCE</string>
+    <string name="MEETING_SECRETARY">MEETING SECRETARY</string>
+    <string name="MEETING_SERVICES">MEETING SERVICES</string>
+    <string name="MEETING_ROOM">MEETING ROOM</string>
+    <string name="MEETING_EQUIPMENT">MEETING EQUIPMENT</string>
+    <string name="MEETING_START_DATE">MEETING START DATE</string>
+    <string name="MEETING_END_DATE">MEETING END DATE</string>
+    <string name="MEETING_PER_DATE">MEETING PER DATE</string>
+    <string name="MEETING_START_TIME">MEETING START TIME</string>
+    <string name="MEETING_END_TIME">MEETING END TIME</string>
 
 
     <string name="ID">Unique ID</string>

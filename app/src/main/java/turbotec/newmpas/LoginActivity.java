@@ -30,7 +30,7 @@ import java.util.UUID;
 public class LoginActivity extends AppCompatActivity {
 
     List<String> Mlist = new ArrayList<>(); //Messages List
-    List<String> Tlist = new ArrayList<>(); //Title List
+    List<String> Tlist = new ArrayList<>(); //Topic List
     //        List<String> Dlist = new ArrayList<>(); //Date List
     List<Boolean> SList = new ArrayList<>(); //is Seen
     List<Integer> IList = new ArrayList<>(); //Message ID

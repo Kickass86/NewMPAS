@@ -29,18 +29,53 @@ public class MyProvider extends ContentProvider {
     static final int Tasks = 3;
     static final int TasksT = 4;
     static final int User = 5;
+    static final int Meeting = 6;
     //    static final int MID = 5;
-//    static final int TID = 6;
-    static final UriMatcher uriMatcher;
     // Table Name
     static final String TABLE_USER = "USERS";
     static final String TABLE_MESSAGES = "MESSAGES";
     static final String TABLE_TASKS = "TASKS";
+    static final String TABLE_MEETING = "MEETING";
+    //    static final int TID = 6;
+    static final UriMatcher uriMatcher;
+
+    private static final String MEETING_ID = "_id";
+    private static final String MEETING_TOPIC = "TOPIC";
+    private static final String MEETING_CREATOR = "CREATOR";
+    private static final String MEETING_ATTENDANCE = "ATTENDANCE";
+    private static final String MEETING_SECRETARY = "SECRETARY";
+    private static final String MEETING_SERVICES = "SERVICES";
+    private static final String MEETING_ROOM = "ROOM";
+    private static final String MEETING_EQUIPMENT = "EQUIPMENT";
+    private static final String MEETING_START_DATE = "START_DATE";
+    private static final String MEETING_END_DATE = "END_DATE";
+    private static final String MEETING_PER_DATE = "PER_DATE";
+    private static final String MEETING_START_TIME = "START_TIME";
+    private static final String MEETING_END_TIME = "END_TIME";
+    private static final String SendDelivered = "SendDelivered";
+    private static final String EVENT_INSERT = "CalendarInsert";
+
+
+    static final String CREATE_MEETING_TABLE =
+            "CREATE TABLE " + TABLE_MEETING + "(" +
+                    MEETING_ID + " TEXT PRIMARY KEY," +
+                    MEETING_TOPIC + " TEXT," + MEETING_CREATOR + " TEXT,"
+                    + MEETING_ATTENDANCE + " TEXT," + MEETING_SECRETARY + " TEXT,"
+                    + MEETING_SERVICES + " TEXT," + MEETING_ROOM + " TEXT,"
+                    + MEETING_EQUIPMENT + " TEXT," + MEETING_START_DATE + " TEXT,"
+                    + MEETING_END_DATE + " TEXT," + MEETING_START_TIME + " TEXT,"
+                    + MEETING_END_TIME + " TEXT," + MEETING_PER_DATE + " TEXT,"
+                    + SendDelivered + " Boolean," + EVENT_INSERT + " Boolean)";
+
+
+
     private static final String USER_ID = "_id";
     private static final String USER_NAME = "Name";
+
     static final String CREATE_USER_TABLE =
             "CREATE TABLE " + TABLE_USER + "(" + USER_ID + " TEXT PRIMARY KEY,"
                     + USER_NAME + " TEXT)";
+
     private static final String MESSAGE_ID = "_id";
     private static final String MESSAGE_Title = "MessageTitle";
     private static final String MESSAGE_BODY = "MessageBody";
@@ -50,13 +85,16 @@ public class MyProvider extends ContentProvider {
     private static final String WillDeleted = "WillDeleted";
     private static final String Seen = "Seen";
     private static final String SendSeen = "SendSeen";
-    private static final String SendDelivered = "SendDelivered";
+
+
     static final String CREATE_MESSAGES_TABLE =
             "CREATE TABLE " + TABLE_MESSAGES + "(" +
                     MESSAGE_ID + " INTEGER PRIMARY KEY," +
-                    MESSAGE_Title + " TEXT," + MESSAGE_BODY + " TEXT," + INSERT_DATE +
-                    " TEXT," + Critical + " Boolean," + Seen + " Boolean,"
-                    + SendDelivered + " Boolean," + SendSeen + " Boolean, " + WillDeleted + " Boolean, " + Link + " TEXT)";
+                    MESSAGE_Title + " TEXT," + MESSAGE_BODY + " TEXT," + INSERT_DATE
+                    + " TEXT," + Critical + " Boolean," + Seen + " Boolean,"
+                    + SendDelivered + " Boolean," + SendSeen + " Boolean, "
+                    + WillDeleted + " Boolean, " + Link + " TEXT)";
+
     private static final String TASK_ID = "_id";
     private static final String TASK_Title = "TaskTitle";
     private static final String Task_Description = "TaskDescription";
@@ -91,7 +129,7 @@ public class MyProvider extends ContentProvider {
         uriMatcher.addURI(PROVIDER_NAME, "/tasks/", Tasks);
         uriMatcher.addURI(PROVIDER_NAME, "/tasks/unsent/", TasksT);
         uriMatcher.addURI(PROVIDER_NAME, "/users", User);
-
+        uriMatcher.addURI(PROVIDER_NAME, "/meetings", Meeting);
 //        uriMatcher.addURI(PROVIDER_NAME, "/messages/#", MID);
 //        uriMatcher.addURI(PROVIDER_NAME, "/tasks/*", TID);
     }
@@ -137,6 +175,8 @@ public class MyProvider extends ContentProvider {
             cursor = dbHelper.getUnsendTask(projection, selection, selectionArgs, sortOrder);
         } else if (uriMatcher.match(uri) == User) {
             cursor = dbHelper.getUser(projection, selection, selectionArgs, sortOrder);
+        } else if (uriMatcher.match(uri) == Meeting) {
+            cursor = dbHelper.getMeeting(projection, selection, selectionArgs, sortOrder);
         }
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
 //        getContext().getContentResolver().notifyChange(uri, null);
@@ -191,6 +231,13 @@ public class MyProvider extends ContentProvider {
                 return uri;
             }
         }
+        if (uriMatcher.match(uri) == Meeting) {
+//            dbHelper.deleteUsers();
+            long rowID = dbHelper.addNewMeeting(values);
+            if (rowID > 0) {
+                return uri;
+            }
+        }
 
         throw new SQLException("Failed to add a record into " + uri);
 
@@ -199,13 +246,16 @@ public class MyProvider extends ContentProvider {
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
 
-        dbHelper.deleteUsers();
+//        dbHelper.deleteUsers();
         long i = 0;
         for (ContentValues value : values) {
 
 //            insert(uri, value);
-            i = dbHelper.addNewUser(value);
-
+            try {
+                i = dbHelper.addNewUser(value);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
 //        return super.bulkInsert(uri, values);
@@ -231,6 +281,8 @@ public class MyProvider extends ContentProvider {
             count = dbHelper.deleteMessage(id, selection, selectionArgs);
         } else if (uriMatcher.match(uri) == Tasks) {
             count = dbHelper.deleteTask(id, selection, selectionArgs);
+        } else if (uriMatcher.match(uri) == Meeting) {
+            count = dbHelper.deleteMeeting(id, selection, selectionArgs);
         }
 
 
@@ -252,8 +304,10 @@ public class MyProvider extends ContentProvider {
 
             count = dbHelper.updateMessage(values, selection, selectionArgs);
 
-        } else {
+        } else if (uriMatcher.match(uri) == Tasks) {
             count = dbHelper.updateTask(values, selection, selectionArgs);
+        } else if (uriMatcher.match(uri) == Meeting) {
+            count = dbHelper.updateMeeting(values, selection, selectionArgs);
         }
 //        getContext().getContentResolver().notifyChange(uri, null);
         return count;
@@ -263,7 +317,7 @@ public class MyProvider extends ContentProvider {
     class DatabaseHandler extends SQLiteOpenHelper {
 
 
-        private static final int DATABASE_VERSION = 8;
+        private static final int DATABASE_VERSION = 9;
 
 
         private DatabaseHandler(Context context) {
@@ -281,18 +335,20 @@ public class MyProvider extends ContentProvider {
             db.execSQL(CREATE_TASKS_TABLE);
             db.execSQL(CREATE_MESSAGES_TABLE);
             db.execSQL(CREATE_USER_TABLE);
+            db.execSQL(CREATE_MEETING_TABLE);
         }
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-            // Drop older table if existed
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASKS);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-
-            // Create tables again
-            onCreate(db);
+//            // Drop older table if existed
+//            db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
+//            db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASKS);
+//            db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+//
+//            // Create tables again
+//            onCreate(db);
+            db.execSQL(CREATE_MEETING_TABLE);
 
         }
 
@@ -368,6 +424,24 @@ public class MyProvider extends ContentProvider {
         }
 
 
+        public Cursor getMeeting(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+
+            SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
+            sqliteQueryBuilder.setTables(TABLE_MEETING);
+
+
+            Cursor cursor = sqliteQueryBuilder.query(getReadableDatabase(),
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    sortOrder);
+            return cursor;
+
+        }
+
+
         public Cursor getUser(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
             SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
@@ -405,6 +479,16 @@ public class MyProvider extends ContentProvider {
 
             return id;
         }
+
+        public long addNewMeeting(ContentValues values) {
+            long id = getWritableDatabase().insert(TABLE_MEETING, "", values);
+            if (id <= 0) {
+                throw new SQLException("Failed to add an image");
+            }
+
+            return id;
+        }
+
 
         public long addNewUser(ContentValues values) throws SQLException {
             long id = getWritableDatabase().insert(TABLE_USER, "", values);
@@ -454,6 +538,15 @@ public class MyProvider extends ContentProvider {
 
         public int deleteUsers() {
             return getWritableDatabase().delete(TABLE_USER, null, null);
+        }
+
+
+        public int deleteMeeting(String id, String selection, String[] selectionArgs) {
+            return getWritableDatabase().delete(TABLE_MEETING, selection, selectionArgs);
+        }
+
+        public int updateMeeting(ContentValues values, String selection, String[] selectionArgs) {
+            return getWritableDatabase().update(TABLE_MEETING, values, selection, selectionArgs);
         }
     }
 

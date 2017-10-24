@@ -51,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
     static final Uri CONTENT_URI = Uri.parse(URL);
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
     static final Uri CONTENT_URI2 = Uri.parse(URL2);
-    static final int NUM_PAGES = 2;
-    static final String[] TABS_Names = {"Messages", "Tasks"};
+    static final int NUM_PAGES = 3;
+    static final String[] TABS_Names = {"Messages", "Tasks", "Meeting"};
     static String[] Responsible;
     static String IDResponsible;
     static String NameResponsible = "";
@@ -62,29 +62,32 @@ public class MainActivity extends AppCompatActivity {
     static int Scroll_Position = 0;
     static boolean NFlag = true;
     static boolean TFlag = true;
-    static boolean Gone = false;
+    static boolean Gone = false, Filter = true;
     static MessagesListAdapter AdaptNo;
     static TasksAdapter AdaptTa;
+    static MeetingAdapter AdaptMt;
     //    List<Boolean> CList = new ArrayList<>(); //Critical
 //    List<Boolean> SSList = new ArrayList<>(); //SendSeen
     //    boolean isSelected = false;
 //    private Menu mMenu;
     static TabController.Tabs setTab;
+    String Enable;
     boolean First = true;
-    boolean search = false;
+    //    boolean search = false;
     EditText subject;
     EditText description;
     EditText message;
     EditText body;
-    MenuItem item_search, item_filter;
+    MenuItem item_search, item_filter, item_setting;
     SearchView searchView;
     TabController tabController;
     //    List<String> Mlist = new ArrayList<>(); //Messages List
-//    List<String> Tlist = new ArrayList<>(); //Title List
+//    List<String> Tlist = new ArrayList<>(); //Topic List
 //    List<Boolean> SList = new ArrayList<>(); //is Seen
-    List<Integer> IList = new ArrayList<>(); //Message ID
-    List<String> IDList = new ArrayList<>();
-    private MainActivity Myactivity;
+    List<Integer> MIDList = new ArrayList<>(); //Message ID
+    List<String> TIDList = new ArrayList<>();
+    List<String> MTIDList = new ArrayList<>();
+    private MainActivity MyActivity;
     private SharedPreferenceHandler share = SharedPreferenceHandler.getInstance(this);
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -114,14 +117,14 @@ public class MainActivity extends AppCompatActivity {
 
 //                        MessagesListAdapter ad = MessagesListAdapter.getInstance(context);
 //                        lvno.setAdapter(ad);
-                    AdaptNo = MessagesListAdapter.getInstance(context);
+                    AdaptNo = MessagesListAdapter.getInstance();
                     AdaptNo.notifyDataSetChanged();
 
 //                    } else {
 
 //                        TasksAdapter ad = TasksAdapter.getInstance(context);
 //                        lvta.setAdapter(ad);
-                    AdaptTa = TasksAdapter.getInstance(context);
+                    AdaptTa = TasksAdapter.getInstance();
                     AdaptTa.notifyDataSetChanged();
 //                    }
                     Log.i("is this ", "BroadcastReceiver");
@@ -156,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTab = TabController.Tabs.Message;
+        Enable = share.GetTabsControl();
         Handle(savedInstanceState);
     }
 
@@ -165,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 //        MessaCheckedState[0] = false;
 
-        Myactivity = this;
+        MyActivity = this;
         tabController = TabController.getInstance(getApplicationContext());
 //        try {
 
@@ -175,14 +179,15 @@ public class MainActivity extends AppCompatActivity {
 
         MessagesListAdapter.set(this);
         TasksAdapter.set(this);
+        MeetingAdapter.set(this);
 
         Intent in = getIntent();
         if (in != null) {
             if (Intent.ACTION_SEARCH.equals(in.getAction())) {
                 String query = getIntent().getStringExtra(SearchManager.QUERY);
 
-                MessagesListAdapter ma = MessagesListAdapter.getSearchInstance(getApplicationContext(), query.trim());
-                TasksAdapter ta = TasksAdapter.getSearchInstance(getApplicationContext(), query.trim());
+//                MessagesListAdapter ma = MessagesListAdapter.getSearchInstance(getApplicationContext(), query.trim());
+//                TasksAdapter ta = TasksAdapter.getSearchInstance(getApplicationContext(), query.trim());
 
                 MessageFragment.isSearch = true;
                 MessageFragment.query = query.trim();
@@ -216,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
                                         showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         Gone = true;
                                         setTab = TabController.Tabs.Message;
+                                        Scroll_Position = 0;
                                         startActivity(showActivity);
                                         overridePendingTransition(0, 0);
                                     }
@@ -239,6 +245,33 @@ public class MainActivity extends AppCompatActivity {
                                 Gone = true;
                                 setTab = TabController.Tabs.Task;
                                 showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                Scroll_Position = 0;
+//                            Log.i("Task Detail", Tlist.get(position));
+//                    finish();
+                                startActivity(showActivity);
+                                overridePendingTransition(0, 0);
+                            } else if (b.getInt("Type") == 2) {
+                                Intent showActivity = new Intent(MainActivity.this, Meeting_Detail_Activity.class);
+                                Bundle bundle = new Bundle();
+
+                                bundle.putString(getString(R.string.MEETING_ID), b.getString(getString(R.string.MEETING_ID)));
+                                bundle.putString(getString(R.string.MEETING_TOPIC), b.getString(getString(R.string.MEETING_TOPIC)));
+                                bundle.putString(getString(R.string.MEETING_CREATOR), b.getString(getString(R.string.MEETING_CREATOR)));
+                                bundle.putString(getString(R.string.MEETING_ATTENDANCE), b.getString(getString(R.string.MEETING_ATTENDANCE)));
+                                bundle.putString(getString(R.string.MEETING_SECRETARY), b.getString(getString(R.string.MEETING_SECRETARY)));
+                                bundle.putString(getString(R.string.MEETING_SERVICES), b.getString(getString(R.string.MEETING_SERVICES)));
+                                bundle.putString(getString(R.string.MEETING_ROOM), b.getString(getString(R.string.MEETING_ROOM)));
+                                bundle.putString(getString(R.string.MEETING_EQUIPMENT), b.getString(getString(R.string.MEETING_EQUIPMENT)));
+                                bundle.putString(getString(R.string.MEETING_START_DATE), b.getString(getString(R.string.MEETING_START_DATE)));
+                                bundle.putString(getString(R.string.MEETING_END_DATE), b.getString(getString(R.string.MEETING_END_DATE)));
+                                bundle.putString(getString(R.string.MEETING_PER_DATE), b.getString(getString(R.string.MEETING_PER_DATE)));
+                                bundle.putString(getString(R.string.MEETING_START_TIME), b.getString(getString(R.string.MEETING_START_TIME)));
+                                bundle.putString(getString(R.string.MEETING_END_TIME), b.getString(getString(R.string.MEETING_END_TIME)));
+                                showActivity.putExtras(bundle);
+                                Gone = true;
+                                setTab = TabController.Tabs.Task;
+                                Scroll_Position = 0;
+                                showActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //                            Log.i("Task Detail", Tlist.get(position));
 //                    finish();
                                 startActivity(showActivity);
@@ -256,6 +289,7 @@ public class MainActivity extends AppCompatActivity {
         //add Dynamic Tabs here
         fragments.add(Fragment.instantiate(this, MessageFragment.class.getName()));
         fragments.add(Fragment.instantiate(this, TaskFragment.class.getName()));
+        fragments.add(Fragment.instantiate(this, MeetingFragment.class.getName()));
 
         this.mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), fragments);
         mPager = (ViewPager) findViewById(R.id.pager);
@@ -302,11 +336,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 switch (tab.getPosition()) {
-                    case 0:
-                        setTab = TabController.Tabs.Message;
+
+                    case 2:
+                        setTab = TabController.Tabs.Meeting;
                         break;
                     case 1:
-                        setTab = TabController.Tabs.Task;
+                        if (0 == findNthIndexOf(Enable, "1", 1)) {
+                            setTab = TabController.Tabs.Task;
+                        } else if (1 == findNthIndexOf(Enable, "1", 1)) {
+                            setTab = TabController.Tabs.Meeting;
+                        }
+                        break;
+                    case 0:
+
+                        if (0 == findNthIndexOf(Enable, "1", 1)) {
+                            setTab = TabController.Tabs.Message;
+                        } else if (1 == findNthIndexOf(Enable, "1", 1)) {
+                            setTab = TabController.Tabs.Task;
+                        } else if (2 == findNthIndexOf(Enable, "1", 1)) {
+                            setTab = TabController.Tabs.Meeting;
+                        }
                         break;
                 }
             }
@@ -327,12 +376,13 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 switch (tb.getPosition()) {
+                    //TODO: check if there is a problem here switching between tabs
                     case 0: {
                         if (sumN > 0) {
                             new Handler().postDelayed(new Runnable() {
                                 public void run() {
-//                                        MessagesListAdapter NAda = MessagesListAdapter.getInstance(Myactivity);
-                                    AdaptNo = MessagesListAdapter.getInstance(Myactivity);
+//                                        MessagesListAdapter NAda = MessagesListAdapter.getInstance(MyActivity);
+                                    AdaptNo = MessagesListAdapter.getInstance();
                                     AdaptNo.notifyDataSetChanged();
                                 }
                             }, 300);
@@ -344,8 +394,8 @@ public class MainActivity extends AppCompatActivity {
                             new Handler().postDelayed(new Runnable() {
                                 public void run() {
 
-//                                        TasksAdapter TAda = TasksAdapter.getInstance(Myactivity);
-                                    AdaptTa = TasksAdapter.getInstance(Myactivity);
+//                                        TasksAdapter TAda = TasksAdapter.getInstance(MyActivity);
+                                    AdaptTa = TasksAdapter.getInstance();
                                     AdaptTa.notifyDataSetChanged();
                                 }
                             }, 300);
@@ -359,7 +409,28 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 2:
+                        setTab = TabController.Tabs.Meeting;
+                        break;
+                    case 1:
+                        if (0 == findNthIndexOf(Enable, "1", 1)) {
+                            setTab = TabController.Tabs.Task;
+                        } else if (1 == findNthIndexOf(Enable, "1", 1)) {
+                            setTab = TabController.Tabs.Meeting;
+                        }
+                        break;
+                    case 0:
 
+                        if (0 == findNthIndexOf(Enable, "1", 1)) {
+                            setTab = TabController.Tabs.Message;
+                        } else if (1 == findNthIndexOf(Enable, "1", 1)) {
+                            setTab = TabController.Tabs.Task;
+                        } else if (2 == findNthIndexOf(Enable, "1", 1)) {
+                            setTab = TabController.Tabs.Meeting;
+                        }
+                        break;
+                }
             }
         });
 
@@ -402,15 +473,15 @@ public class MainActivity extends AppCompatActivity {
             TaskFragment.query = query.trim();
             ListView lvm = (ListView) findViewById(R.id.list_messages);
             MessagesListAdapter ma = MessagesListAdapter.getSearchInstance(getApplicationContext(), query.trim());
-            TextView tv = (TextView) findViewById(R.id.empty1);
+            TextView tv = (TextView) findViewById(R.id.empty);
             tv.setText("No Search Result");
             lvm.setEmptyView(tv);
             lvm.setAdapter(ma);
             ma.notifyDataSetChanged();
 
             ListView lvt = (ListView) findViewById(R.id.list_task);
-            TasksAdapter ta = TasksAdapter.getSearchInstance(getApplicationContext(), query.trim());
-            TextView tv1 = (TextView) findViewById(R.id.empty1);
+            TasksAdapter ta = TasksAdapter.getSearchInstance(query.trim());
+            TextView tv1 = (TextView) findViewById(R.id.empty);
             tv1.setText("No Search Result");
             lvt.setEmptyView(tv1);
             lvt.setAdapter(ta);
@@ -442,7 +513,7 @@ public class MainActivity extends AppCompatActivity {
                         Handle(null);
 
 //                    ListView lvm = (ListView) findViewById(R.id.list_messages);
-//                    MessagesListAdapter ma = MessagesListAdapter.Filter(Title, Body);
+//                    MessagesListAdapter ma = MessagesListAdapter.Filter(Topic, Body);
 //                MessagesListAdapter ma = MessagesListAdapter.getInstance(getApplicationContext());
 //                    TextView tv = (TextView) findViewById(R.id.empty1);
 //                    tv.setText("No Result");
@@ -502,20 +573,21 @@ public class MainActivity extends AppCompatActivity {
         int nt = tabController.GetTabNum(setTab);
         mPager.setCurrentItem(nt);
 
-        NFlag = true;
-        TFlag = true;
+
         if (Gone) {
+            NFlag = true;
+            TFlag = true;
             ListView lvno = (ListView) findViewById(R.id.list_messages);
             ListView lvta = (ListView) findViewById(R.id.list_task);
             if ((tabLayout.getSelectedTabPosition() == 0) & (lvno != null)) {
 //                MessagesListAdapter ad = MessagesListAdapter.getInstance(this);
 
                 if (MessageFragment.isSearch)
-                    AdaptNo = MessagesListAdapter.getSearchInstance(getBaseContext(), MessageFragment.query);
+                    AdaptNo = MessagesListAdapter.getSearchInstance(getBaseContext(), MessageFragment.query.trim());
                 else if (MessageFragment.isFilter)
                     AdaptNo = MessagesListAdapter.Filter(MessageFragment.Title, MessageFragment.Body);
                 else
-                    AdaptNo = MessagesListAdapter.getInstance(this);
+                    AdaptNo = MessagesListAdapter.getInstance();
 //                AdaptNo = MessagesListAdapter.getInstance();
                 lvno.setAdapter(AdaptNo);
                 AdaptNo.notifyDataSetChanged();
@@ -527,11 +599,11 @@ public class MainActivity extends AppCompatActivity {
 
 //                TasksAdapter ad = TasksAdapter.getInstance(this);
                 if (TaskFragment.isSearch)
-                    AdaptTa = TasksAdapter.getSearchInstance(getBaseContext(), searchView.getQuery().toString());
+                    AdaptTa = TasksAdapter.getSearchInstance(TaskFragment.query.trim());
                 else if (TaskFragment.isFilter)
                     AdaptTa = TasksAdapter.Filter(TaskFragment.Subject, TaskFragment.Description, TaskFragment.Creator, TaskFragment.Responsible);
                 else
-                    AdaptTa = TasksAdapter.getInstance(this);
+                    AdaptTa = TasksAdapter.getInstance();
 //                AdaptTa = TasksAdapter.getInstance();
                 lvta.setAdapter(AdaptTa);
 
@@ -545,6 +617,9 @@ public class MainActivity extends AppCompatActivity {
                 searchView.setQuery("", false);
             }
 
+        } else {
+            NFlag = false;
+            TFlag = false;
         }
 
 
@@ -559,6 +634,8 @@ public class MainActivity extends AppCompatActivity {
         MenuItem item_select = menu.findItem(R.id.menu_select_all);
         item_search = menu.findItem(R.id.action_search);
         item_filter = menu.findItem(R.id.action_filter);
+        item_setting = menu.findItem(R.id.action_settings);
+
 //        main_menu.findItem(R.id.menu_read).setVisible(false);
 //        main_menu.findItem(R.id.menu_delete).setVisible(false);
 //        mMenu = menu;
@@ -588,18 +665,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
         }
-//        if (tabLayout.getSelectedTabPosition() == 0) {
-//            for (boolean b : MessaCheckedState) {
-//                sum += b ? 1 : 0;
-//            }
-//            total = MessaCheckedState.length;
-//
-//        } else if (tabLayout.getSelectedTabPosition() == 1) {
-//            for (boolean b : TaskCheckedState) {
-//                sum += b ? 1 : 0;
-//            }
-//            total = TaskCheckedState.length;
-//        }
+
 
         if (sum > 0) {
             item_read.setVisible(true);
@@ -621,6 +687,14 @@ public class MainActivity extends AppCompatActivity {
             item_select.setIcon(R.mipmap.ic_check_box_outline_blank_black_24dp);
         }
 
+
+        if ((MessageFragment.isFilter | TaskFragment.isFilter) & Filter) {
+            item_setting.setVisible(false);
+            menu.add(Menu.NONE, 10000, Menu.NONE, "Done")
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            Filter = false;
+        }
+
 //        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 //        SearchView searchView = (SearchView) item_search.getActionView();
 //        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(getApplicationContext(), SearchableActivity.class)));
@@ -634,9 +708,9 @@ public class MainActivity extends AppCompatActivity {
                 searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
         searchView.setIconified(true);
-        searchView.setFocusableInTouchMode(true);
+//        searchView.setFocusableInTouchMode(true);
         MessagesListAdapter.valid = false;
-        searchView.setFocusable(true);
+//        searchView.setFocusable(true);
         searchView.setSubmitButtonEnabled(true);
         MenuItemCompat.setOnActionExpandListener(item_search,
                 new MenuItemCompat.OnActionExpandListener() {
@@ -677,7 +751,8 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
 //                searchView.setIconified(true);
                 searchView.clearFocus();
-                search = true;
+                item_search.collapseActionView();
+//                search = true;
 
                 // call the request here
                 MessageFragment.isSearch = true;
@@ -694,7 +769,7 @@ public class MainActivity extends AppCompatActivity {
                 ma.notifyDataSetChanged();
 
                 ListView lvt = (ListView) findViewById(R.id.list_task);
-                TasksAdapter ta = TasksAdapter.getSearchInstance(getApplicationContext(), query.trim());
+                TasksAdapter ta = TasksAdapter.getSearchInstance(query.trim());
 //            TextView tv1 = (TextView) findViewById(R.id.empty1);
 //            tv1.setText("No Task");
 //            lvt.setEmptyView(tv1);
@@ -720,25 +795,16 @@ public class MainActivity extends AppCompatActivity {
             item_filter.setVisible(false);
             searchView.setVisibility(View.GONE);
         }
-//        }
-//        searchView.requestFocus();
 
-//        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//        mgr.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT);
-//        mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-
-//        searchView.setIconified(false);
-//        searchView.requestFocusFromTouch();
-
-//        mMenu.getItem(0).setVisible(false);
-//        mMenu.getItem(1).setVisible(false);
         return true;
     }
 
     private void MarkAll() {
         boolean opposite = true;
         searchView.clearFocus();
-        searchView.onActionViewCollapsed();
+        item_search.collapseActionView();
+        ListView lvno = (ListView) findViewById(R.id.list_messages);
+        ListView lvta = (ListView) findViewById(R.id.list_task);
 //        MenuItem item_select = mMenu.findItem(R.id.menu_select_all);
 //        item_select.setTitle("Deselect All");
 //        item_select.setIcon(R.mipmap.ic_check_box_outline_blank_black_24dp);
@@ -766,15 +832,31 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < total; i++) {
                 MessaCheckedState[i] = opposite;
             }
-            AdaptNo = MessagesListAdapter.getInstance(this);
+
+            if (MessageFragment.isSearch)
+                AdaptNo = MessagesListAdapter.getSearchInstance(getBaseContext(), MessageFragment.query.trim());
+            else if (MessageFragment.isFilter)
+                AdaptNo = MessagesListAdapter.Filter(MessageFragment.Title.trim(), MessageFragment.Body.trim());
+            else
+                AdaptNo = MessagesListAdapter.getInstance();
+
+            lvno.setAdapter(AdaptNo);
             AdaptNo.notifyDataSetChanged();
 
         } else if (tabLayout.getSelectedTabPosition() == 1) {
+
             for (int i = 0; i < total; i++) {
                 TaskCheckedState[i] = opposite;
             }
 //            TasksAdapter ad = TasksAdapter.getInstance(this);
-            AdaptTa = TasksAdapter.getInstance(this);
+            if (TaskFragment.isSearch)
+                AdaptTa = TasksAdapter.getSearchInstance(TaskFragment.query.trim());
+            else if (TaskFragment.isFilter)
+                AdaptTa = TasksAdapter.Filter(TaskFragment.Subject, TaskFragment.Description, TaskFragment.Creator, TaskFragment.Responsible);
+            else
+                AdaptTa = TasksAdapter.getInstance();
+
+            lvta.setAdapter(AdaptTa);
             AdaptTa.notifyDataSetChanged();
         }
 
@@ -785,7 +867,7 @@ public class MainActivity extends AppCompatActivity {
     private void MarkDelete() {
 
         searchView.clearFocus();
-        searchView.onActionViewCollapsed();
+//        searchView.onActionViewCollapsed();
 //        new Thread(new Runnable() {
 //            public void run() {
 
@@ -797,16 +879,21 @@ public class MainActivity extends AppCompatActivity {
 
                 if (MessaCheckedState[i]) {
                     Integer ID;
-                    ID = IList.get(i);
+                    ID = MIDList.get(i);
                     getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{String.valueOf(ID)});
                     MessaCheckedState[i] = false;
                 }
             }
 
 
-//            MessagesListAdapter ad = MessagesListAdapter.getInstance(this);
-//            lvno.setAdapter(ad);
-            AdaptNo = MessagesListAdapter.getInstance(this);
+            if (MessageFragment.isSearch)
+                AdaptNo = MessagesListAdapter.getSearchInstance(getBaseContext(), MessageFragment.query.trim());
+            else if (MessageFragment.isFilter)
+                AdaptNo = MessagesListAdapter.Filter(MessageFragment.Title.trim(), MessageFragment.Body.trim());
+            else
+                AdaptNo = MessagesListAdapter.getInstance();
+
+            lvno.setAdapter(AdaptNo);
             AdaptNo.notifyDataSetChanged();
 
         } else if (tabLayout.getSelectedTabPosition() == 1) {
@@ -814,16 +901,21 @@ public class MainActivity extends AppCompatActivity {
 
                 if (TaskCheckedState[i]) {
                     String ID;
-                    ID = IDList.get(i);
+                    ID = TIDList.get(i);
                     getContentResolver().delete(CONTENT_URI2, "_id  = ?", new String[]{String.valueOf(ID)});
                     TaskCheckedState[i] = false;
                 }
             }
 
 
-//            TasksAdapter ad = TasksAdapter.getInstance(this);
-//            lvta.setAdapter(ad);
-            AdaptTa = TasksAdapter.getInstance(this);
+            if (TaskFragment.isSearch)
+                AdaptTa = TasksAdapter.getSearchInstance(TaskFragment.query.trim());
+            else if (TaskFragment.isFilter)
+                AdaptTa = TasksAdapter.Filter(TaskFragment.Subject, TaskFragment.Description, TaskFragment.Creator, TaskFragment.Responsible);
+            else
+                AdaptTa = TasksAdapter.getInstance();
+
+            lvta.setAdapter(AdaptTa);
             AdaptTa.notifyDataSetChanged();
         }
 
@@ -837,7 +929,7 @@ public class MainActivity extends AppCompatActivity {
     private void MarkRead() {
 
         searchView.clearFocus();
-        searchView.onActionViewCollapsed();
+//        searchView.onActionViewCollapsed();
 
 //        new Thread(new Runnable() {
 //            public void run() {
@@ -850,7 +942,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (MessaCheckedState[i]) {
                     Integer ID;
-                    ID = IList.get(i);
+                    ID = MIDList.get(i);
                     ContentValues values = new ContentValues();
                     values.put("Seen", true);
                     getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{String.valueOf(ID)});
@@ -860,16 +952,22 @@ public class MainActivity extends AppCompatActivity {
                 MessaCheckedState[i] = false;
             }
 
-//            MessagesListAdapter ad = MessagesListAdapter.getInstance(getApplication());
-//            lvno.setAdapter(ad);
-            AdaptNo = MessagesListAdapter.getInstance(getApplication());
+
+            if (MessageFragment.isSearch)
+                AdaptNo = MessagesListAdapter.getSearchInstance(getBaseContext(), MessageFragment.query.trim());
+            else if (MessageFragment.isFilter)
+                AdaptNo = MessagesListAdapter.Filter(MessageFragment.Title.trim(), MessageFragment.Body.trim());
+            else
+                AdaptNo = MessagesListAdapter.getInstance();
+
+            lvno.setAdapter(AdaptNo);
             AdaptNo.notifyDataSetChanged();
         } else if (tabLayout.getSelectedTabPosition() == 1) {
             for (int i = 0; i < TaskCheckedState.length; i++) {
 
                 if (TaskCheckedState[i]) {
                     String ID;
-                    ID = IDList.get(i);
+                    ID = TIDList.get(i);
                     ContentValues values = new ContentValues();
                     values.put("isSeen", true);
                     getContentResolver().update(CONTENT_URI2, values, "_id  = ?", new String[]{String.valueOf(ID)});
@@ -878,9 +976,15 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < TaskCheckedState.length; i++) {
                 TaskCheckedState[i] = false;
             }
-//            TasksAdapter ad = TasksAdapter.getInstance(getApplication());
-//            lvta.setAdapter(ad);
-            AdaptTa = TasksAdapter.getInstance(getApplication());
+
+            if (TaskFragment.isSearch)
+                AdaptTa = TasksAdapter.getSearchInstance(TaskFragment.query.trim());
+            else if (TaskFragment.isFilter)
+                AdaptTa = TasksAdapter.Filter(TaskFragment.Subject, TaskFragment.Description, TaskFragment.Creator, TaskFragment.Responsible);
+            else
+                AdaptTa = TasksAdapter.getInstance();
+
+            lvta.setAdapter(AdaptTa);
             AdaptTa.notifyDataSetChanged();
         }
 
@@ -894,6 +998,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        int TabNum = tabLayout.getSelectedTabPosition();
+
         switch (item.getItemId()) {
             case R.id.menu_delete:
 
@@ -903,6 +1009,7 @@ public class MainActivity extends AppCompatActivity {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
 
+                                item_search.collapseActionView();
                                 MarkDelete();
 
                             }
@@ -922,16 +1029,107 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.menu_read:
+                item_search.collapseActionView();
                 MarkRead();
                 return true;
             case R.id.menu_select_all:
+                item_search.collapseActionView();
                 MarkAll();
                 return true;
             case R.id.action_settings:
                 Toast.makeText(this, "Info about MPAS", Toast.LENGTH_SHORT).show();
                 return true;
+            case 10000:
+//                Filter = false;
+                if (TabNum == 0) {
+
+                    MessageFragment.isFilter = true;
+                    setTab = TabController.Tabs.Message;
+
+                    message = (EditText) findViewById(R.id.titlefilter);
+                    body = (EditText) findViewById(R.id.bodyfilter);
+
+                    String title = message.getText().toString();
+                    String detail = body.getText().toString();
+
+                    Bundle b = new Bundle();
+                    b.putString(getString(R.string.Title), title);
+                    b.putString(getString(R.string.Body), detail);
+                    b.putInt("Type", 0);
+
+                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    intent.putExtras(b);
+                    startActivity(intent);
+                } else if (TabNum == 1) {
+                    TaskFragment.isFilter = true;
+                    setTab = TabController.Tabs.Task;
+
+                    subject = (EditText) findViewById(R.id.titlefilter);
+                    description = (EditText) findViewById(R.id.descriptionfilter);
+                    AutoCompleteTextView creator = (AutoCompleteTextView) findViewById(R.id.creatorfilter);
+                    AutoCompleteTextView responsible = (AutoCompleteTextView) findViewById(R.id.responsiblefilter);
+
+
+                    Cursor c = getContentResolver().query(CONTENT_URI, null, null, null, null);
+                    final String[] Names = new String[c.getCount()];
+                    Responsible = new String[c.getCount()];
+                    int index = 0;
+                    if (c.moveToFirst()) {
+                        do {
+                            Names[index] = c.getString(1);
+                            Responsible[index] = c.getString(0);
+                            index++;
+                        } while (c.moveToNext());
+                    }
+                    c.close();
+
+                    final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, Names);
+                    responsible.setAdapter(adapter);
+                    responsible.setThreshold(1);
+                    adapter.notifyDataSetChanged();
+
+                    responsible.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                            NameResponsible = (String) parent.getItemAtPosition(position);
+                        }
+                    });
+
+
+                    final ArrayAdapter<String> ad = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, Names);
+                    creator.setAdapter(ad);
+                    creator.setThreshold(1);
+                    ad.notifyDataSetChanged();
+                    creator.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                            NameCreator = (String) parent.getItemAtPosition(position);
+
+                        }
+                    });
+
+                    String title = subject.getText().toString();
+                    String body = description.getText().toString();
+
+                    Bundle b = new Bundle();
+                    b.putString(getString(R.string.Subject), title);
+                    b.putString(getString(R.string.Description), body);
+                    b.putString(getString(R.string.Responsible), NameResponsible);
+                    b.putString(getString(R.string.Creator), NameCreator);
+                    b.putInt("Type", 1);
+
+                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    intent.putExtras(b);
+                    startActivity(intent);
+                }
+
+                return true;
+
             case R.id.action_filter:
-                int TabNum = tabLayout.getSelectedTabPosition();
+                item_search.collapseActionView();
+                TabNum = tabLayout.getSelectedTabPosition();
                 item_filter.setVisible(false);
 //                searchView.setEnabled(false);
 //                searchView.setVisibility(View.INVISIBLE);
@@ -940,7 +1138,7 @@ public class MainActivity extends AppCompatActivity {
                 GetUserList userList = new GetUserList(getBaseContext());
                 userList.execute();
                 if (TabNum == 0) {
-                    //TODO: filter by message title - body - date
+                    //filter by message title - body - date
                     MessageFragment.isFilter = true;
                     setTab = TabController.Tabs.Message;
                     setContentView(R.layout.message_filter);
@@ -970,7 +1168,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 } else if (TabNum == 1) {
-                    //TODO: filter by creator - responsible - title - description
+                    //filter by creator - responsible - title - description
                     TaskFragment.isFilter = true;
                     setTab = TabController.Tabs.Task;
                     setContentView(R.layout.task_filter);
@@ -1066,11 +1264,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         boolean fl = false;
-        MessageFragment.isSearch = false;
-        TaskFragment.isSearch = false;
 
         ListView lvno = (ListView) findViewById(R.id.list_messages);
         ListView lvta = (ListView) findViewById(R.id.list_task);
+
+
+        searchView.clearFocus();
+        searchView.setIconified(true);
+        item_search.collapseActionView();
 
         if (tabLayout.getSelectedTabPosition() == 0) {
             for (boolean i : MessaCheckedState) {
@@ -1086,8 +1287,16 @@ public class MainActivity extends AppCompatActivity {
 
 //                MessagesListAdapter ad = MessagesListAdapter.getInstance(this);
 //                lvno.setAdapter(ad);
-                AdaptNo = MessagesListAdapter.getInstance(this);
+                if (MessageFragment.isSearch)
+                    AdaptNo = MessagesListAdapter.getSearchInstance(getBaseContext(), MessageFragment.query.trim());
+                else if (MessageFragment.isFilter)
+                    AdaptNo = MessagesListAdapter.Filter(MessageFragment.Title.trim(), MessageFragment.Body.trim());
+                else
+                    AdaptNo = MessagesListAdapter.getInstance();
+
+                lvno.setAdapter(AdaptNo);
                 AdaptNo.notifyDataSetChanged();
+
             }
         } else if (tabLayout.getSelectedTabPosition() == 1) {
             for (boolean i : TaskCheckedState) {
@@ -1100,43 +1309,63 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < TaskCheckedState.length; i++) {
                     TaskCheckedState[i] = false;
                 }
-//                TasksAdapter ad = TasksAdapter.getInstance(this);
-//                lvta.setAdapter(ad);
-                AdaptTa = TasksAdapter.getInstance(this);
+//
+                if (TaskFragment.isSearch)
+                    AdaptTa = TasksAdapter.getSearchInstance(TaskFragment.query.trim());
+                else if (TaskFragment.isFilter)
+                    AdaptTa = TasksAdapter.Filter(TaskFragment.Subject, TaskFragment.Description, TaskFragment.Creator, TaskFragment.Responsible);
+                else
+                    AdaptTa = TasksAdapter.getInstance();
+
+                lvta.setAdapter(AdaptTa);
                 AdaptTa.notifyDataSetChanged();
             }
         }
+//        if ((TaskFragment.isSearch | MessageFragment.isSearch)& search) {
+//            searchView.setIconified(false);
+//            searchView.clearFocus();
+//            item_search.collapseActionView();
+//
+////            MessagesListAdapter Mad = MessagesListAdapter.getInstance(this);
+////            lvno.setAdapter(Mad);
+//            AdaptNo = MessagesListAdapter.getInstance(this);
+//            lvno.setAdapter(AdaptNo);
+//            AdaptNo.notifyDataSetChanged();
+//
+////            TasksAdapter Tad = TasksAdapter.getInstance(this);
+////            lvta.setAdapter(Tad);
+//            AdaptTa = TasksAdapter.getInstance(this);
+//            lvta.setAdapter(AdaptTa);
+//            AdaptTa.notifyDataSetChanged();
+//            search = false;
+//        } else
         if (TaskFragment.isSearch | MessageFragment.isSearch) {
-            searchView.setIconified(false);
-            searchView.clearFocus();
-            item_search.collapseActionView();
-
-//            MessagesListAdapter Mad = MessagesListAdapter.getInstance(this);
-//            lvno.setAdapter(Mad);
-            AdaptNo = MessagesListAdapter.getInstance(this);
+            TaskFragment.isSearch = false;
+            MessageFragment.isSearch = false;
+            AdaptNo = MessagesListAdapter.getInstance();
             lvno.setAdapter(AdaptNo);
             AdaptNo.notifyDataSetChanged();
 
-//            TasksAdapter Tad = TasksAdapter.getInstance(this);
-//            lvta.setAdapter(Tad);
-            AdaptTa = TasksAdapter.getInstance(this);
+
+            AdaptTa = TasksAdapter.getInstance();
             lvta.setAdapter(AdaptTa);
             AdaptTa.notifyDataSetChanged();
-            search = false;
+
         } else if (MessageFragment.isFilter | TaskFragment.isFilter) {
-            if (TaskFragment.isFilter) {
-                setTab = TabController.Tabs.Task;
-            }
+
             MessageFragment.isFilter = false;
             TaskFragment.isFilter = false;
+            Filter = true;
             setIntent(null);
             Handle(null);
         } else if (!fl) {
             super.onBackPressed();
         }
 
-
         invalidateOptionsMenu();
+        item_search.collapseActionView();
+        searchView.clearFocus();
+
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

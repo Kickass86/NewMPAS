@@ -1,7 +1,6 @@
 package turbotec.newmpas;
 
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,9 +17,9 @@ public class MessageFragment extends Fragment {
 
 
     //    private SimpleCursorAdapter m_adapter;
-    static final String PROVIDER_NAME = "TURBOTEC.NEWMPAS.MESSAGEPROVIDER";
-    static final String URL = "content://" + PROVIDER_NAME + "/messages";
-    static final Uri CONTENT_URI = Uri.parse(URL);
+//    static final String PROVIDER_NAME = "TURBOTEC.NEWMPAS.MESSAGEPROVIDER";
+//    static final String URL = "content://" + PROVIDER_NAME + "/messages";
+//    static final Uri CONTENT_URI = Uri.parse(URL);
     static boolean isSearch;
     static boolean isFilter;
     static String Title = "", Body = "";
@@ -71,13 +70,13 @@ public class MessageFragment extends Fragment {
 //        MessagesListAdapter.set(acticity);
 //        MessagesListAdapter adapter = MessagesListAdapter.getInstance(getContext());
         if (isSearch) {
-            MainActivity.AdaptNo = MessagesListAdapter.getSearchInstance(getContext(), query);
+            MainActivity.AdaptNo = MessagesListAdapter.getSearchInstance(getContext(), query.trim());
         } else if (isFilter) {
-            MainActivity.AdaptNo = MessagesListAdapter.Filter(Title, Body);
+            MainActivity.AdaptNo = MessagesListAdapter.Filter(Title.trim(), Body.trim());
         } else {
-            MainActivity.AdaptNo = MessagesListAdapter.getInstance(getContext());
+            MainActivity.AdaptNo = MessagesListAdapter.getInstance();
         }
-        TextView tv = (TextView) view.findViewById(R.id.empty1);
+        TextView tv = (TextView) view.findViewById(R.id.empty);
         tv.setText("No Message");
         list.setEmptyView(tv);
 //        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);

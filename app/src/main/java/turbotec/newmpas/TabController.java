@@ -39,6 +39,14 @@ public class TabController {
                 } else {
                     return 0;
                 }
+            case Meeting:
+                if ((0 == findNthIndexOf(Enable, "1", 1)) & (1 == findNthIndexOf(Enable, "1", 2))) {
+                    return 2;
+                } else if ((0 == findNthIndexOf(Enable, "1", 1)) | (1 == findNthIndexOf(Enable, "1", 2))) {
+                    return 1;
+                } else {
+                    return 0;
+                }
         }
         return 0;
     }
@@ -60,6 +68,6 @@ public class TabController {
 
 
     public enum Tabs {
-        Message, Task
+        Message, Task, Meeting
     }
 }

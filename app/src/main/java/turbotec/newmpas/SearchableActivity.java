@@ -45,7 +45,7 @@ public class SearchableActivity extends AppCompatActivity {
 
                     setContentView(R.layout.activity_searchable);
                     ListView lvm = (ListView) findViewById(R.id.list);
-                    MessagesListAdapter ma = MessagesListAdapter.getSearchInstance(getApplicationContext(), query);
+                    MessagesListAdapter ma = MessagesListAdapter.getSearchInstance(getApplicationContext(), query.trim());
                     TextView tv = (TextView) findViewById(R.id.empty1);
                     tv.setText("No Message");
                     lvm.setEmptyView(tv);
@@ -56,7 +56,7 @@ public class SearchableActivity extends AppCompatActivity {
                 case 1:
                     setContentView(R.layout.activity_searchable);
                     ListView lvt = (ListView) findViewById(R.id.list);
-                    TasksAdapter ta = TasksAdapter.getSearchInstance(getApplicationContext(), query);
+                    TasksAdapter ta = TasksAdapter.getSearchInstance(query.trim());
                     TextView tv1 = (TextView) findViewById(R.id.empty1);
                     tv1.setText("No Task");
                     lvt.setEmptyView(tv1);

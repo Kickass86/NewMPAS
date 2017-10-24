@@ -47,11 +47,29 @@ public class SyncService extends IntentService {
     static final String URL2 = "content://" + PROVIDER_NAME + "/messages/unsent";
     static final String URL3 = "content://" + PROVIDER_NAME + "/tasks/";
     static final String URL4 = "content://" + PROVIDER_NAME + "/tasks/unsent/";
+    static final String URL5 = "content://" + PROVIDER_NAME + "/meetings/";
     static final Uri CONTENT_URI1 = Uri.parse(URL1);
     static final Uri CONTENT_URI2 = Uri.parse(URL2);
     static final Uri CONTENT_URI3 = Uri.parse(URL3);
     static final Uri CONTENT_URI4 = Uri.parse(URL4);
+    static final Uri CONTENT_URI5 = Uri.parse(URL5);
     //    static final Uri CONTENT_URI3 = Uri.parse(URL3);
+    private static final String MEETING_ID = "_id";
+    private static final String MEETING_TOPIC = "TOPIC";
+    private static final String MEETING_CREATOR = "CREATOR";
+    private static final String MEETING_ATTENDANCE = "ATTENDANCE";
+    private static final String MEETING_SECRETARY = "SECRETARY";
+    private static final String MEETING_SERVICES = "SERVICES";
+    private static final String MEETING_ROOM = "ROOM";
+    private static final String MEETING_EQUIPMENT = "EQUIPMENT";
+    private static final String MEETING_START_DATE = "START_DATE";
+    private static final String MEETING_END_DATE = "END_DATE";
+    private static final String MEETING_PER_DATE = "PER_DATE";
+    private static final String MEETING_START_TIME = "START_TIME";
+    private static final String MEETING_END_TIME = "END_TIME";
+    private static final String EVENT_INSERT = "SendDelivered";
+
+
 //    private static final int Timeout = 70000;
     private static final String MESSAGE_ID = "_id";
     private static final String MESSAGE_Title = "MessageTitle";
@@ -102,6 +120,11 @@ public class SyncService extends IntentService {
     private String IDs = "";
     private String TIDs = "";
     private String TID = "";
+    private String SIDs = "";
+
+
+    private String MeetingID, MeetingTopic, MeetingRoom, Creator, Attendance, StartTime, Secretary, Services, EndTime, Equipment, Date, PDate;
+
     private int MessageID;
     private String MessageTitle;
     private String MessageBody;
@@ -295,15 +318,17 @@ public class SyncService extends IntentService {
             SoapObject token = (SoapObject) response1.getProperty(1);
             SoapObject auth = (SoapObject) response1.getProperty(2);
             SoapObject tasks = (SoapObject) response1.getProperty(3);
+            SoapObject meeting = (SoapObject) response1.getProperty(4);
 
 
             String Taskresp = "";
             String Authresp = "";
             String Tokenresp = "";
+            String Meetresp = "";
             String Nameresp = "";
             Log.e("Response ", response1.toString());
 
-            SoapObject Messagesresp = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_CHECK);
+//            SoapObject Messagesresp = new SoapObject(WSDL_TARGET_NAMESPACE, OPERATION_NAME_CHECK);
 
             if (auth.getPropertyCount() > 0)
                 Authresp = auth.getProperty(0).toString();
@@ -313,6 +338,10 @@ public class SyncService extends IntentService {
             if (tasks.getPropertyCount() > 0)
                 Taskresp = tasks.getProperty(0).toString();
             Log.e("Task response", Taskresp);
+
+            if (meeting.getPropertyCount() > 0)
+                Meetresp = meeting.getProperty(0).toString();
+            Log.e("Meeting response", Meetresp);
 
 
             if (token.getPropertyCount() > 0) {
@@ -343,9 +372,12 @@ public class SyncService extends IntentService {
 
             InsertTasks(tasks);
 
+            InsertMeeting(meeting);
+
             isDuplicate = false;
 
             HandleUnsendInsert();
+
 
             HandleUnsendDelivery();
 
@@ -392,6 +424,7 @@ public class SyncService extends IntentService {
 
 
     }
+
 
     private void HandleUnsendInsert() {
         int num = 0;
@@ -547,6 +580,23 @@ public class SyncService extends IntentService {
             e.getStackTrace();
         }
 
+        cursor = getContentResolver().query(CONTENT_URI5, null, "SendDelivered = ?", new String[]{"0"}, null);
+        SIDs = "";
+        try {
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        SIDs = SIDs + cursor.getString(0) + ";";
+                        num = num + 1;
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+            }
+
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
 //        for(int i = 0; i < DeletedTIDs.length; i++){
 //            TIDs = TIDs + DeletedTIDs[i] + ";";
 //        }
@@ -556,7 +606,7 @@ public class SyncService extends IntentService {
         if (num > 0) {
             String Status = "0";
             String plaintxt = "value1=" + IDs + ",value2=" + share.GetToken()
-                    + ",value3=" + Status + ",value4=" + TIDs;
+                    + ",value3=" + Status + ",value4=" + TIDs + ",value5=" + SIDs;
 
 
             try {
@@ -935,6 +985,126 @@ public class SyncService extends IntentService {
             contentValues.put(SendDelivered, false);
             contentValues.put(SSeen, false);
             getContentResolver().insert(CONTENT_URI1, contentValues);
+
+            index++;
+        }
+
+
+    }
+
+    private void InsertMeeting(SoapObject meeting) {
+
+        int index = 0;
+
+        while (index < meeting.getPropertyCount()) {
+
+//            FLag = "OK";
+            Change = "OK";
+            FlagChange = true;
+            MainActivity.setTab = TabController.Tabs.Meeting;
+
+
+            SoapObject Meeting = (SoapObject) meeting.getProperty(index);
+
+
+            MeetingID = Meeting.getProperty(0).toString();
+            MeetingTopic = Meeting.getProperty(1).toString().trim();
+            MeetingRoom = Meeting.getProperty(2).toString().trim();
+            StartTime = Meeting.getProperty(3).toString();
+            EndTime = Meeting.getProperty(4).toString();
+            Date = Meeting.getProperty(5).toString();
+            PDate = Meeting.getProperty(6).toString();
+            Attendance = Meeting.getProperty(7).toString();
+            Secretary = Meeting.getProperty(8).toString();
+            Creator = Meeting.getProperty(9).toString();
+            Services = Meeting.getProperty(10).toString();
+            Equipment = Meeting.getProperty(11).toString();
+
+
+            Cursor c = getContentResolver().query(CONTENT_URI5, new String[]{"*"}, "_id  = ?", new String[]{String.valueOf(MeetingID)}, null);
+            if (c != null) {
+                if (c.getCount() > 0) {
+                    index++;
+                    if (index >= meeting.getPropertyCount()) {
+                        c.close();
+                    }
+//                    if (Deleted) {
+//                        ContentValues contentValues = new ContentValues();
+//
+//                        contentValues.put(SendDelivered, false);
+//
+//                        getContentResolver().update(CONTENT_URI5, contentValues, "_id  = ?", new String[]{String.valueOf(MeetingID)});
+//                    }
+                    continue;
+                }
+            }
+            c.close();
+
+
+            if (!isAppForeground(MyContext)) {
+
+                Log.i("Notify", "is running");
+                Intent nid = new Intent(MyContext, MainActivity.class);
+                Bundle bundle = new Bundle();
+//                bundle.putBoolean(MyContext.getString(R.string.Seen), Seen);
+                bundle.putString(MyContext.getString(R.string.MEETING_ID), MeetingID);
+                bundle.putString(MyContext.getString(R.string.MEETING_TOPIC), MeetingTopic);
+                bundle.putString(MyContext.getString(R.string.MEETING_CREATOR), Creator);
+                bundle.putString(MyContext.getString(R.string.MEETING_ATTENDANCE), Attendance);
+                bundle.putString(MyContext.getString(R.string.MEETING_SECRETARY), Secretary);
+                bundle.putString(MyContext.getString(R.string.MEETING_SERVICES), Services);
+                bundle.putString(MyContext.getString(R.string.MEETING_ROOM), MeetingRoom);
+                bundle.putString(MyContext.getString(R.string.MEETING_EQUIPMENT), Equipment);
+                bundle.putString(MyContext.getString(R.string.MEETING_START_DATE), Date);
+                bundle.putString(MyContext.getString(R.string.MEETING_END_DATE), Date);
+                bundle.putString(MyContext.getString(R.string.MEETING_PER_DATE), PDate);
+                bundle.putString(MyContext.getString(R.string.MEETING_START_TIME), StartTime);
+                bundle.putString(MyContext.getString(R.string.MEETING_END_TIME), EndTime);
+
+                bundle.putInt("Type", 2);
+                nid.putExtras(bundle);
+                nid.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                PendingIntent ci = PendingIntent.getActivity(MyContext, MessageID, nid, 0);
+
+
+                mBuilder =
+                        new android.support.v4.app.NotificationCompat.Builder(MyContext)
+                                .setSmallIcon(R.mipmap.ic_group_black_24dp)
+                                .setContentTitle("Meeting")
+                                .setContentIntent(ci)
+                                .setColor(0x00FFFF)
+                                .setAutoCancel(true)
+                                .setContentText(MeetingTopic);
+                if (!isDuplicate) {
+                    mBuilder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS);
+                }
+
+                Random r = new Random();
+                mNotificationManager.notify(r.nextInt(5000), mBuilder.build());
+                isDuplicate = true;
+            } else {
+                TAB = 0;
+            }
+
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MEETING_ID, MeetingID);
+            contentValues.put(MEETING_TOPIC, MeetingTopic);
+            contentValues.put(MEETING_ROOM, MeetingRoom);
+            contentValues.put(MEETING_START_TIME, StartTime);
+            contentValues.put(MEETING_END_TIME, EndTime);
+            contentValues.put(MEETING_START_DATE, Date);
+            contentValues.put(MEETING_END_DATE, Date);
+            contentValues.put(MEETING_PER_DATE, PDate);
+            contentValues.put(MEETING_ATTENDANCE, Attendance);
+            contentValues.put(MEETING_SECRETARY, Secretary);
+            contentValues.put(MEETING_CREATOR, Creator);
+            contentValues.put(MEETING_SERVICES, Services);
+            contentValues.put(MEETING_EQUIPMENT, Equipment);
+            contentValues.put(SendDelivered, false);
+            contentValues.put(EVENT_INSERT, false);
+
+            getContentResolver().insert(CONTENT_URI5, contentValues);
 
             index++;
         }

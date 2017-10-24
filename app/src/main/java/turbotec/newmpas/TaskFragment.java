@@ -49,7 +49,7 @@ public class TaskFragment extends Fragment {
 //        ViewGroup rootView = (ViewGroup) inflater.inflate(
 //                R.layout.fragment_screen_slide_page, container, false);
 
-//        TextView textView = (TextView) rootView.findViewById(R.id.Title);
+//        TextView textView = (TextView) rootView.findViewById(R.id.Topic);
 //        textView.setText(R.string.hello_blank_fragment);
 
         return rootView;
@@ -208,15 +208,15 @@ public class TaskFragment extends Fragment {
 //        MessagesListAdapter.set(acticity);
 //        TasksAdapter adapter = TasksAdapter.getInstance(getContext());
         if (isSearch) {
-            MainActivity.AdaptTa = TasksAdapter.getSearchInstance(getContext(), query);
+            MainActivity.AdaptTa = TasksAdapter.getSearchInstance(query.trim());
             b.setVisibility(View.GONE);
         } else if (isFilter) {
             MainActivity.AdaptTa = TasksAdapter.Filter(Subject, Description, Creator, Responsible);
         } else {
-            MainActivity.AdaptTa = TasksAdapter.getInstance(getContext());
+            MainActivity.AdaptTa = TasksAdapter.getInstance();
         }
 
-        TextView tv = (TextView) view.findViewById(R.id.tempty);
+        TextView tv = (TextView) view.findViewById(R.id.empty);
         tv.setText("No Task");
         list.setEmptyView(tv);
 //        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);

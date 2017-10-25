@@ -67,7 +67,7 @@ public class SyncService extends IntentService {
     private static final String MEETING_PER_DATE = "PER_DATE";
     private static final String MEETING_START_TIME = "START_TIME";
     private static final String MEETING_END_TIME = "END_TIME";
-    private static final String EVENT_INSERT = "SendDelivered";
+    private static final String EVENT_INSERT = "CalendarInsert";
 
 
 //    private static final int Timeout = 70000;
@@ -649,6 +649,7 @@ public class SyncService extends IntentService {
                 ContentValues values = new ContentValues();
                 values.put(SendDelivered, true);
                 String[] MIDs = IDs.split(";");
+                String[] SID = SIDs.split(";");
                 for (String MID : MIDs) {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
                     getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{MID});
@@ -662,6 +663,10 @@ public class SyncService extends IntentService {
                 }
                 for (String TID : DeletedTIDs) {
                     getContentResolver().delete(CONTENT_URI3, "_id  = ?", new String[]{String.valueOf(TID)});
+                }
+
+                for (String sid : SID) {
+                    getContentResolver().update(CONTENT_URI5, values, "_id  = ?", new String[]{String.valueOf(sid)});
                 }
 
             } else if (response.toString().contains(MyContext.getString(R.string.Seen))) {

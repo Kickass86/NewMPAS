@@ -59,6 +59,8 @@
     <string name="error_invalid_password">Error! Password is empty.</string>
     <string name="error_field_required">Error! Username is empty.</string>
 
+    <string name="Secretary">Secretary</string>
+    <string name="Date">Date</string>
 
     <string name="TID">TID</string>
     <string name="Subject">Subject</string>
@@ -97,6 +99,7 @@
     <string name="search_hint">Search</string>
 
     <string name="dialog_message">Are you sure?</string>
+    <string name="Save_in_Calendar">Save in Calendar</string>
     <string name="Delete_Button">Delete</string>
     <string name="Reply_Button">Reply</string>
     <string name="Edit_Done_Button">Done</string>

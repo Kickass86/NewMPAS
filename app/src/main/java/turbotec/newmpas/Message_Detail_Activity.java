@@ -63,8 +63,8 @@ public class Message_Detail_Activity extends AppCompatActivity {
 
         MainActivity.setTab = TabController.Tabs.Message;
 
-        try {
-            share = SharedPreferenceHandler.getInstance(this);
+
+        share = SharedPreferenceHandler.getInstance(this);
 
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -294,13 +294,6 @@ public class Message_Detail_Activity extends AppCompatActivity {
 
                 }
             });
-
-
-        } catch (Exception e) {
-            share.SaveError(e.getMessage());
-            Intent SE = new Intent(this, SendError.class);
-            startService(SE);
-        }
 
 
     }

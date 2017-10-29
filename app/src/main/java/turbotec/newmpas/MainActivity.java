@@ -1,6 +1,7 @@
 package turbotec.newmpas;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.NotificationManager;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
@@ -29,14 +30,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     static String IDResponsible;
     static String NameResponsible = "";
     static String NameCreator = "";
+    static String NameSecretary = "";
     static boolean[] MessaCheckedState = new boolean[1];
     static boolean[] TaskCheckedState = new boolean[1];
     static int Scroll_Position = 0;
@@ -78,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
     EditText description;
     EditText message;
     EditText body;
+    EditText Date;
+    //    EditText Creator;
     MenuItem item_search, item_filter, item_setting;
     SearchView searchView;
     TabController tabController;
@@ -87,6 +95,19 @@ public class MainActivity extends AppCompatActivity {
     List<Integer> MIDList = new ArrayList<>(); //Message ID
     List<String> TIDList = new ArrayList<>();
     List<String> MTIDList = new ArrayList<>();
+    Calendar myCalendar = Calendar.getInstance();
+    DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                              int dayOfMonth) {
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH, monthOfYear);
+            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            updateLabel();
+        }
+
+    };
     private MainActivity MyActivity;
     private SharedPreferenceHandler share = SharedPreferenceHandler.getInstance(this);
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -155,6 +176,15 @@ public class MainActivity extends AppCompatActivity {
         return index;
     }
 
+    private void updateLabel() {
+
+        EditText edittext = (EditText) findViewById(R.id.DateFilter);
+        String myFormat = "yyyy-MM-dd"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+
+        edittext.setText(sdf.format(myCalendar.getTime()));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -194,6 +224,10 @@ public class MainActivity extends AppCompatActivity {
 
                 TaskFragment.isSearch = true;
                 TaskFragment.query = query.trim();
+
+                MeetingFragment.isSearch = true;
+                MeetingFragment.query = query.trim();
+
             } else {
 
 
@@ -471,21 +505,33 @@ public class MainActivity extends AppCompatActivity {
             TaskFragment.isSearch = true;
             TaskFragment.isFilter = false;
             TaskFragment.query = query.trim();
-            ListView lvm = (ListView) findViewById(R.id.list_messages);
+
+            MeetingFragment.isSearch = true;
+            MeetingFragment.isFilter = false;
+            MeetingFragment.query = query.trim();
+//            ListView lvm = (ListView) findViewById(R.id.list_messages);
             MessagesListAdapter ma = MessagesListAdapter.getSearchInstance(getApplicationContext(), query.trim());
             TextView tv = (TextView) findViewById(R.id.empty);
             tv.setText("No Search Result");
-            lvm.setEmptyView(tv);
-            lvm.setAdapter(ma);
+//            lvm.setEmptyView(tv);
+//            lvm.setAdapter(ma);
             ma.notifyDataSetChanged();
 
-            ListView lvt = (ListView) findViewById(R.id.list_task);
+//            ListView lvt = (ListView) findViewById(R.id.list_task);
             TasksAdapter ta = TasksAdapter.getSearchInstance(query.trim());
             TextView tv1 = (TextView) findViewById(R.id.empty);
             tv1.setText("No Search Result");
-            lvt.setEmptyView(tv1);
-            lvt.setAdapter(ta);
+//            lvt.setEmptyView(tv1);
+//            lvt.setAdapter(ta);
             ta.notifyDataSetChanged();
+
+
+            MeetingAdapter mt = MeetingAdapter.getSearchInstance(query.trim());
+            TextView tv2 = (TextView) findViewById(R.id.empty);
+            tv2.setText("No Search Result");
+
+            mt.notifyDataSetChanged();
+
         } else {
 
 
@@ -539,6 +585,27 @@ public class MainActivity extends AppCompatActivity {
                         TaskFragment.Responsible = Responsible;
 
                         setTab = TabController.Tabs.Task;
+                        setIntent(null);
+
+                        Handle(null);
+
+                        break;
+
+                    case 2:
+
+                        String Date = b.getString(getString(R.string.Date));
+                        NameCreator = b.getString(getString(R.string.Creator));
+                        String NameSecretary = b.getString(getString(R.string.Secretary));
+//                        String Creator = b.getString(getString(R.string.Creator));
+
+                        MeetingFragment.isFilter = true;
+                        MeetingFragment.isSearch = false;
+
+                        MeetingFragment.Date = Date;
+                        MeetingFragment.NameCreator = NameCreator;
+                        MeetingFragment.NameSecretary = NameSecretary;
+
+                        setTab = TabController.Tabs.Meeting;
                         setIntent(null);
 
                         Handle(null);
@@ -688,7 +755,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        if ((MessageFragment.isFilter | TaskFragment.isFilter) & Filter) {
+        if ((MessageFragment.isFilter | TaskFragment.isFilter | MessageFragment.isFilter) & Filter) {
             item_setting.setVisible(false);
             menu.add(Menu.NONE, 10000, Menu.NONE, "Done")
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -760,21 +827,30 @@ public class MainActivity extends AppCompatActivity {
 
                 TaskFragment.isSearch = true;
                 TaskFragment.query = query.trim();
-                ListView lvm = (ListView) findViewById(R.id.list_messages);
+
+                MeetingFragment.isSearch = true;
+                MeetingFragment.query = query.trim();
+
+//                ListView lvm = (ListView) findViewById(R.id.list_messages);
                 MessagesListAdapter ma = MessagesListAdapter.getSearchInstance(getApplicationContext(), query.trim());
 //            TextView tv = (TextView) findViewById(R.id.empty1);
 //            tv.setText("No Message");
 //            lvm.setEmptyView(tv);
-                lvm.setAdapter(ma);
+//                lvm.setAdapter(ma);
                 ma.notifyDataSetChanged();
 
-                ListView lvt = (ListView) findViewById(R.id.list_task);
+//                ListView lvt = (ListView) findViewById(R.id.list_task);
                 TasksAdapter ta = TasksAdapter.getSearchInstance(query.trim());
 //            TextView tv1 = (TextView) findViewById(R.id.empty1);
 //            tv1.setText("No Task");
 //            lvt.setEmptyView(tv1);
-                lvt.setAdapter(ta);
+//                lvt.setAdapter(ta);
                 ta.notifyDataSetChanged();
+
+//                ListView lmt = (ListView) findViewById(R.id.list_meeting);
+                MeetingAdapter mt = MeetingAdapter.getSearchInstance(query.trim());
+//                lmt.setAdapter(mt);
+                mt.notifyDataSetChanged();
 
 
                 // call collapse action view on 'MenuItem'
@@ -1072,12 +1148,12 @@ public class MainActivity extends AppCompatActivity {
 
                     Cursor c = getContentResolver().query(CONTENT_URI, null, null, null, null);
                     final String[] Names = new String[c.getCount()];
-                    Responsible = new String[c.getCount()];
+//                    Responsible = new String[c.getCount()];
                     int index = 0;
                     if (c.moveToFirst()) {
                         do {
                             Names[index] = c.getString(1);
-                            Responsible[index] = c.getString(0);
+//                            Responsible[index] = c.getString(0);
                             index++;
                         } while (c.moveToNext());
                     }
@@ -1087,7 +1163,7 @@ public class MainActivity extends AppCompatActivity {
                     responsible.setAdapter(adapter);
                     responsible.setThreshold(1);
                     adapter.notifyDataSetChanged();
-
+                    NameResponsible = "";
                     responsible.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -1101,6 +1177,7 @@ public class MainActivity extends AppCompatActivity {
                     creator.setAdapter(ad);
                     creator.setThreshold(1);
                     ad.notifyDataSetChanged();
+                    NameCreator = "";
                     creator.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -1123,6 +1200,82 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, MainActivity.class);
                     intent.putExtras(b);
                     startActivity(intent);
+                } else if (TabNum == 2) {
+                    MeetingFragment.isFilter = true;
+                    setTab = TabController.Tabs.Meeting;
+
+                    Date = (EditText) findViewById(R.id.DateFilter);
+//                    Secretary = (EditText) findViewById(R.id.SecretaryFilter);
+                    AutoCompleteTextView Creator = (AutoCompleteTextView) findViewById(R.id.CreatorFilter);
+                    AutoCompleteTextView Secretary = (AutoCompleteTextView) findViewById(R.id.SecretaryFilter);
+
+
+                    Cursor c = getContentResolver().query(CONTENT_URI, null, null, null, null);
+                    final String[] Names = new String[c.getCount()];
+//                    Responsible = new String[c.getCount()];
+                    int index = 0;
+                    if (c.moveToFirst()) {
+                        do {
+                            Names[index] = c.getString(1);
+//                            Responsible[index] = c.getString(0);
+                            index++;
+                        } while (c.moveToNext());
+                    }
+                    c.close();
+
+                    final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, Names);
+                    Creator.setAdapter(adapter);
+                    Creator.setThreshold(1);
+                    adapter.notifyDataSetChanged();
+                    NameCreator = "";
+                    Creator.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                            NameCreator = (String) parent.getItemAtPosition(position);
+                        }
+                    });
+
+
+                    final ArrayAdapter<String> ad = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, Names);
+                    Secretary.setAdapter(ad);
+                    Secretary.setThreshold(1);
+                    ad.notifyDataSetChanged();
+                    NameSecretary = "";
+                    Secretary.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                            NameSecretary = (String) parent.getItemAtPosition(position);
+
+                        }
+                    });
+
+
+                    Date.setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View v) {
+                            new DatePickerDialog(MainActivity.this, date, myCalendar
+                                    .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                                    myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                        }
+                    });
+
+
+                    String DueDate = Date.getText().toString();
+
+
+                    Bundle b = new Bundle();
+                    b.putString(getString(R.string.Date), DueDate);
+                    b.putString(getString(R.string.Secretary), NameSecretary);
+                    b.putString(getString(R.string.Creator), NameCreator);
+                    b.putInt("Type", 2);
+
+                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    intent.putExtras(b);
+                    startActivity(intent);
+
                 }
 
                 return true;
@@ -1183,12 +1336,12 @@ public class MainActivity extends AppCompatActivity {
 
                     Cursor c = getContentResolver().query(CONTENT_URI, null, null, null, null);
                     final String[] Names = new String[c.getCount()];
-                    Responsible = new String[c.getCount()];
+//                    Responsible = new String[c.getCount()];
                     int index = 0;
                     if (c.moveToFirst()) {
                         do {
                             Names[index] = c.getString(1);
-                            Responsible[index] = c.getString(0);
+//                            Responsible[index] = c.getString(0);
                             index++;
                         } while (c.moveToNext());
                     }
@@ -1198,7 +1351,7 @@ public class MainActivity extends AppCompatActivity {
                     responsible.setAdapter(adapter);
                     responsible.setThreshold(1);
                     adapter.notifyDataSetChanged();
-
+                    NameResponsible = "";
                     responsible.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -1212,6 +1365,7 @@ public class MainActivity extends AppCompatActivity {
                     creator.setAdapter(ad);
                     creator.setThreshold(1);
                     ad.notifyDataSetChanged();
+                    NameCreator = "";
                     creator.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -1241,7 +1395,93 @@ public class MainActivity extends AppCompatActivity {
                     });
 
 
+                } else if (TabNum == 2) {
+                    MeetingFragment.isFilter = true;
+                    setTab = TabController.Tabs.Meeting;
+                    setContentView(R.layout.meeting_filter);
+//                    searchView.setVisibility(View.INVISIBLE);
+                    Date = (EditText) findViewById(R.id.DateFilter);
+//                    description = (EditText) findViewById(R.id.descriptionfilter);
+                    AutoCompleteTextView creator = (AutoCompleteTextView) findViewById(R.id.CreatorFilter);
+                    AutoCompleteTextView secretary = (AutoCompleteTextView) findViewById(R.id.SecretaryFilter);
+
+                    Button Filter_Done = (Button) findViewById(R.id.Filter);
+
+
+                    Cursor c = getContentResolver().query(CONTENT_URI, null, null, null, null);
+                    final String[] Names = new String[c.getCount()];
+//                    Responsible = new String[c.getCount()];
+                    int index = 0;
+                    if (c.moveToFirst()) {
+                        do {
+                            Names[index] = c.getString(1);
+//                            Responsible[index] = c.getString(0);
+                            index++;
+                        } while (c.moveToNext());
+                    }
+                    c.close();
+
+                    final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, Names);
+                    creator.setAdapter(adapter);
+                    creator.setThreshold(1);
+                    adapter.notifyDataSetChanged();
+                    NameCreator = "";
+                    creator.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                            NameCreator = (String) parent.getItemAtPosition(position);
+                        }
+                    });
+
+
+                    final ArrayAdapter<String> ad = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, Names);
+                    secretary.setAdapter(ad);
+                    secretary.setThreshold(1);
+                    ad.notifyDataSetChanged();
+                    NameSecretary = "";
+                    secretary.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                            NameSecretary = (String) parent.getItemAtPosition(position);
+
+                        }
+                    });
+
+
+                    Date.setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View v) {
+                            new DatePickerDialog(MainActivity.this, date, myCalendar
+                                    .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                                    myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                        }
+                    });
+
+
+                    Filter_Done.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String DueDate = Date.getText().toString();
+//                            String body = description.getText().toString();
+
+                            Bundle b = new Bundle();
+//                            b.putString(getString(R.string.Subject), title);
+                            b.putString(getString(R.string.Date), DueDate);
+                            b.putString(getString(R.string.Creator), NameCreator);
+                            b.putString(getString(R.string.Secretary), NameSecretary);
+                            b.putInt("Type", 2);
+
+                            Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                            intent.putExtras(b);
+                            startActivity(intent);
+                        }
+                    });
                 }
+
+
                 invalidateOptionsMenu();
 
                 return true;
@@ -1267,6 +1507,7 @@ public class MainActivity extends AppCompatActivity {
 
         ListView lvno = (ListView) findViewById(R.id.list_messages);
         ListView lvta = (ListView) findViewById(R.id.list_task);
+        ListView lvmt = (ListView) findViewById(R.id.list_meeting);
 
 
         searchView.clearFocus();
@@ -1339,22 +1580,29 @@ public class MainActivity extends AppCompatActivity {
 //            AdaptTa.notifyDataSetChanged();
 //            search = false;
 //        } else
-        if (TaskFragment.isSearch | MessageFragment.isSearch) {
+        if (TaskFragment.isSearch | MessageFragment.isSearch | MeetingFragment.isSearch) {
             TaskFragment.isSearch = false;
             MessageFragment.isSearch = false;
+            MeetingFragment.isSearch = false;
             AdaptNo = MessagesListAdapter.getInstance();
-            lvno.setAdapter(AdaptNo);
+//            lvno.setAdapter(AdaptNo);
             AdaptNo.notifyDataSetChanged();
 
 
             AdaptTa = TasksAdapter.getInstance();
-            lvta.setAdapter(AdaptTa);
+//            lvta.setAdapter(AdaptTa);
             AdaptTa.notifyDataSetChanged();
 
-        } else if (MessageFragment.isFilter | TaskFragment.isFilter) {
+
+            AdaptMt = MeetingAdapter.getInstance();
+//            lvmt.setAdapter(AdaptMt);
+            AdaptMt.notifyDataSetChanged();
+
+        } else if (MessageFragment.isFilter | TaskFragment.isFilter | MeetingFragment.isFilter) {
 
             MessageFragment.isFilter = false;
             TaskFragment.isFilter = false;
+            MeetingFragment.isFilter = false;
             Filter = true;
             setIntent(null);
             Handle(null);

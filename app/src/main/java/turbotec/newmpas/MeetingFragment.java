@@ -18,7 +18,7 @@ public class MeetingFragment extends Fragment {
 
     static boolean isSearch;
     static boolean isFilter;
-    static String Topic = "", Body = "";
+    static String Date = "", NameCreator = "", NameSecretary = "";
     static String query;
 
 
@@ -52,7 +52,7 @@ public class MeetingFragment extends Fragment {
         if (isSearch) {
             MainActivity.AdaptMt = MeetingAdapter.getSearchInstance(query.trim());
         } else if (isFilter) {
-            MainActivity.AdaptMt = MeetingAdapter.Filter(Topic.trim(), Body.trim());
+            MainActivity.AdaptMt = MeetingAdapter.Filter(NameCreator.trim(), NameSecretary.trim(), Date);
         } else {
             MainActivity.AdaptMt = MeetingAdapter.getInstance();
         }

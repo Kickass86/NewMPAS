@@ -56,6 +56,15 @@ public class MessagesListAdapter extends BaseAdapter {
 
     }
 
+    public static MessagesListAdapter getInstance() {
+        if (instance == null) {
+            instance = new MessagesListAdapter(activity.getApplicationContext());
+
+        }
+        Initialize();
+        return instance;
+    }
+
     public static MessagesListAdapter getSearchInstance(Context context, String search) {
         if (instance == null) {
             instance = new MessagesListAdapter(context);
@@ -68,7 +77,8 @@ public class MessagesListAdapter extends BaseAdapter {
         search = "%" + search + "%";
         valid = false;
 
-        cursor = activity.getContentResolver().query(CONTENT_URI1, null, "WillDeleted = ? AND (MessageTitle like ? OR MessageBody like ?)", new String[]{"0", search, search}, null);
+        cursor = activity.getContentResolver().query(CONTENT_URI1, null, "WillDeleted = ? AND (MessageTitle like ? OR MessageBody like ?)",
+                new String[]{"0", search, search}, null);
 
         Populate();
 
@@ -126,15 +136,6 @@ public class MessagesListAdapter extends BaseAdapter {
 
     }
 
-
-    public static MessagesListAdapter getInstance() {
-        if (instance == null) {
-            instance = new MessagesListAdapter(activity.getApplicationContext());
-
-        }
-        Initialize();
-        return instance;
-    }
 
 //    public static MessagesListAdapter getInstance() {
 ////        Initialize();

@@ -284,7 +284,7 @@ public class Task_Edit_Activity extends AppCompatActivity {
                         DueDate = DE.getText().toString();
                         NameResponsible = ResE.getText().toString();
 
-                        if ((Subject.isEmpty()) | (TDescription.isEmpty()) | (DueDate.isEmpty()) | (NameResponsible.isEmpty())) {
+                        if (((Subject.isEmpty()) | (TDescription.isEmpty()) | (DueDate.isEmpty()) | (NameResponsible.isEmpty())) || (NFCB.isChecked()) || (CCB.isChecked())) {
 
                             Bundle bundle = new Bundle();
                             bundle.putString(getString(R.string.What), "Edit");

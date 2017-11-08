@@ -33,6 +33,7 @@ public class SendEdit extends AsyncTask {
     private static final String TASK_Status = "TaskStatus";
     private static final String TASK_Editable = "isEditable";
     private static final String TASK_ReplyAble = "ReplyAble";
+    private static final String SendInsert = "SendInsert";
     private static final String TASK_Deletable = "Deletable";
     private static final String SendDelivered = "SendDelivered";
     private static final String isSeen = "isSeen";
@@ -231,6 +232,7 @@ public class SendEdit extends AsyncTask {
                 values.put(TASK_isCreator, true);
                 values.put(TASK_Deletable, true);
                 values.put(TASK_Editable, true);
+                values.put(SendInsert, false);
                 values.put(SendDelivered, true);
                 values.put(isSeen, true);
 

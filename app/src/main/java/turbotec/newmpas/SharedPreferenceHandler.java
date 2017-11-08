@@ -25,6 +25,7 @@ public class SharedPreferenceHandler {
     }
 
 
+    // Store Part
 
     public void SaveDeviceID(String newDeviceID) {
 
@@ -108,16 +109,14 @@ public class SharedPreferenceHandler {
     }
 
 
-
-
-    public void SaveActivation(String Activated) {
-
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(context.getString(R.string.Activation), Activated);
-        editor.apply();
-
-    }
+//    public void SaveActivation(String Activated) {
+//
+//        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPref.edit();
+//        editor.putString(context.getString(R.string.Activation), Activated);
+//        editor.apply();
+//
+//    }
 
 
 //    public void SaveUserID(String userID) {
@@ -166,14 +165,6 @@ public class SharedPreferenceHandler {
     }
 
 
-    public int GetLastCheckHour() {
-
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
-        return sharedPref.getInt(context.getString(R.string.LastCheckHour), 0);
-
-    }
-
-
     public void SaveLastCheckDay(int time) {
 
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
@@ -182,6 +173,19 @@ public class SharedPreferenceHandler {
         editor.apply();
 
     }
+
+
+    // Retrieve Part
+
+    public int GetLastCheckHour() {
+
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
+        return sharedPref.getInt(context.getString(R.string.LastCheckHour), 0);
+
+    }
+
+
+
 
 
     public boolean GetChange() {
@@ -255,12 +259,12 @@ public class SharedPreferenceHandler {
 //
 //    }
 
-    public String GetActivation() {
-
-        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
-        return sharedPref.getString(context.getString(R.string.Activation), context.getString(R.string.NotActive));
-
-    }
+//    public String GetActivation() {
+//
+//        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.PREFERENCE_FILE), Context.MODE_PRIVATE);
+//        return sharedPref.getString(context.getString(R.string.Activation), context.getString(R.string.NotActive));
+//
+//    }
 
 
 

@@ -42,16 +42,17 @@ public class Message_Detail_Activity extends AppCompatActivity {
 //    private static DatabaseHandler db;
     //    private final Context main_menu;
     //    SQLiteDatabase database;
-    private final String ip = "192.168.1.13";
-    private final int port = 80;
-    private SharedPreferenceHandler share;
+    private static final String ip = "192.168.1.13";
+    private static final int port = 80;
+    //            String Link;
+    static GetLink n;
+    private static SharedPreferenceHandler share;
     private Intent starterIntent;
     private String Link;
     private Button DelBut;
     private Integer ID = 1;
     private String Title;
     private String Body;
-    //            String Link;
     private Boolean Critical;
     private Boolean isSeen;
     private Boolean isSendSeen = false;
@@ -66,164 +67,55 @@ public class Message_Detail_Activity extends AppCompatActivity {
 
         share = SharedPreferenceHandler.getInstance(this);
 
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-            Bundle b = getIntent().getExtras();
+        Bundle b = getIntent().getExtras();
 
-            starterIntent = getIntent();
+        starterIntent = getIntent();
 
-            if (b != null) {
-                Title = b.getString(getString(R.string.Title));
-                Body = b.getString(getString(R.string.Body));
-                Critical = b.getBoolean(getString(R.string.Critical));
-                isSeen = b.getBoolean(getString(R.string.Seen));
-                isSendSeen = b.getBoolean(getString(R.string.SendSeen));
-                Link = b.getString(getString(R.string.Link));
-                ID = b.getInt(getString(R.string.ID));
+        if (b != null) {
+            Title = b.getString(getString(R.string.Title));
+            Body = b.getString(getString(R.string.Body));
+            Critical = b.getBoolean(getString(R.string.Critical));
+            isSeen = b.getBoolean(getString(R.string.Seen));
+            isSendSeen = b.getBoolean(getString(R.string.SendSeen));
+            Link = b.getString(getString(R.string.Link));
+            ID = b.getInt(getString(R.string.ID));
 
 
-                TextView t1 = (TextView) findViewById(R.id.titledetail2);
-                TextView t2 = (TextView) findViewById(R.id.bodydetail2);
-                TextView t3 = (TextView) findViewById(R.id.link);
-                ImageView i1 = (ImageView) findViewById(R.id.statedetail2);
-                ImageView i2 = (ImageView) findViewById(R.id.Critical2);
+            TextView t1 = (TextView) findViewById(R.id.titledetail2);
+            TextView t2 = (TextView) findViewById(R.id.bodydetail2);
+            TextView t3 = (TextView) findViewById(R.id.link);
+            ImageView i1 = (ImageView) findViewById(R.id.statedetail2);
+            ImageView i2 = (ImageView) findViewById(R.id.Critical2);
 
-                t1.setText(Title);
-                t2.setText(Body);
+            t1.setText(Title);
+            t2.setText(Body);
 //                t3.setText(Link);
-                t3.setText(Html.fromHtml("<u> Click Here </u>"));
-                t3.setOnClickListener(new View.OnClickListener() {
+            t3.setText(Html.fromHtml("<u> Click Here </u>"));
+            t3.setOnClickListener(new View.OnClickListener() {
 
-                    @Override
-                    public void onClick(View v) {
+                @Override
+                public void onClick(View v) {
 
-                        v.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.SelectColor1));
-                        setContentView(R.layout.waiting_layout);
-                        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                    v.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.SelectColor1));
+                    setContentView(R.layout.waiting_layout);
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
-                        AsyncTask n = new AsyncTask() {
+                    n = new GetLink();
+                    n.execute();
 
-                            String responseMessage;
-                            boolean exists = false;
-
-                            @Override
-                            protected Object doInBackground(Object[] params) {
-
-                                String requestString;
-                                URL url;
-
-                                try {
-                                    SocketAddress sockaddr = new InetSocketAddress(ip, port);
-                                    // Create an unbound socket
-                                    Socket sock = new Socket();
-
-                                    // This method will block no more than timeoutMs.
-                                    // If the timeout occurs, SocketTimeoutException is thrown.
-                                    int timeoutMs = 1000;   // 200 milliseconds
-                                    sock.connect(sockaddr, timeoutMs);
-                                    exists = true;
-
-                                    sock.close();
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                //TODO GetLinkRequest
-
-//                                return exists;
-
-
-                                if (exists) {
-                                    requestString = "http://192.168.1.13/Andr/GetLinkRequest.ashx?Value=";
-                                } else {
-                                    requestString = "https://mpas.migtco.com:3000/Andr/GetLinkRequest.ashx?Value=";
-                                }
-
-//        String requestString = intent.getStringExtra(REQUEST_STRING);
-                                Log.v("Intent Service", "Check Request");
-
-
-                                try {
-
-
-                                    String value = "Val1=" + share.GetDeviceID() + ",Val2=" + share.GetToken() + ",Val3=1";
-                                    requestString = requestString + new String(Base64.encode(value.getBytes("UTF-8"), Base64.DEFAULT));
-                                    requestString = requestString.replaceAll("\n", "");
-
-
-                                    url = new URL(requestString);
-                                    HttpURLConnection c = (HttpURLConnection) url.openConnection();
-                                    c.setRequestMethod("GET");
-                                    c.connect();
-
-                                    int code = c.getResponseCode();
-                                    String s = "";
-                                    if (code == 200) {
-
-                                        final InputStream is = c.getInputStream();
-
-                                        if (is != null) {
-                                            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
-                                            String line;
-
-                                            while ((line = bufferedReader.readLine()) != null)
-                                                s += line;
-                                            is.close();
-                                        }
-
-                                    }
-                                    c.disconnect();
-                                    if (!(s.contains("Invalid") | s.contains("Error") | s.contains("Unable") | (s.contains("unexpected")))) {
-
-                                        responseMessage = s;
-                                    } else {
-                                        responseMessage = "";
-                                    }
-
-
-                                } catch (Exception e) {
-                                    Log.w("HTTP:", e);
-                                    responseMessage = "";
-                                }
-
-
-                                return responseMessage;
-
-                            }
-
-                            @Override
-                            protected void onPostExecute(Object o) {
-
-                                finish();
-                                startActivity(starterIntent);
-
-                                if (exists) {
-                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://192.168.1.13/" + responseMessage));
-                                    startActivity(browserIntent);
-                                } else {
-                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://mpas.migtco.com:3000/" + responseMessage));
-                                    startActivity(browserIntent);
-                                }
-
-                                super.onPostExecute(o);
-                            }
-
-
-                        };
-
-                        n.execute();
-
-                    }
-                });
+                }
+            });
 
 //                t3.setText(Html.fromHtml(" <a href=" + Link +">Click Here</a> "));
 //                t3.setMovementMethod(LinkMovementMethod.getInstance());
-                i1.setImageResource(R.mipmap.ic_done_all_black_24dp);
-                if (Critical) {
-                    i2.setImageResource(R.mipmap.ic_priority_high_black_24dp);
-                }
-                if (!isSeen) {
+            i1.setImageResource(R.mipmap.ic_done_all_black_24dp);
+            if (Critical) {
+                i2.setImageResource(R.mipmap.ic_priority_high_black_24dp);
+            }
+            if (!isSeen) {
 
 //                Intent in = new Intent(this, SaveState.class);
 //                startService(in);
@@ -234,10 +126,10 @@ public class Message_Detail_Activity extends AppCompatActivity {
 
 //                        SQLiteDatabase database = db.getWritableDatabase();
 
-                    ContentValues values = new ContentValues();
-                    values.put("Seen", true);
+                ContentValues values = new ContentValues();
+                values.put("Seen", true);
 
-                    getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{String.valueOf(ID)});
+                getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{String.valueOf(ID)});
 
 
 //                        }
@@ -246,54 +138,54 @@ public class Message_Detail_Activity extends AppCompatActivity {
 //                    }).start();
 
 
-                }
             }
+        }
 
 
-            if (!isSendSeen) {
-                int z = 3;
-                String[] data = new String[]{z + "", "1", String.valueOf(ID)};
+        if (!isSendSeen) {
+            int z = 3;
+            String[] data = new String[]{z + "", "1", String.valueOf(ID)};
 
-                SendStatusAsyncTask taskstate = new SendStatusAsyncTask(this);
+            SendStatusAsyncTask taskstate = new SendStatusAsyncTask(this);
 
-                taskstate.execute(data);
+            taskstate.execute(data);
+        }
+        DelBut = (Button) findViewById(R.id.button2);
+
+        DelBut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Message_Detail_Activity.this);
+
+                alertDialogBuilder.setPositiveButton("Yes",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+
+                                getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{String.valueOf(ID)});
+
+                                finish();
+
+                            }
+                        })
+                        .setNegativeButton("No",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        dialog.cancel();
+
+                                    }
+                                })
+                        .setMessage(R.string.dialog_message)
+                        .setTitle(R.string.Delete_Button);
+                AlertDialog adialog = alertDialogBuilder.create();
+                adialog.show();
+
+
             }
-            DelBut = (Button) findViewById(R.id.button2);
-
-            DelBut.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Message_Detail_Activity.this);
-
-                    alertDialogBuilder.setPositiveButton("Yes",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-
-
-                                    getContentResolver().delete(CONTENT_URI1, "_id  = ?", new String[]{String.valueOf(ID)});
-
-                                    finish();
-
-                                }
-                            })
-                            .setNegativeButton("No",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-
-                                            dialog.cancel();
-
-                                        }
-                                    })
-                            .setMessage(R.string.dialog_message)
-                            .setTitle(R.string.Delete_Button);
-                    AlertDialog adialog = alertDialogBuilder.create();
-                    adialog.show();
-
-
-                }
-            });
+        });
 
 
     }
@@ -308,6 +200,123 @@ public class Message_Detail_Activity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
+    public class GetLink extends AsyncTask {
+
+        String responseMessage;
+        boolean exists = false;
+
+
+        public GetLink() {
+
+        }
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+
+            String requestString;
+            URL url;
+
+            try {
+                SocketAddress sockaddr = new InetSocketAddress(ip, port);
+                // Create an unbound socket
+                Socket sock = new Socket();
+
+                // This method will block no more than timeoutMs.
+                // If the timeout occurs, SocketTimeoutException is thrown.
+                int timeoutMs = 1000;   // 200 milliseconds
+                sock.connect(sockaddr, timeoutMs);
+                exists = true;
+
+                sock.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            // GetLinkRequest
+
+//                                return exists;
+
+
+            if (exists) {
+                requestString = "http://192.168.1.13/Andr/GetLinkRequest.ashx?Value=";
+            } else {
+                requestString = "https://mpas.migtco.com:3000/Andr/GetLinkRequest.ashx?Value=";
+            }
+
+//        String requestString = intent.getStringExtra(REQUEST_STRING);
+            Log.v("Intent Service", "Check Request");
+
+
+            try {
+
+
+                String value = "Val1=" + share.GetDeviceID() + ",Val2=" + share.GetToken() + ",Val3=1";
+                requestString = requestString + new String(Base64.encode(value.getBytes("UTF-8"), Base64.DEFAULT));
+                requestString = requestString.replaceAll("\n", "");
+
+
+                url = new URL(requestString);
+                HttpURLConnection c = (HttpURLConnection) url.openConnection();
+                c.setRequestMethod("GET");
+                c.connect();
+
+                int code = c.getResponseCode();
+                String s = "";
+                if (code == 200) {
+
+                    final InputStream is = c.getInputStream();
+
+                    if (is != null) {
+                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+                        String line;
+
+                        while ((line = bufferedReader.readLine()) != null)
+                            s += line;
+                        is.close();
+                    }
+
+                }
+                c.disconnect();
+                if (!(s.contains("Invalid") | s.contains("Error") | s.contains("Unable") | (s.contains("unexpected")))) {
+
+                    responseMessage = s;
+                } else {
+                    responseMessage = "";
+                }
+
+
+            } catch (Exception e) {
+                Log.w("HTTP:", e);
+                responseMessage = "";
+            }
+
+
+            return responseMessage;
+
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+
+            finish();
+            startActivity(starterIntent);
+
+            if (exists) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://192.168.1.13/" + responseMessage));
+                startActivity(browserIntent);
+            } else {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://mpas.migtco.com:3000/" + responseMessage));
+                startActivity(browserIntent);
+            }
+
+            super.onPostExecute(o);
+        }
+
+
+    }
+
 
 
 

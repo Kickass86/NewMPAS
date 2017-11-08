@@ -30,15 +30,15 @@ public class MyProvider extends ContentProvider {
     static final int TasksT = 4;
     static final int User = 5;
     static final int Meeting = 6;
-    //    static final int MID = 5;
-    // Table Name
+    // Table Names
     static final String TABLE_USER = "USERS";
     static final String TABLE_MESSAGES = "MESSAGES";
     static final String TABLE_TASKS = "TASKS";
     static final String TABLE_MEETING = "MEETING";
-    //    static final int TID = 6;
     static final UriMatcher uriMatcher;
-
+    // Database Name
+    private static final String DATABASE_NAME = "MPAS";
+    // Table Meeting
     private static final String MEETING_ID = "_id";
     private static final String MEETING_TOPIC = "TOPIC";
     private static final String MEETING_CREATOR = "CREATOR";
@@ -68,7 +68,7 @@ public class MyProvider extends ContentProvider {
                     + SendDelivered + " Boolean," + EVENT_INSERT + " Boolean)";
 
 
-
+    // Table User
     private static final String USER_ID = "_id";
     private static final String USER_NAME = "Name";
 
@@ -76,6 +76,8 @@ public class MyProvider extends ContentProvider {
             "CREATE TABLE " + TABLE_USER + "(" + USER_ID + " TEXT PRIMARY KEY,"
                     + USER_NAME + " TEXT)";
 
+
+    // Table Message
     private static final String MESSAGE_ID = "_id";
     private static final String MESSAGE_Title = "MessageTitle";
     private static final String MESSAGE_BODY = "MessageBody";
@@ -95,6 +97,8 @@ public class MyProvider extends ContentProvider {
                     + SendDelivered + " Boolean," + SendSeen + " Boolean, "
                     + WillDeleted + " Boolean, " + Link + " TEXT)";
 
+
+    // Table Task
     private static final String TASK_ID = "_id";
     private static final String TASK_Title = "TaskTitle";
     private static final String Task_Description = "TaskDescription";
@@ -119,7 +123,7 @@ public class MyProvider extends ContentProvider {
                     + TASK_isResponsible + " Boolean," + SendInsert + " Boolean,"
                     + TASK_NameResponsible + " TEXT)";
 
-    private static final String DATABASE_NAME = "MPAS";
+
 //    private static HashMap<String, String> MESSAGES_PROJECTION_MAP;
 
     static {

@@ -409,12 +409,6 @@ public class SyncService extends IntentService {
 //                startActivity(i);
 //                mNotificationManager.cancelAll();
 //            }
-//            if ((isCritical) & (!isAppForeground(MyContext))) {
-//                Intent i = new Intent(MyContext, MainActivity.class);
-//                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-//                startActivity(i);
-//                mNotificationManager.cancelAll();
-//            }
 //        }else{
 //            Intent i = new Intent(MyContext, LoginActivity.class);
 //            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -504,7 +498,7 @@ public class SyncService extends IntentService {
 
 
                                 values.put(SendDelivered, true);
-                                values.put(SendInsert, true);
+                                values.put(SendInsert, false);
 
 
                                 MyContext.getContentResolver().insert(CONTENT_URI1, values);
@@ -512,7 +506,7 @@ public class SyncService extends IntentService {
                             } else {
 
 
-                                values.put(SendDelivered, false);
+                                values.put(SendInsert, true);
 
                                 MyContext.getContentResolver().update(CONTENT_URI1, values, "_id  = ?", new String[]{TID});
                             }
@@ -679,6 +673,10 @@ public class SyncService extends IntentService {
 //                        database.update("Messages", values, "MessageID  = ?", new String[]{MID});
                     getContentResolver().update(CONTENT_URI3, values, "_id  = ?", new String[]{TID});
                 }
+                String[] SID = SIDs.split(";");
+                for (String sid : SID) {
+                    getContentResolver().update(CONTENT_URI5, values, "_id  = ?", new String[]{String.valueOf(sid)});
+                }
 
                 values.put("SendSeen", true);
 
@@ -766,7 +764,7 @@ public class SyncService extends IntentService {
                         values.put(TASK_isResponsible, TisResponsible);
                         values.put(TASK_NameResponsible, TNameResponsible);
                         values.put(SendInsert, false);
-                        values.put(SendDelivered, true);
+                        values.put(SendDelivered, false);
                         values.put(Report, TReport);
                         values.put(isSeen, false);
 
@@ -937,6 +935,20 @@ public class SyncService extends IntentService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+                Intent i = new Intent(MyContext, MainActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString(MyContext.getString(R.string.Title), MessageTitle);
+                bundle.putString(MyContext.getString(R.string.Body), MessageBody);
+                bundle.putString(getString(R.string.Link), Link);
+                bundle.putBoolean(MyContext.getString(R.string.Critical), isCritical);
+                bundle.putBoolean(MyContext.getString(R.string.SendSeen), SendSeen);
+                bundle.putInt(MyContext.getString(R.string.ID), MessageID);
+                bundle.putBoolean(MyContext.getString(R.string.Seen), Seen);
+                bundle.putInt("Type", 0);
+                i.putExtras(bundle);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivity(i);
 
 
             } else {

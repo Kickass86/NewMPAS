@@ -147,6 +147,9 @@ public class MainActivity extends AppCompatActivity {
 //                        lvta.setAdapter(ad);
                     AdaptTa = TasksAdapter.getInstance();
                     AdaptTa.notifyDataSetChanged();
+
+                    AdaptMt = MeetingAdapter.getInstance();
+                    AdaptMt.notifyDataSetChanged();
 //                    }
                     Log.i("is this ", "BroadcastReceiver");
                     share.SaveChange(false);
@@ -677,6 +680,21 @@ public class MainActivity extends AppCompatActivity {
                 AdaptTa.notifyDataSetChanged();
                 lvta.setSelection(Scroll_Position);
                 Gone = false;
+            } else if ((tabLayout.getSelectedTabPosition() == 2)) {
+
+//                TasksAdapter ad = TasksAdapter.getInstance(this);
+                if (MeetingFragment.isSearch)
+                    AdaptMt = MeetingAdapter.getSearchInstance(MeetingFragment.query.trim());
+                else if (MeetingFragment.isFilter)
+                    AdaptMt = MeetingAdapter.Filter(MeetingFragment.NameCreator, MeetingFragment.NameSecretary, MeetingFragment.Date);
+                else
+                    AdaptMt = MeetingAdapter.getInstance();
+//                AdaptTa = TasksAdapter.getInstance();
+//                lvta.setAdapter(AdaptMt);
+
+                AdaptMt.notifyDataSetChanged();
+                lvta.setSelection(Scroll_Position);
+                Gone = false;
             }
 
             if (item_search != null) {
@@ -866,7 +884,7 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        if (MessageFragment.isFilter | TaskFragment.isFilter) {
+        if (MessageFragment.isFilter | TaskFragment.isFilter | MeetingFragment.isFilter) {
             item_search.setVisible(false);
             item_filter.setVisible(false);
             searchView.setVisibility(View.GONE);
@@ -1113,7 +1131,7 @@ public class MainActivity extends AppCompatActivity {
                 MarkAll();
                 return true;
             case R.id.action_settings:
-                Toast.makeText(this, "Info about MPAS", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Have fun with MPAS", Toast.LENGTH_SHORT).show();
                 return true;
             case 10000:
 //                Filter = false;
@@ -1287,7 +1305,9 @@ public class MainActivity extends AppCompatActivity {
 //                searchView.setEnabled(false);
 //                searchView.setVisibility(View.INVISIBLE);
 //                invalidateOptionsMenu();
-                getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(false);
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(false);
+                }
                 GetUserList userList = new GetUserList(getBaseContext());
                 userList.execute();
                 if (TabNum == 0) {
